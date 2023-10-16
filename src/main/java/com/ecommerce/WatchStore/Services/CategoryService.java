@@ -17,21 +17,33 @@ public class CategoryService {
     public List<Category> getAllCategory(){
         return categoryRepository.findAll();
     }
+
     public Optional<Category> getCategoryById(Long id){
         return categoryRepository.findById(id);
     }
-    public Category saveCategory(Category category){
-        return categoryRepository.save(category);
+
+    public Category saveCategory(Category newCategory){
+        Optional<Category> existingCategory = categoryRepository.findCategoryByName(newCategory.getName());
+        if (existingCategory.isPresent()) {
+            throw new RuntimeException("Tên danh mục đã tồn tại.");
+        }
+        else{
+            return categoryRepository.save(newCategory);
+        }
     }
-    public Category updateCategory(Category updatedCategory){
-        Optional<Category> existingCategoryOptional = categoryRepository.findById(updatedCategory.getIdBrand());
+
+    public Category updateCategory(Long id,Category updatedCategory){
+        Optional<Category> existingCategoryOptional = categoryRepository.findById(id);
         if(existingCategoryOptional.isPresent()){
             Category existingCategory = existingCategoryOptional.get();
             existingCategory.setName(updatedCategory.getName());
+            existingCategory.setUpdatedDt(updatedCategory.getUpdatedDt());
+            existingCategory.setUpdatedBy(updatedCategory.getUpdatedBy());
+
             return categoryRepository.save(existingCategory);
         }else
         {
-            throw  new RuntimeException("Không tìm thấy danh mục với ID: " + updatedCategory.getIdBrand());
+            throw  new RuntimeException("Không tìm thấy danh mục với ID: " + updatedCategory.getIdCategory());
         }
     }
     public void deleteCategory(Long id){

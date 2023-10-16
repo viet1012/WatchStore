@@ -2,6 +2,8 @@ package com.ecommerce.WatchStore.Entities;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import java.util.Date;
 
 @Entity (name = "product_models")
@@ -47,7 +49,7 @@ public class Product {
 
     @Column(name = "updated_by")
     private String updatedBy;
-    @CreationTimestamp
+    @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_dt")
     private Date updatedDate;

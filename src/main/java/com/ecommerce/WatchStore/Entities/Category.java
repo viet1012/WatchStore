@@ -2,6 +2,8 @@ package com.ecommerce.WatchStore.Entities;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import java.util.Date;
 
 @Entity (name = "category_models")
@@ -9,7 +11,7 @@ public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long idBrand;
+    private Long id;
     @Column(name = "name")
     private String name;
     @CreationTimestamp
@@ -20,7 +22,7 @@ public class Category {
     private String createdBy;
     @Column(name = "updated_by")
     private String updatedBy;
-    @CreationTimestamp
+    @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_dt")
     private Date updatedDt;
@@ -29,12 +31,12 @@ public class Category {
     private boolean active;
 
 
-    public Long getIdBrand() {
-        return idBrand;
+    public Long getIdCategory() {
+        return id;
     }
 
-    public void setIdBrand(Long idBrand) {
-        this.idBrand = idBrand;
+    public void setIdCategory(Long id) {
+        this.id = id;
     }
 
     public String getName() {

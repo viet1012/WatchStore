@@ -20,8 +20,9 @@ public class BrandController {
         List<Brand> brands = brandService.getAllBrands();
         return ResponseEntity.ok(brands);
     }
+
     @GetMapping("/{id}")
-    public  ResponseEntity<Brand> getBrandById(@PathVariable Long id){
+    public  ResponseEntity<Brand> getBrandById(@PathVariable int id){
         Optional<Brand> brand = brandService.getBrandById(id);
         if(brand.isPresent()){
             return  ResponseEntity.ok(brand.get());
@@ -30,6 +31,7 @@ public class BrandController {
             return ResponseEntity.notFound().build();
         }
     }
+
     @PostMapping("/createBrand")
     public  ResponseEntity<Brand> createBrand(@RequestBody BrandDTO brand){
         Brand savedBrand = brandService.saveBrand(brand);
@@ -37,7 +39,7 @@ public class BrandController {
     }
 
     @PutMapping("/updateBrand/{id}")
-    public ResponseEntity<Brand> updateBrand(@PathVariable Long id, @RequestBody Brand updateBrand){
+    public ResponseEntity<Brand> updateBrand(@PathVariable int id, @RequestBody Brand updateBrand){
        try{
            updateBrand.setIdBrand(id);
            Brand brand = brandService.updateBrand(updateBrand, id);
@@ -47,7 +49,7 @@ public class BrandController {
        }
     }
     @DeleteMapping("/deleteBrand/{id}")
-    public ResponseEntity<Void> deleteBrandById(@PathVariable Long id){
+    public ResponseEntity<Void> deleteBrandById(@PathVariable int id){
         brandService.deleteBrandById(id);
         return ResponseEntity.noContent().build();
     }
