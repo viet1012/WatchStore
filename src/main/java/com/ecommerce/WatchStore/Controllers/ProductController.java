@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
@@ -25,17 +26,20 @@ public class ProductController {
         List<Product> products =  productService.getAllProduct();
         return ResponseEntity.ok(products);
     }
-    @PostMapping("/createProduct")
-    public ResponseEntity<Product> createProduct(@RequestBody Product product,@RequestParam int brandId, @RequestParam long categoryId ){
-        try{
-            Product saveProduct = productService.createProduct(product, brandId,categoryId );
-            return ResponseEntity.status(HttpStatus.CREATED).body(saveProduct);
-        }catch (BrandNotFoundException e   ){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+
+    @PostMapping(value = "/createProduct",  consumes = "multipart/form-data")
+    public ResponseEntity<Product> createProduct(
+            @RequestParam("brandId") int brandId,
+            @RequestParam("categoryId") long categoryId,
+            @RequestParam("imageFile") MultipartFile imageFile,
+            @ModelAttribute Product product) {
+        Product createdProduct = productService.createProduct(product, brandId, categoryId, imageFile);
+        return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
     }
-    @PutMapping("/updateProduct/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody Product updatedProduct, @RequestParam Long idBrand) {
+
+
+    @PutMapping(value = "/updateProduct/{id}",  consumes = "multipart/form-data" )
+    public ResponseEntity<?> updateProduct(@PathVariable Long id, @ModelAttribute Product updatedProduct, @RequestParam Long idBrand) {
         try {
             Product product = productService.updateProduct(id, updatedProduct, idBrand);
             return ResponseEntity.ok(product);

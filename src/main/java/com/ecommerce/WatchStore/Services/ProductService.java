@@ -11,9 +11,13 @@ import com.ecommerce.WatchStore.Repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.print.Pageable;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,23 +31,32 @@ public class ProductService {
     private CategoryRepository categoryRepository;
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private FileStorageService fileStorageService;
+
     public Optional<Brand> getBrandByProduct(Product product){
         return brandService.getBrandById(product.getBrand().getIdBrand());
     }
     public List<Product> getAllProduct(){
         return productRepository.findAll();
     }
-//    public Optional<Product> getProductById(Long id){
-//        return productRepository.findById(id);
-//    }
-    public Product createProduct(Product product, int brandId, long categoryID){
+
+
+    public Product createProduct(Product product, int brandId, long categoryId, MultipartFile file) {
         if (productRepository.existsByProductName(product.getProductName())) {
             throw new ProductNotFoundException("Sản phẩm đã tồn tại với tên: " + product.getProductName());
         }
-        Optional<Brand> brandOptional   = brandRepository.findById(brandId);
-        Optional<Category> categoryOptional   = categoryRepository.findById(categoryID);
+        Optional<Brand> brandOptional = brandRepository.findById(brandId);
+        Optional<Category> categoryOptional = categoryRepository.findById(categoryId);
+        String fileName = fileStorageService.storeFile(file);
 
-        if(brandOptional .isPresent() && categoryOptional.isPresent()){
+        if (fileName != null) {
+            new RuntimeException("File uploaded successfully. Stored as: " + fileName);
+        } else {
+             new RuntimeException("Failed to upload file.");
+        }
+
+        if (brandOptional.isPresent() && categoryOptional.isPresent()) {
             Brand brand = brandOptional.get();
             Category category = categoryOptional.get();
             Product newProduct = new Product();
@@ -53,24 +66,24 @@ public class ProductService {
             newProduct.setCreatedBy(product.getCreatedBy());
             newProduct.setProductName(product.getProductName());
             newProduct.setPrice(product.getPrice());
-            newProduct.setCreatedDate(product.getCreatedDate());
-            newProduct.setImg(product.getImg());
             newProduct.setQuantity(product.getQuantity());
+            newProduct.setImg(fileName);
             return productRepository.save(newProduct);
-        }
-        else {
+        } else {
             throw new BrandNotFoundException("Không tìm thấy thương hiệu với ID: " + brandId);
         }
     }
+
+
     public void deleteProduct(Long id){
         productRepository.deleteById(id);
     }
-    public Product updateProduct(Long productId,Product updatedProduct, Long brandId ){
+    public Product updateProduct(Long productId,Product updatedProduct, Long brandId, MultipartFile updateImage ){
         Optional<Product> existingProductOptional = productRepository.findById(productId);
         if(existingProductOptional.isPresent()){
             Product existingProduct = existingProductOptional.get();
             existingProduct.setProductName(updatedProduct.getProductName());
-            existingProduct.setImg(updatedProduct.getImg());
+          //  existingProduct.setImg(updatedProduct.getImg());
             existingProduct.setPrice(updatedProduct.getPrice());
             existingProduct.setQuantity(updatedProduct.getQuantity());
             // kiem tra brand có tồn tại hay không

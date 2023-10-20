@@ -30,9 +30,9 @@ public class BillController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Bill> createBill(@RequestBody BillDTO billRequest, @RequestParam Long userId) {
+    public ResponseEntity<Bill> createBill(@RequestBody BillDTO billRequest, @RequestParam Long userId, @RequestParam Long voucherId) {
 
-        Bill savedBill =  billService.createBill(billRequest, userId);
+        Bill savedBill =  billService.createBill(billRequest, userId, voucherId);
         return  ResponseEntity.status(HttpStatus.CREATED).body(savedBill);
     }
 

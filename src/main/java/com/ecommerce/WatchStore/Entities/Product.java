@@ -19,6 +19,10 @@ public class Product {
     @Column(name = "img")
     private String img;
 
+
+    // Getter và Setter cho trường image
+
+
     @Column(name = "price")
     private float price;
 
@@ -32,7 +36,6 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Category category;
-
 
     @Column(name = "material_id")
     private Long materialId;

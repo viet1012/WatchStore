@@ -4,8 +4,10 @@ import com.ecommerce.WatchStore.DTO.BillDTO;
 import com.ecommerce.WatchStore.Entities.Bill;
 import com.ecommerce.WatchStore.Entities.BillDetail;
 import com.ecommerce.WatchStore.Entities.User;
+import com.ecommerce.WatchStore.Entities.Voucher;
 import com.ecommerce.WatchStore.Repositories.BillRepository;
 import com.ecommerce.WatchStore.Repositories.UserRepository;
+import com.ecommerce.WatchStore.Repositories.VoucherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -19,7 +21,16 @@ public class BillService {
     private BillRepository billRepository;
     @Autowired
     private UserRepository userRepository;
-    public Bill createBill(BillDTO bill, Long userId) {
+    @Autowired
+    private VoucherRepository voucherRepository;
+    @Autowired
+    private VoucherService voucherService;
+    
+    public Bill createBill(BillDTO bill, Long userId, Long voucherId) {
+
+        Optional<Voucher> voucherOptional = voucherRepository.findById(voucherId);
+        Voucher voucher = voucherOptional.get();
+        float newPrice = voucherService.applyVoucherDiscount(bill , voucher);
 
         Optional<User> userOptional = userRepository.findById(userId);
         if( userOptional.isPresent())
@@ -29,10 +40,14 @@ public class BillService {
             Bill newBill = new Bill();
             newBill.setUser(user);
             newBill.setDeliverAddress(bill.getDeliverAddress());
-            newBill.setTotalPrice(bill.getTotalPrice());
+           // newBill.setTotalPrice(bill.getTotalPrice());
+
+            newBill.setTotalPrice(newPrice);
+
             newBill.setCreatedBy(bill.getCreatedBy());
             newBill.setActive(true);
             newBill.setCreatedDate(bill.getCreateDate());
+
             return billRepository.save(newBill);
 
         }

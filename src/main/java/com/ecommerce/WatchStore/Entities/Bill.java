@@ -25,9 +25,9 @@ public class Bill {
     @JoinColumn(name = "user_id")
     private User user;
 
-//    @ManyToOne
-//    @JoinColumn(name = "voucher_id")
-//    private Voucher voucher;
+    @ManyToOne
+    @JoinColumn(name = "voucher_id")
+    private Voucher voucher;
 
     @Column(name = "created_by")
     private String createdBy;

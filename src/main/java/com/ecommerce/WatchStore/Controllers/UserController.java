@@ -32,4 +32,9 @@ public class UserController {
             User newUser = userService.createUser(userDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
+    @PutMapping("/update")
+    public ResponseEntity<User> updateUser(@RequestBody User user, @RequestParam Long userId) {
+        User updatedUser = userService.updateUser(user, userId);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedUser);
+    }
 }
