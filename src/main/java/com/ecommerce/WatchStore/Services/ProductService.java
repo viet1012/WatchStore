@@ -34,6 +34,21 @@ public class ProductService {
     @Autowired
     private FileStorageService fileStorageService;
 
+
+    private String formatFileNames(List<MultipartFile> imageFiles) {
+        StringBuilder imageFileNames = new StringBuilder();
+        for (MultipartFile imageFile : imageFiles) {
+            String fileName = fileStorageService.storeFile(imageFile);
+            if (fileName != null) {
+                if (imageFileNames.length() > 0) {
+                    imageFileNames.append(", ");
+                }
+                imageFileNames.append(fileName);
+            }
+        }
+        return imageFileNames.toString();
+    }
+
     public Optional<Brand> getBrandByProduct(Product product){
         return brandService.getBrandById(product.getBrand().getIdBrand());
     }
@@ -42,19 +57,12 @@ public class ProductService {
     }
 
 
-    public Product createProduct(Product product, int brandId, long categoryId, MultipartFile file) {
+    public Product createProduct(Product product, int brandId, long categoryId, List<MultipartFile> imageFiles ) {
         if (productRepository.existsByProductName(product.getProductName())) {
             throw new ProductNotFoundException("Sản phẩm đã tồn tại với tên: " + product.getProductName());
         }
         Optional<Brand> brandOptional = brandRepository.findById(brandId);
         Optional<Category> categoryOptional = categoryRepository.findById(categoryId);
-        String fileName = fileStorageService.storeFile(file);
-
-        if (fileName != null) {
-            new RuntimeException("File uploaded successfully. Stored as: " + fileName);
-        } else {
-             new RuntimeException("Failed to upload file.");
-        }
 
         if (brandOptional.isPresent() && categoryOptional.isPresent()) {
             Brand brand = brandOptional.get();
@@ -67,7 +75,7 @@ public class ProductService {
             newProduct.setProductName(product.getProductName());
             newProduct.setPrice(product.getPrice());
             newProduct.setQuantity(product.getQuantity());
-            newProduct.setImg(fileName);
+            newProduct.setImg(formatFileNames(imageFiles));
             return productRepository.save(newProduct);
         } else {
             throw new BrandNotFoundException("Không tìm thấy thương hiệu với ID: " + brandId);
@@ -78,28 +86,31 @@ public class ProductService {
     public void deleteProduct(Long id){
         productRepository.deleteById(id);
     }
-    public Product updateProduct(Long productId,Product updatedProduct, Long brandId, MultipartFile updateImage ){
+
+    public Product updateProduct(Long productId,Product updatedProduct, Long brandId, List<MultipartFile> updateImage ) {
         Optional<Product> existingProductOptional = productRepository.findById(productId);
-        if(existingProductOptional.isPresent()){
+
+        if (existingProductOptional.isPresent()) {
             Product existingProduct = existingProductOptional.get();
             existingProduct.setProductName(updatedProduct.getProductName());
-          //  existingProduct.setImg(updatedProduct.getImg());
+            existingProduct.setImg(updatedProduct.getImg());
+            existingProduct.setImg( formatFileNames(updateImage));
             existingProduct.setPrice(updatedProduct.getPrice());
             existingProduct.setQuantity(updatedProduct.getQuantity());
             // kiem tra brand có tồn tại hay không
             Optional<Brand> optionalBrand = brandRepository.findById(Math.toIntExact(brandId));
-            if(optionalBrand.isPresent()){
+            if (optionalBrand.isPresent()) {
                 Brand brand = optionalBrand.get();
                 existingProduct.setBrand(brand);
-            }else {
+            } else {
                 throw new BrandNotFoundException("Không tìm thấy thương hiệu với ID: " + brandId);
             }
-           return productRepository.save(existingProduct);
-        }else {
+            return productRepository.save(existingProduct);
+        } else {
             throw new ProductNotFoundException("Không tìm thấy sản phẩm với ID: " + productId);
         }
-    }
 
+    }
     public List<Product> getAllProductsByPriceAsc() {
 
         return productRepository.findAllProductByPriceAsc();
@@ -112,11 +123,13 @@ public class ProductService {
     public long getTotalProducts() {
         return productRepository.count(); // Sử dụng phương thức count của JpaRepository để đếm tổng số sản phẩm.
     }
+
     public List<Product> getProductsByPage(int page, int pageSize) {
         // Trừ 1 để đảm bảo trang bắt đầu từ 0
         PageRequest pageable = PageRequest.of(page - 1, pageSize);
         Page<Product> productPage = productRepository.findAll(pageable);
         return productPage.getContent(); // Lấy danh sách sản phẩm trên trang cụ thể.
+
     }
 
     public List<Product> searchProductsByName(String name) {

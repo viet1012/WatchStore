@@ -16,32 +16,31 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("api/Product")
 public class ProductController {
 
     @Autowired
     private ProductService productService;
-    @GetMapping("/listProducts")
+    @GetMapping("/GetAll")
     public ResponseEntity<List<Product>> getAllProducts(){
         List<Product> products =  productService.getAllProduct();
         return ResponseEntity.ok(products);
     }
 
-    @PostMapping(value = "/createProduct",  consumes = "multipart/form-data")
+    @PostMapping(value = "/Create", consumes = "multipart/form-data")
     public ResponseEntity<Product> createProduct(
             @RequestParam("brandId") int brandId,
             @RequestParam("categoryId") long categoryId,
-            @RequestParam("imageFile") MultipartFile imageFile,
+            @RequestParam("imageFile") List<MultipartFile> imageFile,
             @ModelAttribute Product product) {
         Product createdProduct = productService.createProduct(product, brandId, categoryId, imageFile);
         return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
     }
 
-
-    @PutMapping(value = "/updateProduct/{id}",  consumes = "multipart/form-data" )
-    public ResponseEntity<?> updateProduct(@PathVariable Long id, @ModelAttribute Product updatedProduct, @RequestParam Long idBrand) {
+    @PutMapping(value = "/Update/{id}",  consumes = "multipart/form-data" )
+    public ResponseEntity<?> updateProduct(@PathVariable Long id, @ModelAttribute Product updatedProduct, @RequestParam Long idBrand, List<MultipartFile> file) {
         try {
-            Product product = productService.updateProduct(id, updatedProduct, idBrand);
+            Product product = productService.updateProduct(id, updatedProduct, idBrand, file);
             return ResponseEntity.ok(product);
         } catch (ProductNotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -50,22 +49,28 @@ public class ProductController {
         }
     }
 
-    @DeleteMapping("/deleteProduct")
-    public ResponseEntity<?> deleteProduct(@PathVariable Long id ){
+    @DeleteMapping("/Delete/{id}")
+    public ResponseEntity<String> deleteProduct(@PathVariable Long id ){
         productService.deleteProduct(id);
+        return ResponseEntity.ok().body("Đã xóa sản phẩm thành công");
+    }
+    @DeleteMapping("/Delete-multiple")
+    public ResponseEntity<?> deleteProducts(@RequestBody List<Long> productIds) {
+        for (Long productId : productIds) {
+            productService.deleteProduct(productId);
+        }
         return ResponseEntity.noContent().build();
     }
     @GetMapping
     public ResponseEntity<ProductPageDTO> getProducts(
             @RequestParam(name = "page", defaultValue = "1") int page,
-            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
+            @RequestParam(name = "pageSize",defaultValue = "10" ) int pageSize) {
 
         List<Product> products = productService.getProductsByPage(page, pageSize);
 
         // Tính toán thông tin phân trang
         long totalProducts = productService.getTotalProducts();
-        int totalPages = (int) Math.ceil((double) totalProducts / pageSize);
-
+        int totalPages = (int) Math.ceil( totalProducts / pageSize);
         ProductPageDTO productPageDTO = new ProductPageDTO();
         productPageDTO.setProducts(products);
         productPageDTO.setCurrentPage(page);
