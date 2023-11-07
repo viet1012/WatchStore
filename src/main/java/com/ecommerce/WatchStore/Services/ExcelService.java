@@ -6,9 +6,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.awt.*;
 import java.io.IOException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -22,7 +24,13 @@ public class ExcelService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Value("${file.upload.directory}")
+    private String uploadPath;
     public void exportToExcel(HttpServletResponse response) throws IOException {
+
+        String excelFilePath = uploadPath + "/products.xlsx";
+        File excelFile = new File(excelFilePath);
+
         // Tạo một Workbook Excel mới
         Workbook workbook = new XSSFWorkbook();
 
@@ -52,10 +60,15 @@ public class ExcelService {
         response.setHeader("Content-Disposition", "attachment; filename=products.xlsx");
 
         // Ghi dữ liệu từ Workbook vào HttpServletResponse
-        OutputStream outputStream = response.getOutputStream();
-        workbook.write(outputStream);
-        outputStream.close();
-        workbook.close();
+        try (FileOutputStream fileOutputStream = new FileOutputStream(excelFilePath)) {
+            workbook.write(fileOutputStream);
+        }
+
+        // Ghi dữ liệu từ Workbook vào HttpServletResponse
+//        OutputStream outputStream = response.getOutputStream();
+//        workbook.write(outputStream);
+//        outputStream.close();
+//        workbook.close();
     }
 
     public void importFromExcel(MultipartFile file) throws IOException {

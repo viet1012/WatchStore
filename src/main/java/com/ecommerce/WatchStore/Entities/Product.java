@@ -36,11 +36,6 @@ public class Product {
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Category category;
 
-    @Column(name = "material_id")
-    private Long materialId;
-
-    @Column(name = "pin_id")
-    private Long pinId;
 
     @Column(name = "created_by")
     private String createdBy;
@@ -139,21 +134,6 @@ public class Product {
         this.category = category;
     }
 
-    public Long getMaterialId() {
-        return materialId;
-    }
-
-    public void setMaterialId(Long materialId) {
-        this.materialId = materialId;
-    }
-
-    public Long getPinId() {
-        return pinId;
-    }
-
-    public void setPinId(Long pinId) {
-        this.pinId = pinId;
-    }
 
     public String getCreatedBy() {
         return createdBy;
