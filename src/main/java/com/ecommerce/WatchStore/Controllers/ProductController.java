@@ -32,8 +32,10 @@ public class ProductController {
             @RequestParam("brandId") int brandId,
             @RequestParam("categoryId") long categoryId,
             @RequestParam("imageFile") List<MultipartFile> imageFile,
+            @RequestParam("imageFile") List<MultipartFile> thumnailImgFiles,
+
             @ModelAttribute Product product) {
-        Product createdProduct = productService.createProduct(product, brandId, categoryId, imageFile);
+        Product createdProduct = productService.createProduct(product, brandId, categoryId, imageFile, thumnailImgFiles);
         return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
     }
 

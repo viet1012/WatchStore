@@ -35,8 +35,7 @@ public class RoleService {
             // Cập nhật thông tin role với dữ liệu từ updatedRole
             existingRole.setRoleTitle(updatedRole.getRoleTitle());
             existingRole.setDescription(updatedRole.getDescription());
-            existingRole.setUpdatedBy(updatedRole.getUpdatedBy());
-            existingRole.setUpdatedDate(LocalDateTime.now());
+            existingRole.setUpdated_by(updatedRole.getUpdated_by());
             return roleRepository.save(existingRole);
         } else {
             // Xử lý khi không tìm thấy role

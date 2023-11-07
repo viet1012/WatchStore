@@ -9,6 +9,7 @@ import com.ecommerce.WatchStore.Repositories.UserRepository;
 import com.ecommerce.WatchStore.Repositories.UserRolesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public class UserService {
     private UserRolesRepository userRolesRepository;
 
     @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
 
 
@@ -63,13 +64,15 @@ public class UserService {
             throw new RuntimeException("Không tim thấy user phù hop");
         }
     }
-    public User registerUser(String email, String password, String displayName) {
-        User user = new User();
-        user.setEmail(email);
+    public User registerUser(User user, Long roleId) {
+        Optional<Role> userRole = roleRepository.findById(roleId);
+        User newUser = new User();
+        newUser.setEmail(user.getEmail());
         String encodedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
-        user.setDisplayName(displayName);
-        return userRepository.save(user);
+        newUser.setPassword(encodedPassword);
+        newUser.setDisplayName(user.getDisplayName());
+        newUser.setRole(userRole.get());
+        return userRepository.save(newUser);
     }
 
     public boolean isEmailTaken(String email) {
@@ -88,4 +91,7 @@ public class UserService {
         }
     }
 
+    public Role findRoleByRoleId(Long id){
+        return userRepository.findRoleByRoleId(id);
+    }
 }

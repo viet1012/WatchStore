@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/bills")
+@RequestMapping("api/User/ills")
 public class BillController {
 
     @Autowired
     private BillService billService;
-    @GetMapping("/list")
+    @GetMapping("/GetAll")
     public ResponseEntity<List<Bill>> getBillList(){
         List<Bill> billList = billService.getBillList();
 
@@ -29,7 +29,7 @@ public class BillController {
         return ResponseEntity.ok(billList);
     }
 
-    @PostMapping("/create")
+    @PostMapping("/Create")
     public ResponseEntity<Bill> createBill(@RequestBody BillDTO billRequest, @RequestParam Long userId, @RequestParam Long voucherId) {
 
         Bill savedBill =  billService.createBill(billRequest, userId, voucherId);
@@ -37,7 +37,7 @@ public class BillController {
     }
 
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/Update/{id}")
     public ResponseEntity<Bill> updateBill(@PathVariable Long id, @RequestBody BillDTO billDTO) {
         Bill existingBill = billService.getBillById(id);
         if (existingBill == null) {

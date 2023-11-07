@@ -13,7 +13,7 @@ public class CustomerController {
     @Autowired
     private CustomerService customerService;
 
-    @PostMapping("create")
+    @PostMapping("Create")
     public ResponseEntity<Customer> createCustomer(@RequestBody CustomerDTO customer, @RequestParam Long userId) {
         Customer createdCustomer = customerService.createCustomer(customer, userId);
         return ResponseEntity.ok(createdCustomer);

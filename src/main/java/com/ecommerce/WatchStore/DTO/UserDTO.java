@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 public class UserDTO {
     private Long id;
     private String email;
+    private String password;
     private String phoneNumber;
     private String displayName;
     private LocalDateTime lastOnline;
@@ -112,5 +113,13 @@ public class UserDTO {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

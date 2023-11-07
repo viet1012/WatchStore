@@ -13,17 +13,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/category")
+@RequestMapping("/api/Category")
 public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
-    @GetMapping("/list")
+    @GetMapping("/GetAll")
     public ResponseEntity<List<Category>> getAllCategory(){
         List<Category> categoryList = categoryService.getAllCategory();
         return ResponseEntity.ok(categoryList);
     }
-    @PostMapping("/create")
+    @PostMapping("/Create")
     public ResponseEntity<Category> createCategory(@RequestBody CategoryDTO categoryDTO){
         Category savedCategory = new Category();
         savedCategory.setName(categoryDTO.getName());
@@ -34,14 +34,14 @@ public class CategoryController {
         Category newCategory = categoryService.saveCategory(savedCategory);
         return ResponseEntity.status(HttpStatus.CREATED).body(newCategory);
     }
-    @PostMapping("/update/{id}")
+    @PostMapping("/Update/{id}")
     public ResponseEntity<Category> updateCategory(@PathVariable Long id,@RequestBody Category categoryDTO){
 
         Category newCategory = categoryService.updateCategory(id, categoryDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(newCategory);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/Delete")
     public ResponseEntity<?> deleteCategory(@PathVariable Long id){
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();

@@ -1,11 +1,14 @@
 package com.ecommerce.WatchStore.Entities;
 
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 
+@Getter
+@Setter
 @Entity (name = "product_models")
 public class Product {
     @Id
@@ -18,10 +21,6 @@ public class Product {
 
     @Column(name = "img")
     private String img;
-
-
-    // Getter và Setter cho trường image
-
 
     @Column(name = "price")
     private float price;
@@ -45,6 +44,7 @@ public class Product {
 
     @Column(name = "created_by")
     private String createdBy;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_dt")
@@ -52,6 +52,7 @@ public class Product {
 
     @Column(name = "updated_by")
     private String updatedBy;
+
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_dt")
@@ -60,6 +61,27 @@ public class Product {
     @Column(name = "active")
     private Boolean active;
 
+    @Column(name = "code")
+    private String code;
+
+    @Column(name = "thumbnail")
+    private String thumbnail;
+
+    @Column(name = "gender")
+    private String gender;
+
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "color")
+    private String color;
+
+    @ManyToOne
+    @JoinColumn(name = "accessory_id", referencedColumnName = "id")
+    private Accessory accessory; // Kiểu dữ liệu tùy theo thiết kế cơ sở dữ liệu
+
+    @Column(name = "description")
+    private String description;
 
     public Long getProductId() {
         return productId;

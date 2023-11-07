@@ -15,18 +15,18 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/bill-details")
+@RequestMapping("/api/User/BillDetails")
 public class BillDetailController {
 
     @Autowired
     private BillDetailService billDetailService;
 
-    @GetMapping("/list")
+    @GetMapping("/GetAll")
     public ResponseEntity<List<BillDetail>> getListBillDetail(){
         List<BillDetail> billDetailList =  billDetailService.getBillDetail();
         return ResponseEntity.ok(billDetailList);
     }
-    @PostMapping("/create")
+    @PostMapping("/Create")
     public ResponseEntity<BillDetail> createBillDetail(@RequestBody BillDetailDTO billDetailDTO) {
         BillDetail billDetail = new BillDetail();
         Bill bill = new Bill();

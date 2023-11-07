@@ -1,13 +1,62 @@
-package com.ecommerce.WatchStore.Config;
-
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-@Configuration
-public class SecurityConfig {
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
+    package com.ecommerce.WatchStore.Config;
+    
+    import com.ecommerce.WatchStore.Repositories.UserRepository;
+    import com.ecommerce.WatchStore.Services.UserInfoDetailService;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.security.authentication.AuthenticationProvider;
+    import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+    import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+    import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+    import org.springframework.security.core.userdetails.UserDetailsService;
+    import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+    import org.springframework.security.crypto.password.PasswordEncoder;
+    import org.springframework.security.web.SecurityFilterChain;
+    
+    @Configuration
+    @EnableWebSecurity
+    public class SecurityConfig {
+    
+        @Autowired
+        private UserRepository repository;
+        @Bean
+        public UserDetailsService userDetailsService(){
+            return new UserInfoDetailService(repository);
+        }
+        @Bean
+        public PasswordEncoder passwordEncoder(){
+            return  new BCryptPasswordEncoder();
+        }
+    
+    //    @Bean
+    //    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    //        http.csrf().disable()
+    //                .authorizeRequests()
+    //                .requestMatchers("/auth/login", "/auth/register", "/api/users/get-role/{id}").permitAll() // Cho phép mọi người truy cập /auth/login và /auth/register
+    //                .requestMatchers("/user/**").hasRole("USER") // Đòi hỏi vai trò USER để truy cập các endpoint bắt đầu bằng /user/
+    //                .requestMatchers("/admin/**").hasRole("ADMIN") // Đòi hỏi vai trò ADMIN để truy cập các endpoint bắt đầu bằng /admin/
+    //                .anyRequest().authenticated() // Tất cả các request còn lại yêu cầu xác thực
+    //                .and()
+    //                .formLogin(); // Để sử dụng trang đăng nhập mặc định của Spring Security nếu không được xác thực
+    //        return http.build();
+    //    }
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf().disable()
+            .authorizeRequests()
+            .requestMatchers("/**").permitAll() // Cho phép mọi người truy cập tất cả các endpoint mà không cần xác thực
+            .anyRequest().authenticated() // Các yêu cầu còn lại yêu cầu xác thực
+            .and()
+            .formLogin(); // Để sử dụng trang đăng nhập mặc định của Spring Security nếu không được xác thực
+        return http.build();
+        }
+    
+        @Bean
+        public AuthenticationProvider authenticationProvider(){
+            DaoAuthenticationProvider authenticationProvider=new DaoAuthenticationProvider();
+            authenticationProvider.setUserDetailsService(userDetailsService());
+            authenticationProvider.setPasswordEncoder(passwordEncoder());
+            return authenticationProvider;
+        }
     }
-}

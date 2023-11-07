@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @RestController
-@RequestMapping("/file")
+@RequestMapping("/api/file")
 public class FileStorageController {
 
     @Autowired

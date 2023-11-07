@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 @RestController
-@RequestMapping("/brands")
+@RequestMapping("/api/Brands")
 public class BrandController {
 
     @Autowired
     private BrandService brandService;
-    @GetMapping("/listBrands")
+    @GetMapping("/GetAll")
     public  ResponseEntity<List<Brand>> getAllBrands(){
         List<Brand> brands = brandService.getAllBrands();
         return ResponseEntity.ok(brands);
@@ -32,13 +32,13 @@ public class BrandController {
         }
     }
 
-    @PostMapping("/createBrand")
+    @PostMapping("/Create")
     public  ResponseEntity<Brand> createBrand(@RequestBody BrandDTO brand){
         Brand savedBrand = brandService.saveBrand(brand);
         return  ResponseEntity.status(HttpStatus.CREATED).body(savedBrand);
     }
 
-    @PutMapping("/updateBrand/{id}")
+    @PutMapping("/Update/{id}")
     public ResponseEntity<Brand> updateBrand(@PathVariable int id, @RequestBody Brand updateBrand){
        try{
            updateBrand.setIdBrand(id);
@@ -48,7 +48,7 @@ public class BrandController {
            return ResponseEntity.notFound().build();
        }
     }
-    @DeleteMapping("/deleteBrand/{id}")
+    @DeleteMapping("/Delete/{id}")
     public ResponseEntity<Void> deleteBrandById(@PathVariable int id){
         brandService.deleteBrandById(id);
         return ResponseEntity.noContent().build();

@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/roles")
+@RequestMapping("/api/Admin/Roles")
 public class RoleController {
     @Autowired
     private RoleService roleService;
 
-    @PostMapping("/create")
+    @PostMapping("/Create")
     public ResponseEntity<String> createRole(@RequestBody Role role) {
         Role existingRole = roleService.getRoleByTitle(role.getRoleTitle());
         if (existingRole != null) {

@@ -16,18 +16,18 @@ import java.time.LocalTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/sales")
+@RequestMapping("/api/Admin/sales")
 public class SalesController {
 
     @Autowired
     private SaleService saleService;
 
-    @GetMapping("/product-sales")
+    @GetMapping("/GetAll")
     public ResponseEntity<List<ProductSalesDTO>> getProductSales() {
         List<ProductSalesDTO> productSales = saleService.getProductSales();
         return ResponseEntity.ok(productSales);
     }
-    @GetMapping("/top-buyer")
+    @GetMapping("/GetTopBuyer")
     public ResponseEntity<ProductSalesDTO> getTopBuyer() {
         ProductSalesDTO topBuyer = saleService.getUserWithMostPurchases();
         if (topBuyer != null) {

@@ -2,9 +2,11 @@ package com.ecommerce.WatchStore.Services;
 
 import com.ecommerce.WatchStore.Common.BrandNotFoundException;
 import com.ecommerce.WatchStore.Common.ProductNotFoundException;
+import com.ecommerce.WatchStore.Entities.Accessory;
 import com.ecommerce.WatchStore.Entities.Brand;
 import com.ecommerce.WatchStore.Entities.Category;
 import com.ecommerce.WatchStore.Entities.Product;
+import com.ecommerce.WatchStore.Repositories.AccessoryRepository;
 import com.ecommerce.WatchStore.Repositories.BrandRepository;
 import com.ecommerce.WatchStore.Repositories.CategoryRepository;
 import com.ecommerce.WatchStore.Repositories.ProductRepository;
@@ -32,6 +34,8 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
     @Autowired
+    private AccessoryRepository accessoryRepository;
+    @Autowired
     private FileStorageService fileStorageService;
 
 
@@ -57,16 +61,19 @@ public class ProductService {
     }
 
 
-    public Product createProduct(Product product, int brandId, long categoryId, List<MultipartFile> imageFiles ) {
+    public Product createProduct(Product product, int brandId, long categoryId, List<MultipartFile> imageFiles ,List<MultipartFile> thumnailImgFiles ) {
         if (productRepository.existsByProductName(product.getProductName())) {
             throw new ProductNotFoundException("Sản phẩm đã tồn tại với tên: " + product.getProductName());
         }
         Optional<Brand> brandOptional = brandRepository.findById(brandId);
         Optional<Category> categoryOptional = categoryRepository.findById(categoryId);
+        Optional<Accessory> accessoryOptional = accessoryRepository.findById(categoryId);
 
         if (brandOptional.isPresent() && categoryOptional.isPresent()) {
             Brand brand = brandOptional.get();
             Category category = categoryOptional.get();
+            Accessory accessory = accessoryOptional.get();
+
             Product newProduct = new Product();
             newProduct.setCategory(category);
             newProduct.setBrand(brand);
@@ -75,7 +82,14 @@ public class ProductService {
             newProduct.setProductName(product.getProductName());
             newProduct.setPrice(product.getPrice());
             newProduct.setQuantity(product.getQuantity());
+            newProduct.setAccessory(accessory);
             newProduct.setImg(formatFileNames(imageFiles));
+            newProduct.setThumbnail(formatFileNames(thumnailImgFiles));
+            newProduct.setGender(product.getGender());
+            newProduct.setCode(product.getCode());
+            newProduct.setColor(product.getColor());
+            newProduct.setDescription(product.getDescription());
+            newProduct.setStatus(product.getStatus());
             return productRepository.save(newProduct);
         } else {
             throw new BrandNotFoundException("Không tìm thấy thương hiệu với ID: " + brandId);
@@ -87,17 +101,18 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
-    public Product updateProduct(Long productId,Product updatedProduct, Long brandId, List<MultipartFile> updateImage ) {
+    public Product updateProduct(Long productId, Product updatedProduct, Long brandId, List<MultipartFile> updateImage) {
         Optional<Product> existingProductOptional = productRepository.findById(productId);
 
         if (existingProductOptional.isPresent()) {
             Product existingProduct = existingProductOptional.get();
             existingProduct.setProductName(updatedProduct.getProductName());
-            existingProduct.setImg(updatedProduct.getImg());
-            existingProduct.setImg( formatFileNames(updateImage));
+            existingProduct.setImg(formatFileNames(updateImage)); // Cập nhật ảnh với danh sách mới
             existingProduct.setPrice(updatedProduct.getPrice());
             existingProduct.setQuantity(updatedProduct.getQuantity());
-            // kiem tra brand có tồn tại hay không
+            existingProduct.setCode(updatedProduct.getCode());
+            existingProduct.setColor(updatedProduct.getColor());
+            // Kiểm tra brand có tồn tại hay không
             Optional<Brand> optionalBrand = brandRepository.findById(Math.toIntExact(brandId));
             if (optionalBrand.isPresent()) {
                 Brand brand = optionalBrand.get();
@@ -105,12 +120,13 @@ public class ProductService {
             } else {
                 throw new BrandNotFoundException("Không tìm thấy thương hiệu với ID: " + brandId);
             }
+
             return productRepository.save(existingProduct);
         } else {
             throw new ProductNotFoundException("Không tìm thấy sản phẩm với ID: " + productId);
         }
-
     }
+
     public List<Product> getAllProductsByPriceAsc() {
 
         return productRepository.findAllProductByPriceAsc();
