@@ -42,6 +42,19 @@ public class ExcelService {
         headerRow.createCell(0).setCellValue("ID");
         headerRow.createCell(1).setCellValue("Tên sản phẩm");
         headerRow.createCell(2).setCellValue("Giá");
+        headerRow.createCell(3).setCellValue("Brand");
+        headerRow.createCell(4).setCellValue("Category");
+        headerRow.createCell(5).setCellValue("Active");
+        headerRow.createCell(6).setCellValue("CreatedBy");
+        headerRow.createCell(7).setCellValue("Quantity");
+        headerRow.createCell(8).setCellValue("Accessory");
+        headerRow.createCell(9).setCellValue("Img");
+        headerRow.createCell(10).setCellValue("Thumbnail");
+        headerRow.createCell(11).setCellValue("Gender");
+        headerRow.createCell(12).setCellValue("Code");
+        headerRow.createCell(13).setCellValue("Color");
+        headerRow.createCell(14).setCellValue("Description");
+        headerRow.createCell(15).setCellValue("Status");
 
         // Lấy danh sách sản phẩm từ cơ sở dữ liệu
         List<Product> products = productRepository.findAll();
@@ -53,8 +66,24 @@ public class ExcelService {
             row.createCell(0).setCellValue(product.getProductId());
             row.createCell(1).setCellValue(product.getProductName());
             row.createCell(2).setCellValue(product.getPrice());
+            row.createCell(3).setCellValue(product.getBrand().getName());
+            row.createCell(4).setCellValue(product.getCategory().getName());
+            row.createCell(5).setCellValue(product.getActive());
+            row.createCell(6).setCellValue(product.getCreatedBy());
+            row.createCell(7).setCellValue(product.getQuantity());
+            row.createCell(8).setCellValue(product.getAccessory().getName());
+            row.createCell(9).setCellValue(product.getImg());
+            row.createCell(10).setCellValue(product.getThumbnail());
+            row.createCell(11).setCellValue(product.getGender());
+            row.createCell(12).setCellValue(product.getCode());
+            row.createCell(13).setCellValue(product.getColor());
+            row.createCell(14).setCellValue(product.getDescription());
+            row.createCell(15).setCellValue(product.getStatus());
         }
 
+        for (int i = 0; i <= 15; i++) {
+            sheet.autoSizeColumn(i);
+        }
         // Thiết lập loại Content-Type và header cho phản hồi
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=products.xlsx");

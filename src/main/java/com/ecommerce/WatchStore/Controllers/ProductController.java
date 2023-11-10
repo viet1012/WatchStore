@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/Product")
+@RequestMapping("/api/Product")
 public class ProductController {
 
     @Autowired
@@ -30,12 +30,12 @@ public class ProductController {
     @PostMapping(value = "/Create", consumes = "multipart/form-data")
     public ResponseEntity<Product> createProduct(
             @RequestParam("brandId") int brandId,
-            @RequestParam("categoryId") long categoryId,
+            @RequestParam("categoryId") Long categoryId,
+            @RequestParam("accessoryId") Long  accessoryId,
             @RequestParam("imageFile") List<MultipartFile> imageFile,
-            @RequestParam("imageFile") List<MultipartFile> thumnailImgFiles,
-
+            @RequestParam("thumnail") List<MultipartFile> thumnailImgFiles,
             @ModelAttribute Product product) {
-        Product createdProduct = productService.createProduct(product, brandId, categoryId, imageFile, thumnailImgFiles);
+        Product createdProduct = productService.createProduct(product, brandId, categoryId,accessoryId, imageFile, thumnailImgFiles);
         return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
     }
 

@@ -61,13 +61,13 @@ public class ProductService {
     }
 
 
-    public Product createProduct(Product product, int brandId, long categoryId, List<MultipartFile> imageFiles ,List<MultipartFile> thumnailImgFiles ) {
+    public Product createProduct(Product product, int brandId, Long categoryId, Long accessoryId, List<MultipartFile> imageFiles ,List<MultipartFile> thumnailImgFiles ) {
         if (productRepository.existsByProductName(product.getProductName())) {
             throw new ProductNotFoundException("Sản phẩm đã tồn tại với tên: " + product.getProductName());
         }
         Optional<Brand> brandOptional = brandRepository.findById(brandId);
         Optional<Category> categoryOptional = categoryRepository.findById(categoryId);
-        Optional<Accessory> accessoryOptional = accessoryRepository.findById(categoryId);
+        Optional<Accessory> accessoryOptional = accessoryRepository.findById(accessoryId);
 
         if (brandOptional.isPresent() && categoryOptional.isPresent()) {
             Brand brand = brandOptional.get();
