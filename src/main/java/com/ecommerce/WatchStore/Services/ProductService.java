@@ -60,7 +60,6 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-
     public Product createProduct(Product product, int brandId, Long categoryId, Long accessoryId, List<MultipartFile> imageFiles ,List<MultipartFile> thumnailImgFiles ) {
         if (productRepository.existsByProductName(product.getProductName())) {
             throw new ProductNotFoundException("Sản phẩm đã tồn tại với tên: " + product.getProductName());

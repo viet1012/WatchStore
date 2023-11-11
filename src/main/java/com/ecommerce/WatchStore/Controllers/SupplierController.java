@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/suppliers")
+@RequestMapping("/api/Admin/suppliers")
 public class SupplierController {
     @Autowired
     private SupplierService supplierService;
 
-    @GetMapping
+    @GetMapping("/GetAll")
     public ResponseEntity<List<Supplier>> getAllSuppliers() {
         List<Supplier> suppliers = supplierService.getAllSuppliers();
         return new ResponseEntity<>(suppliers, HttpStatus.OK);
@@ -30,13 +30,13 @@ public class SupplierController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PostMapping
+    @PostMapping("/Create")
     public ResponseEntity<Supplier> createSupplier(@RequestBody Supplier supplier) {
         Supplier createdSupplier = supplierService.createSupplier(supplier);
         return new ResponseEntity<>(createdSupplier, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/Update/{id}")
     public ResponseEntity<Supplier> updateSupplier(@PathVariable Long id, @RequestBody Supplier updatedSupplier) {
         Supplier updated = supplierService.updateSupplier(id, updatedSupplier);
 
@@ -47,9 +47,16 @@ public class SupplierController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/Delete/{id}")
     public ResponseEntity<Void> deleteSupplier(@PathVariable Long id) {
         supplierService.deleteSupplier(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    @DeleteMapping("/Delete-multiple")
+    public ResponseEntity<?> deleteSuppliers(@RequestBody List<Long> supplierIds) {
+        for (Long supplierId : supplierIds) {
+            supplierService.deleteSupplier(supplierId);
+        }
+        return ResponseEntity.noContent().build();
     }
 }
