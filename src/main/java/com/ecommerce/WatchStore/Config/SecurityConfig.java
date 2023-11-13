@@ -13,7 +13,12 @@
     import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
     import org.springframework.security.crypto.password.PasswordEncoder;
     import org.springframework.security.web.SecurityFilterChain;
-    
+    import org.springframework.web.cors.CorsConfiguration;
+    import org.springframework.web.cors.CorsConfigurationSource;
+    import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+    import java.util.Arrays;
+
     @Configuration
     @EnableWebSecurity
     public class SecurityConfig {
@@ -48,6 +53,7 @@
             .requestMatchers("/**").permitAll() // Cho phép mọi người truy cập tất cả các endpoint mà không cần xác thực
             .anyRequest().authenticated() // Các yêu cầu còn lại yêu cầu xác thực
             .and()
+                .cors().configurationSource(corsConfigurationSource()).and()
             .formLogin(); // Để sử dụng trang đăng nhập mặc định của Spring Security nếu không được xác thực
         return http.build();
         }
@@ -59,4 +65,16 @@
             authenticationProvider.setPasswordEncoder(passwordEncoder());
             return authenticationProvider;
         }
+        @Bean
+        CorsConfigurationSource corsConfigurationSource() {
+            CorsConfiguration configuration = new CorsConfiguration();
+            configuration.addAllowedOrigin("*");
+            configuration.addAllowedHeader("*");
+            configuration.addAllowedMethod("*");
+            UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+            source.registerCorsConfiguration("/**", configuration);
+            return source;
+        }
+
+
     }
