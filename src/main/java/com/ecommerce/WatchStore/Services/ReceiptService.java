@@ -1,7 +1,11 @@
 package com.ecommerce.WatchStore.Services;
 
 import com.ecommerce.WatchStore.Entities.Receipt;
+import com.ecommerce.WatchStore.Entities.Supplier;
+import com.ecommerce.WatchStore.Entities.User;
 import com.ecommerce.WatchStore.Repositories.ReceiptRepository;
+import com.ecommerce.WatchStore.Repositories.SupplierRepository;
+import com.ecommerce.WatchStore.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +17,12 @@ public class ReceiptService {
     @Autowired
     private ReceiptRepository receiptRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private SupplierRepository supplierRepository;
+
     public List<Receipt> getAllReceipts() {
         return receiptRepository.findAll();
     }
@@ -21,9 +31,18 @@ public class ReceiptService {
         return receiptRepository.findById(id);
     }
 
-    public Receipt createReceipt(Receipt receipt) {
+    public Receipt createReceipt(Receipt receipt, long userId, long supplierId) {
         // Thực hiện các kiểm tra hoặc xử lý trước khi lưu vào cơ sở dữ liệu
-        return receiptRepository.save(receipt);
+        Optional<Supplier> supplier = supplierRepository.findById(supplierId);
+        Optional<User> userOptional = userRepository.findById(userId);
+
+        Receipt newReceipt = new Receipt();
+        newReceipt.setTotal(receipt.getTotal());
+        newReceipt.setSupplier(supplier.get());
+        newReceipt.setCreatedBy(userOptional.get().getDisplayName());
+        newReceipt.setUser(userOptional.get());
+
+        return receiptRepository.save(newReceipt);
     }
 
     public Receipt updateReceipt(Long id, Receipt updatedReceipt) {

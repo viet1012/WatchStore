@@ -26,11 +26,13 @@ public class ReceiptDetail {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    private int quantity;
     @Column(name = "quantity")
+    private int quantity;
 
-    private double price;
     @Column(name = "price")
+    private double price;
+
+    @Column(name = "created_by")
     private String createdBy;
 
     @CreationTimestamp
@@ -49,5 +51,4 @@ public class ReceiptDetail {
     @Column(name = "active")
     private boolean active;
 
-    // Constructors, getters, and setters
 }

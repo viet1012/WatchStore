@@ -33,8 +33,8 @@ public class ReceiptController {
     }
 
     @PostMapping("/Create")
-    public ResponseEntity<Receipt> createReceipt(@RequestBody Receipt receipt) {
-        Receipt createdReceipt= receiptService.createReceipt(receipt);
+    public ResponseEntity<Receipt> createReceipt(@RequestBody Receipt receipt, @RequestParam Long userId, @RequestParam Long supplierId) {
+        Receipt createdReceipt= receiptService.createReceipt(receipt, userId , supplierId);
         return new ResponseEntity<>(createdReceipt, HttpStatus.CREATED);
     }
 
