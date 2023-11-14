@@ -2,8 +2,10 @@ package com.ecommerce.WatchStore.Controllers;
 
 import com.ecommerce.WatchStore.DTO.ProductSalesDTO;
 import com.ecommerce.WatchStore.Entities.Product;
+import com.ecommerce.WatchStore.Response.ResponseWrapper;
 import com.ecommerce.WatchStore.Services.SaleService;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,32 +16,33 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-
 @RestController
 @RequestMapping("/api/Admin/sales")
 public class SalesController {
 
     @Autowired
     private SaleService saleService;
-
     @GetMapping("/GetAll")
-    public ResponseEntity<List<ProductSalesDTO>> getProductSales() {
+    public ResponseEntity<ResponseWrapper<List<ProductSalesDTO>>> getProductSales() {
         List<ProductSalesDTO> productSales = saleService.getProductSales();
-        return ResponseEntity.ok(productSales);
+        ResponseWrapper<List<ProductSalesDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, productSales);
+        return ResponseEntity.ok(response);
     }
+
     @GetMapping("/GetTopBuyer")
-    public ResponseEntity<ProductSalesDTO> getTopBuyer() {
+    public ResponseEntity<ResponseWrapper<ProductSalesDTO>> getTopBuyer() {
         ProductSalesDTO topBuyer = saleService.getUserWithMostPurchases();
-        if (topBuyer != null) {
-            return ResponseEntity.ok(topBuyer);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        ResponseWrapper<ProductSalesDTO> response = (topBuyer != null) ?
+                new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, topBuyer) :
+                new ResponseWrapper<>(HttpStatus.NOT_FOUND.value(), "Top buyer not found", false, null);
+
+        return (topBuyer != null) ? ResponseEntity.ok(response) : ResponseEntity.notFound().build();
     }
+
     @GetMapping("/by-date-range")
-    public ResponseEntity<ProductSalesDTO> getBestSellingProductByDateRange(
-            @RequestParam("startDate")  @DateTimeFormat(pattern = "yyyy-MM-dd") String startDate,
-            @RequestParam("endDate")  @DateTimeFormat(pattern = "yyyy-MM-dd") String endDate
+    public ResponseEntity<ResponseWrapper<ProductSalesDTO>> getBestSellingProductByDateRange(
+            @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") String startDate,
+            @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") String endDate
     ) {
         LocalDate start = LocalDate.parse(startDate);
         LocalDate end = LocalDate.parse(endDate);
@@ -47,11 +50,10 @@ public class SalesController {
         LocalDateTime endDateTime = end.atTime(LocalTime.MAX);
 
         ProductSalesDTO bestSellingProduct = saleService.getBestSellingProductByDateRange(startDateTime, endDateTime);
+        ResponseWrapper<ProductSalesDTO> response = (bestSellingProduct != null) ?
+                new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, bestSellingProduct) :
+                new ResponseWrapper<>(HttpStatus.NOT_FOUND.value(), "Best selling product not found", false, null);
 
-        if (bestSellingProduct != null) {
-            return ResponseEntity.ok(bestSellingProduct);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return (bestSellingProduct != null) ? ResponseEntity.ok(response) : ResponseEntity.notFound().build();
     }
 }

@@ -5,6 +5,7 @@ import com.ecommerce.WatchStore.Common.ProductNotFoundException;
 import com.ecommerce.WatchStore.DTO.ProductPageDTO;
 import com.ecommerce.WatchStore.Entities.Brand;
 import com.ecommerce.WatchStore.Entities.Product;
+import com.ecommerce.WatchStore.Response.ResponseWrapper;
 import com.ecommerce.WatchStore.Services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,49 +23,56 @@ public class ProductController {
     @Autowired
     private ProductService productService;
     @GetMapping("/GetAll")
-    public ResponseEntity<List<Product>> getAllProducts(){
-        List<Product> products =  productService.getAllProduct();
-        return ResponseEntity.ok(products);
+    public ResponseEntity<ResponseWrapper<List<Product>>> getAllProducts(){
+        List<Product> products = productService.getAllProduct();
+        ResponseWrapper<List<Product>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, products);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping(value = "/Create", consumes = "multipart/form-data")
-    public ResponseEntity<Product> createProduct(
+    public ResponseEntity<ResponseWrapper<Product>> createProduct(
             @RequestParam("brandId") int brandId,
             @RequestParam("categoryId") Long categoryId,
             @RequestParam("accessoryId") Long  accessoryId,
             @RequestParam("imageFile") List<MultipartFile> imageFile,
             @RequestParam("thumnail") List<MultipartFile> thumnailImgFiles,
             @ModelAttribute Product product) {
-        Product createdProduct = productService.createProduct(product, brandId, categoryId,accessoryId, imageFile, thumnailImgFiles);
-        return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
+        Product createdProduct = productService.createProduct(product, brandId, categoryId, accessoryId, imageFile, thumnailImgFiles);
+        ResponseWrapper<Product> response = new ResponseWrapper<>(HttpStatus.CREATED.value(), "Product created successfully", true, createdProduct);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping(value = "/Update/{id}",  consumes = "multipart/form-data" )
-    public ResponseEntity<?> updateProduct(@PathVariable Long id, @ModelAttribute Product updatedProduct, @RequestParam Long idBrand, List<MultipartFile> file) {
+    public ResponseEntity<ResponseWrapper<Product>> updateProduct(@PathVariable Long id, @ModelAttribute Product updatedProduct, @RequestParam Long idBrand, List<MultipartFile> file) {
         try {
             Product product = productService.updateProduct(id, updatedProduct, idBrand, file);
-            return ResponseEntity.ok(product);
+            ResponseWrapper<Product> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Product updated successfully", true, product);
+            return ResponseEntity.ok(response);
         } catch (ProductNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (BrandNotFoundException e) {
-            return ResponseEntity.badRequest().body("Không tìm thấy thương hiệu với ID: " + idBrand);
+            ResponseWrapper<Product> response = new ResponseWrapper<>(HttpStatus.BAD_REQUEST.value(), "Brand not found with ID: " + idBrand, false, null);
+            return ResponseEntity.badRequest().body(response);
         }
     }
 
     @DeleteMapping("/Delete/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable Long id ){
+    public ResponseEntity<ResponseWrapper<String>> deleteProduct(@PathVariable Long id ){
         productService.deleteProduct(id);
-        return ResponseEntity.ok().body("Đã xóa sản phẩm thành công");
+        ResponseWrapper<String> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Deleted product successfully", true, "Deleted");
+        return ResponseEntity.ok(response);
     }
+
     @DeleteMapping("/Delete-multiple")
-    public ResponseEntity<?> deleteProducts(@RequestBody List<Long> productIds) {
+    public ResponseEntity<ResponseWrapper<String>> deleteProducts(@RequestBody List<Long> productIds) {
         for (Long productId : productIds) {
             productService.deleteProduct(productId);
         }
+        ResponseWrapper<String> response = new ResponseWrapper<>(HttpStatus.NO_CONTENT.value(), "Deleted multiple products successfully", true, "Deleted");
         return ResponseEntity.noContent().build();
     }
     @GetMapping
-    public ResponseEntity<ProductPageDTO> getProducts(
+    public ResponseEntity<ResponseWrapper<ProductPageDTO>> getProducts(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "pageSize",defaultValue = "10" ) int pageSize) {
 
@@ -72,44 +80,54 @@ public class ProductController {
 
         // Tính toán thông tin phân trang
         long totalProducts = productService.getTotalProducts();
-        int totalPages = (int) Math.ceil( totalProducts / pageSize);
+        int totalPages = (int) Math.ceil(totalProducts / (double) pageSize);
         ProductPageDTO productPageDTO = new ProductPageDTO();
         productPageDTO.setProducts(products);
         productPageDTO.setCurrentPage(page);
         productPageDTO.setPageSize(pageSize);
         productPageDTO.setTotalPages(totalPages);
 
-        return ResponseEntity.ok(productPageDTO);
+        ResponseWrapper<ProductPageDTO> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, productPageDTO);
+        return ResponseEntity.ok(response);
     }
+
     @GetMapping("/price-asc")
-    public ResponseEntity<List<Product>>getAllProductsByPriceAsc(){
+    public ResponseEntity<ResponseWrapper<List<Product>>> getAllProductsByPriceAsc(){
         List<Product> products = productService.getAllProductsByPriceAsc();
-        return ResponseEntity.ok(products);
+        ResponseWrapper<List<Product>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, products);
+        return ResponseEntity.ok(response);
     }
+
     @GetMapping("/price-desc")
-    public ResponseEntity<List<Product>>getAllProductsByPriceDesc(){
+    public ResponseEntity<ResponseWrapper<List<Product>>> getAllProductsByPriceDesc(){
         List<Product> products = productService.getAllProductsByPriceDesc();
-        return ResponseEntity.ok(products);
+        ResponseWrapper<List<Product>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, products);
+        return ResponseEntity.ok(response);
     }
+
     @GetMapping("/search")
-    public ResponseEntity<List<Product>> searchProducts(
+    public ResponseEntity<ResponseWrapper<List<Product>>> searchProducts(
             @RequestParam(name = "name", required = false) String productName,
             @RequestParam(name = "id", required = false) Long productId) {
 
+        List<Product> products;
+
         if (productName != null) {
-            List<Product> products = productService.searchProductsByName(productName);
-            return ResponseEntity.ok(products);
+            products = productService.searchProductsByName(productName);
         } else if (productId != null) {
             Product product = productService.getProductById(productId);
             if (product != null) {
-                return ResponseEntity.ok(Collections.singletonList(product));
+                products = Collections.singletonList(product);
             } else {
                 return ResponseEntity.notFound().build();
             }
         } else {
             // Trường hợp không có tham số nào được cung cấp,  có thể trả về danh sách trống hoặc thông báo lỗi tùy ý.
-            return ResponseEntity.ok(Collections.emptyList());
+            products = Collections.emptyList();
         }
+
+        ResponseWrapper<List<Product>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, products);
+        return ResponseEntity.ok(response);
     }
 
 }

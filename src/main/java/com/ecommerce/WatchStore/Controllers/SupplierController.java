@@ -1,6 +1,7 @@
 package com.ecommerce.WatchStore.Controllers;
 
 import com.ecommerce.WatchStore.Entities.Supplier;
+import com.ecommerce.WatchStore.Response.ResponseWrapper;
 import com.ecommerce.WatchStore.Services.SupplierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,46 +18,55 @@ public class SupplierController {
     private SupplierService supplierService;
 
     @GetMapping("/GetAll")
-    public ResponseEntity<List<Supplier>> getAllSuppliers() {
+    public ResponseEntity<ResponseWrapper<List<Supplier>>> getAllSuppliers() {
         List<Supplier> suppliers = supplierService.getAllSuppliers();
-        return new ResponseEntity<>(suppliers, HttpStatus.OK);
+        ResponseWrapper<List<Supplier>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Suppliers retrieved successfully", true, suppliers);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Supplier> getSupplierById(@PathVariable Long id) {
+    public ResponseEntity<ResponseWrapper<Supplier>> getSupplierById(@PathVariable Long id) {
         Optional<Supplier> supplier = supplierService.getSupplierById(id);
 
-        return supplier.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return supplier.map(value -> {
+            ResponseWrapper<Supplier> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Supplier retrieved successfully", true, value);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping("/Create")
-    public ResponseEntity<Supplier> createSupplier(@RequestBody Supplier supplier) {
+    public ResponseEntity<ResponseWrapper<Supplier>> createSupplier(@RequestBody Supplier supplier) {
         Supplier createdSupplier = supplierService.createSupplier(supplier);
-        return new ResponseEntity<>(createdSupplier, HttpStatus.CREATED);
+        ResponseWrapper<Supplier> response = new ResponseWrapper<>(HttpStatus.CREATED.value(), "Supplier created successfully", true, createdSupplier);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping("/Update/{id}")
-    public ResponseEntity<Supplier> updateSupplier(@PathVariable Long id, @RequestBody Supplier updatedSupplier) {
+    public ResponseEntity<ResponseWrapper<Supplier>> updateSupplier(@PathVariable Long id, @RequestBody Supplier updatedSupplier) {
         Supplier updated = supplierService.updateSupplier(id, updatedSupplier);
 
         if (updated != null) {
-            return new ResponseEntity<>(updated, HttpStatus.OK);
+            ResponseWrapper<Supplier> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Supplier updated successfully", true, updated);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @DeleteMapping("/Delete/{id}")
-    public ResponseEntity<Void> deleteSupplier(@PathVariable Long id) {
+    public ResponseEntity<ResponseWrapper<Void>> deleteSupplier(@PathVariable Long id) {
         supplierService.deleteSupplier(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.NO_CONTENT.value(), "Supplier deleted successfully", true, null);
+        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
+
     @DeleteMapping("/Delete-multiple")
-    public ResponseEntity<?> deleteSuppliers(@RequestBody List<Long> supplierIds) {
+    public ResponseEntity<ResponseWrapper<Void>> deleteSuppliers(@RequestBody List<Long> supplierIds) {
         for (Long supplierId : supplierIds) {
             supplierService.deleteSupplier(supplierId);
         }
-        return ResponseEntity.noContent().build();
+        ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.NO_CONTENT.value(), "Suppliers deleted successfully", true, null);
+        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
 }

@@ -4,6 +4,7 @@ import com.ecommerce.WatchStore.DTO.BillDTO;
 import com.ecommerce.WatchStore.Entities.Bill;
 import com.ecommerce.WatchStore.Entities.BillDetail;
 import com.ecommerce.WatchStore.Entities.Brand;
+import com.ecommerce.WatchStore.Response.ResponseWrapper;
 import com.ecommerce.WatchStore.Services.BillService;
 import jakarta.websocket.server.ServerEndpoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,25 +21,26 @@ public class BillController {
     @Autowired
     private BillService billService;
     @GetMapping("/GetAll")
-    public ResponseEntity<List<Bill>> getBillList(){
+    public ResponseEntity<ResponseWrapper<List<Bill>>> getBillList() {
         List<Bill> billList = billService.getBillList();
 
         if (billList.isEmpty()) {
-            return ResponseEntity.noContent().build(); // Trả về mã 204 No Content nếu danh sách rỗng.
+            return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(billList);
+
+        ResponseWrapper<List<Bill>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, billList);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/Create")
-    public ResponseEntity<Bill> createBill(@RequestBody BillDTO billRequest, @RequestParam Long userId, @RequestParam Long voucherId) {
-
+    public ResponseEntity<ResponseWrapper<Bill>> createBill(@RequestBody BillDTO billRequest, @RequestParam Long userId, @RequestParam Long voucherId) {
         Bill savedBill =  billService.createBill(billRequest, userId, voucherId);
-        return  ResponseEntity.status(HttpStatus.CREATED).body(savedBill);
+        ResponseWrapper<Bill> response = new ResponseWrapper<>(HttpStatus.CREATED.value(), "Created", true, savedBill);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-
     @PutMapping("/Update/{id}")
-    public ResponseEntity<Bill> updateBill(@PathVariable Long id, @RequestBody BillDTO billDTO) {
+    public ResponseEntity<ResponseWrapper<Bill>> updateBill(@PathVariable Long id, @RequestBody BillDTO billDTO) {
         Bill existingBill = billService.getBillById(id);
         if (existingBill == null) {
             return ResponseEntity.notFound().build();
@@ -51,22 +53,22 @@ public class BillController {
         existingBill.setUpdatedDate(billDTO.getUpdateDate());
 
         // Lưu hóa đơn đã cập nhật
-        Bill updatedBill = billService.updateBill(id,existingBill);
+        Bill updatedBill = billService.updateBill(id, existingBill);
 
-        return new ResponseEntity<>(updatedBill, HttpStatus.OK);
+        ResponseWrapper<Bill> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Updated", true, updatedBill);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Bill> getBillById(@PathVariable Long id) {
+    public ResponseEntity<ResponseWrapper<Bill>> getBillById(@PathVariable Long id) {
         Bill bill = billService.getBillById(id);
         if (bill != null) {
-            return ResponseEntity.ok(bill);
+            ResponseWrapper<Bill> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, bill);
+            return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
-
-
 
 }
 

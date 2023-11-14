@@ -15,16 +15,18 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/Category")
 public class CategoryController {
+
     @Autowired
     private CategoryService categoryService;
 
     @GetMapping("/GetAll")
-    public ResponseEntity<List<Category>> getAllCategory(){
+    public ResponseEntity<List<Category>> getAllCategory() {
         List<Category> categoryList = categoryService.getAllCategory();
         return ResponseEntity.ok(categoryList);
     }
+
     @PostMapping("/Create")
-    public ResponseEntity<Category> createCategory(@RequestBody CategoryDTO categoryDTO){
+    public ResponseEntity<Category> createCategory(@RequestBody CategoryDTO categoryDTO) {
         Category savedCategory = new Category();
         savedCategory.setName(categoryDTO.getName());
         savedCategory.setCreatedBy(categoryDTO.getCreatedBy());
@@ -34,17 +36,21 @@ public class CategoryController {
         Category newCategory = categoryService.saveCategory(savedCategory);
         return ResponseEntity.status(HttpStatus.CREATED).body(newCategory);
     }
-    @PostMapping("/Update/{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable Long id,@RequestBody Category categoryDTO){
 
-        Category newCategory = categoryService.updateCategory(id, categoryDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newCategory);
+    @PutMapping("/Update/{id}")
+    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody Category categoryDTO) {
+        Category updatedCategory = categoryService.updateCategory(id, categoryDTO);
+        if (updatedCategory != null) {
+            return ResponseEntity.ok(updatedCategory);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @DeleteMapping("/Delete")
-    public ResponseEntity<?> deleteCategory(@PathVariable Long id){
+    @DeleteMapping("/Delete/{id}")
+    public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().body("Category with ID " + id + " deleted successfully");
     }
-
 }
+

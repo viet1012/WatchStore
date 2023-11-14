@@ -53,7 +53,8 @@
             .requestMatchers("/**").permitAll() // Cho phép mọi người truy cập tất cả các endpoint mà không cần xác thực
             .anyRequest().authenticated() // Các yêu cầu còn lại yêu cầu xác thực
             .and()
-                .cors().configurationSource(corsConfigurationSource()).and()
+                .cors().configurationSource(corsConfigurationSource())
+                .and()
             .formLogin(); // Để sử dụng trang đăng nhập mặc định của Spring Security nếu không được xác thực
         return http.build();
         }
