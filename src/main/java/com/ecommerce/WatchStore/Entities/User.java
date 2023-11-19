@@ -24,6 +24,9 @@ public class User {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "new_password")
+    private String newPassword;
+
     @Column(name = "phone_number")
     private String phoneNumber;
 
@@ -56,6 +59,12 @@ public class User {
 
     @Column(name = "active")
     private Boolean active;
+
+    @Column(name = "otp")
+    private String otp;
+
+    @Column(name = "create_date_otp")
+    private LocalDateTime createDateOtp;
 
     // Các getter và setter
 }

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/User/ills")
+@RequestMapping("api/User/Bill")
 public class BillController {
 
     @Autowired
@@ -33,7 +33,7 @@ public class BillController {
     }
 
     @PostMapping("/Create")
-    public ResponseEntity<ResponseWrapper<Bill>> createBill(@RequestBody BillDTO billRequest, @RequestParam Long userId, @RequestParam Long voucherId) {
+    public ResponseEntity<ResponseWrapper<Bill>> createBill(@RequestBody BillDTO billRequest, @RequestParam Long userId, @RequestParam(required = false, defaultValue = "1") Long voucherId ) {
         Bill savedBill =  billService.createBill(billRequest, userId, voucherId);
         ResponseWrapper<Bill> response = new ResponseWrapper<>(HttpStatus.CREATED.value(), "Created", true, savedBill);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

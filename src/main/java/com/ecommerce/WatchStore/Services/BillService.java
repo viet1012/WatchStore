@@ -5,6 +5,7 @@ import com.ecommerce.WatchStore.Entities.Bill;
 import com.ecommerce.WatchStore.Entities.BillDetail;
 import com.ecommerce.WatchStore.Entities.User;
 import com.ecommerce.WatchStore.Entities.Voucher;
+import com.ecommerce.WatchStore.Repositories.BillDetailRepository;
 import com.ecommerce.WatchStore.Repositories.BillRepository;
 import com.ecommerce.WatchStore.Repositories.UserRepository;
 import com.ecommerce.WatchStore.Repositories.VoucherRepository;
@@ -25,13 +26,13 @@ public class BillService {
     private VoucherRepository voucherRepository;
     @Autowired
     private VoucherService voucherService;
-    
-    public Bill createBill(BillDTO bill, Long userId, Long voucherId) {
 
+
+    public Bill createBill(BillDTO bill, Long userId, Long voucherId) {
+        float newPrice = 0f;
         Optional<Voucher> voucherOptional = voucherRepository.findById(voucherId);
         Voucher voucher = voucherOptional.get();
-        float newPrice = voucherService.applyVoucherDiscount(bill , voucher);
-
+        newPrice = voucherService.applyVoucherDiscount(bill , voucher);
         Optional<User> userOptional = userRepository.findById(userId);
         if( userOptional.isPresent())
         {
@@ -40,16 +41,18 @@ public class BillService {
             Bill newBill = new Bill();
             newBill.setUser(user);
             newBill.setDeliverAddress(bill.getDeliverAddress());
-           // newBill.setTotalPrice(bill.getTotalPrice());
-
             newBill.setTotalPrice(newPrice);
-
-            newBill.setCreatedBy(bill.getCreatedBy());
+            newBill.setCreatedBy(user.getDisplayName());
             newBill.setActive(true);
             newBill.setCreatedDate(bill.getCreateDate());
+            newBill.setVoucher(voucher);
+            Bill savedBill = billRepository.save(newBill);
 
-            return billRepository.save(newBill);
+            // Lấy danh sách chi tiết đơn hàng tương ứng với đơn hàng mới lưu
 
+            return savedBill;
+        }else {
+            System.out.println("Không tìm thấy userID : "+ userId);
         }
         return null;
 

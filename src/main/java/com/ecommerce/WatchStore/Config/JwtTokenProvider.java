@@ -26,6 +26,20 @@ public class JwtTokenProvider {
         this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     }
 
+
+    public boolean verifyToken(String token) {
+        try {
+            // Parse token và lấy ra thông tin claims
+            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
+            return true;
+        } catch (ExpiredJwtException ex) {
+            // Token đã hết hạn
+            return false;
+        } catch (Exception ex) {
+            // Token không hợp lệ hoặc không thể xác minh
+            return false;
+        }
+    }
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, userDetails.getUsername());

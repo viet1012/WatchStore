@@ -27,21 +27,10 @@ public class BillDetailController {
         return ResponseEntity.ok(billDetailList);
     }
     @PostMapping("/Create")
-    public ResponseEntity<BillDetail> createBillDetail(@RequestBody BillDetailDTO billDetailDTO) {
-        BillDetail billDetail = new BillDetail();
-        Bill bill = new Bill();
-        bill.setId(billDetailDTO.getBillId()); // Đặt ID của hóa đơn từ DTO
-        Product product = new Product();
-        product.setProductId(billDetailDTO.getProductId()); // Đặt ID của sản phẩm từ DTO
+    public ResponseEntity<BillDetail> createBillDetail(@RequestBody BillDetail billDetail, @RequestParam Long billId,@RequestParam Long productId) {
 
-        billDetail.setBill(bill);
-        billDetail.setProduct(product);
-        billDetail.setUnitPrice(billDetailDTO.getUnitPrice());
-        billDetail.setQuantity(billDetailDTO.getQuantity());
-        billDetail.setCreatedBy(billDetailDTO.getCreatedBy());
-        billDetail.setActive(billDetailDTO.getActive());
+        BillDetail createdBillDetail = billDetailService.createBillDetail(billDetail, billId, productId);
 
-        BillDetail createdBillDetail = billDetailService.createBillDetail(billDetail);
         return new ResponseEntity<>(createdBillDetail, HttpStatus.CREATED);
     }
 }

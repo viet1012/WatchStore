@@ -21,15 +21,17 @@ public class BillDetailService {
     private ProductService productService;
     @Autowired
     private BillService billService;
+    @Autowired
+    private EmailService emailService;
 
     public List<BillDetail> getBillDetail(){
         return billDetailRepository.findAll();
     }
 
-    public BillDetail createBillDetail(BillDetail newBillDetail) {
+    public BillDetail createBillDetail(BillDetail newBillDetail, Long billId, Long productId) {
 
-        Product product = productService.getProductById( newBillDetail.getProduct().getProductId());
-        Bill bill = billService.getBillById(newBillDetail.getBill().getId());
+        Product product = productService.getProductById( productId);
+        Bill bill = billService.getBillById(billId);
 
         BillDetail billDetail = new BillDetail();
         if (product == null || bill  == null) {
@@ -41,16 +43,24 @@ public class BillDetailService {
             int quantity = newBillDetail.getQuantity();
             float newTotalPrice = bill.getTotalPrice() + (unitPrice * quantity);
             bill.setTotalPrice(newTotalPrice);
-            billService.updateBill(newBillDetail.getBill().getId(),bill);
+            billService.updateBill(billId,bill);
 
             billDetail.setBill(bill);
             billDetail.setProduct(product);
             billDetail.setUnitPrice(unitPrice);
             billDetail.setQuantity( newBillDetail.getQuantity());
-            billDetail.setCreatedBy(newBillDetail.getCreatedBy());
-            billDetail.setActive(newBillDetail.getActive());
+            billDetail.setCreatedBy(bill.getUser().getDisplayName());
+            billDetail.setActive(true);
 
-            return billDetailRepository.save(billDetail);
+            BillDetail billDetail1 = billDetailRepository.save(billDetail);
+
+            List<BillDetail> billDetails = billDetailRepository.findByBill(bill);
+            // Gửi email thông báo với danh sách chi tiết đơn hàng
+            emailService.sendOrderConfirmationEmail(bill.getUser().getEmail(), bill, billDetails);
+
+            return  billDetail1;
+            // Lấy danh sách chi tiết đơn hàng tương ứng với đơn hàng mới lưu
+
         }
 
     }
