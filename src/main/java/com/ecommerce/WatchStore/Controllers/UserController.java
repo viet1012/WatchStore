@@ -55,57 +55,6 @@ public class UserController {
         User updatedUser = userService.updateUser(user, userId);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedUser);
     }
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUserWithRole(@RequestBody User registrationDto, @RequestParam("role_id") Long roleId) {
-
-        // Tạo một người dùng mới
-        User registeredUser = userService.registerUser(registrationDto, roleId);
-
-        UserDetails userDetails = userDetailsService.loadUserByUsername(registeredUser.getEmail());
-        String token = jwtTokenProvider.generateToken(userDetails);
-
-        AuthResponse authResponse = new AuthResponse();
-        authResponse.setAccessToken(token);
-        authResponse.setUser(registeredUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(authResponse);
-
-    }
-
-    @PostMapping("/reset-password")
-    public String resetPassword(@RequestBody User user)
-    {
-
-        boolean checkOTP = userService.resetPassword(user,  user.getNewPassword());
-        if (checkOTP) {
-            return "Tài khoản: "+ user.getEmail() +" đã đổi mật khẩu thành công";
-        } else {
-            return "OTP đã sai";
-        }
-    }
-
-    @PostMapping("/verify-otp-registration")
-    public String validateOTP(@RequestBody OTPRequest otpRequest) {
-        String email = otpRequest.getEmail();
-        String otp = otpRequest.getOtp();
-
-        boolean check = userService.verifyOtp(email, otp);
-        if (check) {
-            emailService.sendEmailWithAds(otpRequest.getEmail());
-            return "Tạo tài khoản thành công";
-        } else {
-            return "OTP đã quá 10 phút";
-        }
-    }
-
-    @PostMapping("/re-generate-otp")
-    public String regenerateOTP(@RequestBody OTPRequest email)
-    {
-        boolean check = userService.reGenerateOtp(email.getEmail());
-        if(check)
-            return "Đã gửi OTP thành công";
-        else
-            return "Gửi OTP thất bại";
-    }
 
     @GetMapping("/get-role/{id}")
     public ResponseEntity<Role> getRoleId(@PathVariable Long id){
