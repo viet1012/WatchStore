@@ -34,18 +34,18 @@
             return  new BCryptPasswordEncoder();
         }
     
-    //    @Bean
-    //    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    //        http.csrf().disable()
-    //                .authorizeRequests()
-    //                .requestMatchers("/auth/login", "/auth/register", "/api/users/get-role/{id}").permitAll() // Cho phép mọi người truy cập /auth/login và /auth/register
-    //                .requestMatchers("/user/**").hasRole("USER") // Đòi hỏi vai trò USER để truy cập các endpoint bắt đầu bằng /user/
-    //                .requestMatchers("/admin/**").hasRole("ADMIN") // Đòi hỏi vai trò ADMIN để truy cập các endpoint bắt đầu bằng /admin/
-    //                .anyRequest().authenticated() // Tất cả các request còn lại yêu cầu xác thực
-    //                .and()
-    //                .formLogin(); // Để sử dụng trang đăng nhập mặc định của Spring Security nếu không được xác thực
-    //        return http.build();
-    //    }
+//        @Bean
+//        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//            http.csrf().disable()
+//                    .authorizeRequests()
+//                    .requestMatchers("/auth/login", "/auth/register", "/api/users/get-role/{id}").permitAll() // Cho phép mọi người truy cập /auth/login và /auth/register
+//                    .requestMatchers("/user/**").hasRole("USER") // Đòi hỏi vai trò USER để truy cập các endpoint bắt đầu bằng /user/
+//                    .requestMatchers("/admin/**").hasRole("ADMIN") // Đòi hỏi vai trò ADMIN để truy cập các endpoint bắt đầu bằng /admin/
+//                    .anyRequest().authenticated() // Tất cả các request còn lại yêu cầu xác thực
+//                    .and()
+//                    .formLogin(); // Để sử dụng trang đăng nhập mặc định của Spring Security nếu không được xác thực
+//            return http.build();
+//        }
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()

@@ -20,7 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.print.Pageable;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -76,7 +78,7 @@ public class ProductService {
             Product newProduct = new Product();
             newProduct.setCategory(category);
             newProduct.setBrand(brand);
-            newProduct.setActive(product.getActive());
+            newProduct.setActive(true);
             newProduct.setCreatedBy(product.getCreatedBy());
             newProduct.setProductName(product.getProductName());
             newProduct.setPrice(product.getPrice());
@@ -95,11 +97,33 @@ public class ProductService {
         }
     }
 
+    public List<Product> deleteProduct(Long id) {
+        Optional<Product> productOptional = productRepository.findById(id);
 
-    public void deleteProduct(Long id){
-        productRepository.deleteById(id);
+        if (productOptional.isPresent()) {
+            Product currentProduct = productOptional.get();
+            currentProduct.setActive(false);
+            productRepository.save(currentProduct);
+        } else {
+            throw new NoSuchElementException("Không tìm thấy sản phẩm với ID: " + id);
+        }
+
+        // Lấy danh sách tất cả sản phẩm có trạng thái active = true
+        return productRepository.findAllByActiveTrue();
     }
 
+    public List<Product> deleteMultipleProducts(List<Long> productIds) {
+        List<Product> products = productRepository.findAllById(productIds);
+
+        for (Product product : products) {
+            product.setActive(false);
+        }
+
+        productRepository.saveAll(products);
+
+        // Lấy danh sách tất cả sản phẩm có trạng thái active = true
+        return productRepository.findAllByActiveTrue();
+    }
     public Product updateProduct(Long productId, Product updatedProduct, Long brandId, List<MultipartFile> updateImage) {
         Optional<Product> existingProductOptional = productRepository.findById(productId);
 
@@ -111,6 +135,8 @@ public class ProductService {
             existingProduct.setQuantity(updatedProduct.getQuantity());
             existingProduct.setCode(updatedProduct.getCode());
             existingProduct.setColor(updatedProduct.getColor());
+            existingProduct.setActive(updatedProduct.getActive());
+
             // Kiểm tra brand có tồn tại hay không
             Optional<Brand> optionalBrand = brandRepository.findById(Math.toIntExact(brandId));
             if (optionalBrand.isPresent()) {

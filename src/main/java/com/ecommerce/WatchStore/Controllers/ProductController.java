@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -57,20 +58,19 @@ public class ProductController {
     }
 
     @DeleteMapping("/Delete/{id}")
-    public ResponseEntity<ResponseWrapper<String>> deleteProduct(@PathVariable Long id ){
-        productService.deleteProduct(id);
-        ResponseWrapper<String> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Deleted product successfully", true, "Deleted");
+    public ResponseEntity<ResponseWrapper<List<Product>>>  deleteProduct(@PathVariable Long id ){
+        List<Product> products = productService.deleteProduct(id);
+        ResponseWrapper<List<Product>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Deleted product successfully", true, products);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/Delete-multiple")
-    public ResponseEntity<ResponseWrapper<String>> deleteProducts(@RequestBody List<Long> productIds) {
-        for (Long productId : productIds) {
-            productService.deleteProduct(productId);
-        }
-        ResponseWrapper<String> response = new ResponseWrapper<>(HttpStatus.NO_CONTENT.value(), "Deleted multiple products successfully", true, "Deleted");
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ResponseWrapper<List<Product>>>  deleteMultipleProducts(@RequestBody List<Long> productIds) {
+        List<Product> products =  productService.deleteMultipleProducts(productIds);
+        ResponseWrapper<List<Product>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Deleted product successfully", true, products);
+        return ResponseEntity.ok(response);
     }
+
     @GetMapping
     public ResponseEntity<ResponseWrapper<ProductPageDTO>> getProducts(
             @RequestParam(name = "page", defaultValue = "1") int page,
@@ -91,14 +91,14 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/price-asc")
+    @GetMapping("/Price-asc")
     public ResponseEntity<ResponseWrapper<List<Product>>> getAllProductsByPriceAsc(){
         List<Product> products = productService.getAllProductsByPriceAsc();
         ResponseWrapper<List<Product>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, products);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/price-desc")
+    @GetMapping("/Price-desc")
     public ResponseEntity<ResponseWrapper<List<Product>>> getAllProductsByPriceDesc(){
         List<Product> products = productService.getAllProductsByPriceDesc();
         ResponseWrapper<List<Product>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, products);

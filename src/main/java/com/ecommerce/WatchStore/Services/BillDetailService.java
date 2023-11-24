@@ -9,9 +9,11 @@ import com.ecommerce.WatchStore.Entities.Product;
 import com.ecommerce.WatchStore.Repositories.BillDetailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BillDetailService {
@@ -27,13 +29,18 @@ public class BillDetailService {
     public List<BillDetail> getBillDetail(){
         return billDetailRepository.findAll();
     }
-
+    private float calculateTotalPrice(float unitPrice, int quantity) {
+        return unitPrice * quantity;
+    }
     public BillDetail createBillDetail(BillDetail newBillDetail, Long billId, Long productId) {
 
         Product product = productService.getProductById( productId);
         Bill bill = billService.getBillById(billId);
 
         BillDetail billDetail = new BillDetail();
+        if(product.getActive() == false){
+            throw new IllegalArgumentException("Không tìm thấy sản phẩm!");
+        }
         if (product == null || bill  == null) {
             // Nếu không có sản phẩm hoặc bill ID, hoặc chúng không hợp lệ, bạn có thể xử lý lỗi ở đây
             throw new IllegalArgumentException("Không tìm thấy sản phẩm hoặc id của hóa đơn phù hợp.");
@@ -47,6 +54,7 @@ public class BillDetailService {
 
             billDetail.setBill(bill);
             billDetail.setProduct(product);
+
             billDetail.setUnitPrice(unitPrice);
             billDetail.setQuantity( newBillDetail.getQuantity());
             billDetail.setCreatedBy(bill.getUser().getDisplayName());
@@ -65,6 +73,20 @@ public class BillDetailService {
 
     }
 
+    public BillDetail updateBillDetail(Long billDetailId, BillDetail updatedBillDetail) {
+        Optional<BillDetail> existingBillDetailOptional = billDetailRepository.findById(billDetailId);
 
+        if (existingBillDetailOptional.isPresent()) {
+            BillDetail existingBillDetail = existingBillDetailOptional.get();
+            existingBillDetail.setQuantity(updatedBillDetail.getQuantity());
+            existingBillDetail.setUnitPrice(updatedBillDetail.getUnitPrice());
+
+            // Cập nhật thông tin khác nếu cần
+
+            return billDetailRepository.save(existingBillDetail);
+        } else {
+            throw new IllegalArgumentException("Không tìm thấy chi tiết hóa đơn với ID: " + billDetailId);
+        }
+    }
 
 }

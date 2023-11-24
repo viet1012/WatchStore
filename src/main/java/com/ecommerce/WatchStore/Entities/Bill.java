@@ -24,6 +24,9 @@ public class Bill {
     @Column(name = "total_price")
     private float totalPrice;
 
+    @Column(name = "status")
+    private String status;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

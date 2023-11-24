@@ -7,6 +7,7 @@ import com.ecommerce.WatchStore.Services.ReceiptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,8 @@ public class ReceiptController {
     private ReceiptService receiptService;
 
     @GetMapping("/GetAll")
+   // @PreAuthorize("hasRole('ADMIN')")
+
     public ResponseEntity<List<Receipt>> getAllSuppliers() {
         List<Receipt> receipts = receiptService.getAllReceipts();
         return new ResponseEntity<>(receipts, HttpStatus.OK);

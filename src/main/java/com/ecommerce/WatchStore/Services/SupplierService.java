@@ -21,8 +21,11 @@ public class SupplierService {
         return supplierRepository.findById(id);
     }
 
+    public long countSuppliers() {
+        return supplierRepository.count();
+    }
+
     public Supplier createSupplier(Supplier supplier) {
-        // Thực hiện các kiểm tra hoặc xử lý trước khi lưu vào cơ sở dữ liệu
         return supplierRepository.save(supplier);
     }
 

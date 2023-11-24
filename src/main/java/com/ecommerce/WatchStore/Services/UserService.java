@@ -100,7 +100,9 @@ public class UserService {
             // sending otp to your email
             emailService.sendEmailWithOTP(newUser.getEmail(), newUser.getDisplayName(), newUser.getOtp());
         }
+        System.out.println("Email: "+ newUser.getEmail() + "OTP: "+ newUser.getOtp());
         return userRepository.save(newUser);
+
     }
 
     public boolean reGenerateOtp(String email) {

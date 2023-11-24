@@ -3,6 +3,7 @@ package com.ecommerce.WatchStore.Services;
 import com.ecommerce.WatchStore.DTO.BillDTO;
 import com.ecommerce.WatchStore.Entities.Bill;
 import com.ecommerce.WatchStore.Entities.Voucher;
+import com.ecommerce.WatchStore.Repositories.BillRepository;
 import com.ecommerce.WatchStore.Repositories.VoucherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,25 +17,53 @@ public class VoucherService {
 
     @Autowired
     private VoucherRepository voucherRepository;
+    @Autowired
+    private BillRepository billRepository;
+
     public boolean isVoucherValid(Voucher voucher) {
         LocalDateTime now = LocalDateTime.now();
         return now.isAfter(voucher.getStartDate()) && now.isBefore(voucher.getEndDate());
     }
 
-    public float applyVoucherDiscount(BillDTO bill, Voucher voucher) {
-        if (isVoucherValid(voucher)) {
-            float discountPercentage = voucher.getValue() / 100.0f; // Chuyển phần trăm thành tỷ lệ
-            float discountAmount = bill.getTotalPrice() * discountPercentage;
+    public Bill applyVoucherDiscount(Long billId, Long voucherId) {
+        Optional<Bill> billOptional = billRepository.findById(billId);
+        Optional<Voucher> voucherOptional = voucherRepository.findById(voucherId);
 
-            // Giảm giá chỉ khi discountAmount không vượt quá tổng hóa đơn
-            if (discountAmount <= bill.getTotalPrice()) {
-                float newTotalPrice = bill.getTotalPrice() - discountAmount;
-                bill.setTotalPrice(newTotalPrice);
-                return discountAmount;
-            }
+
+        if(voucherOptional.isEmpty())
+        {
+            throw new IllegalArgumentException("Voucher không hợp lệ.");
         }
-        return 0.0f; // Không áp dụng giảm giá nếu voucher không hợp lệ hoặc giảm giá vượt quá tổng hóa đơn.
+        Voucher voucher = voucherOptional.get();
+        if (billOptional.isPresent()) {
+            Bill bill = billOptional.get();
+
+            System.out.println("Bill :" +bill.getTotalPrice() + " Voucher: " + voucher.getValue());
+            if (bill.getTotalPrice() < 0) {
+                throw new IllegalArgumentException("Tổng tiền hóa đơn không phù hợp điều kiện áp dụng voucher.");
+            }
+
+            if (isVoucherValid(voucher)) {
+               // float discountPercentage = voucher.getValue() / 100.0f; // Chuyển phần trăm thành tỷ lệ
+               // float discountAmount = bill.getTotalPrice() * discountPercentage;
+
+                float discountAmount = voucher.getValue();
+                // Giảm giá chỉ khi discountAmount không vượt quá tổng hóa đơn
+                if (discountAmount <= bill.getTotalPrice()) {
+                    float newTotalPrice = bill.getTotalPrice() - discountAmount;
+                    bill.setTotalPrice(newTotalPrice);
+                    return billRepository.save(bill);
+                } else {
+                    throw new IllegalArgumentException("Số tiền giảm giá vượt quá tổng giá trị hóa đơn.");
+                }
+            } else {
+                throw new IllegalArgumentException("Voucher đã quá hạn sử dụng.");
+            }
+        } else {
+            throw new IllegalArgumentException("Không tìm thấy hóa đơn với ID: " + billId);
+        }
     }
+
 
     public List<Voucher> getListVoucher() {
         return voucherRepository.findAll();

@@ -1,5 +1,9 @@
 package com.ecommerce.WatchStore.DTO;
 
+import lombok.*;
+
+@Getter
+@Setter
 public class ProductSalesDTO {
     private Long userId;
     private Long productId;
@@ -7,7 +11,7 @@ public class ProductSalesDTO {
     private Long totalQuantitySold;
     private float totalPrice;
     private Long billId;
-
+    private  String brandName;
 
 
     public Long getProductId() {

@@ -22,17 +22,9 @@ public class BillService {
     private BillRepository billRepository;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private VoucherRepository voucherRepository;
-    @Autowired
-    private VoucherService voucherService;
 
+    public Bill createBill(Bill bill, Long userId, Long voucherId) {
 
-    public Bill createBill(BillDTO bill, Long userId, Long voucherId) {
-        float newPrice = 0f;
-        Optional<Voucher> voucherOptional = voucherRepository.findById(voucherId);
-        Voucher voucher = voucherOptional.get();
-        newPrice = voucherService.applyVoucherDiscount(bill , voucher);
         Optional<User> userOptional = userRepository.findById(userId);
         if( userOptional.isPresent())
         {
@@ -41,14 +33,12 @@ public class BillService {
             Bill newBill = new Bill();
             newBill.setUser(user);
             newBill.setDeliverAddress(bill.getDeliverAddress());
-            newBill.setTotalPrice(newPrice);
+            newBill.setTotalPrice(0);
             newBill.setCreatedBy(user.getDisplayName());
             newBill.setActive(true);
-            newBill.setCreatedDate(bill.getCreateDate());
-            newBill.setVoucher(voucher);
+            newBill.setStatus("Đã đặt hàng");
             Bill savedBill = billRepository.save(newBill);
 
-            // Lấy danh sách chi tiết đơn hàng tương ứng với đơn hàng mới lưu
 
             return savedBill;
         }else {
@@ -57,6 +47,24 @@ public class BillService {
         return null;
 
     }
+    // Phương thức để cập nhật trạng thái của hóa đơn
+    public Bill updateBillStatus(Long billId, String newStatus) {
+        Optional<Bill> billOptional = billRepository.findById(billId);
+        if (billOptional.isPresent()) {
+            Bill bill = billOptional.get();
+
+            // Cập nhật trạng thái mới cho hóa đơn
+            bill.setStatus(newStatus);
+
+            // Lưu hóa đơn đã được cập nhật vào cơ sở dữ liệu
+            Bill updatedBill = billRepository.save(bill);
+
+            return updatedBill;
+        } else {
+            throw new IllegalArgumentException("Không tìm thấy hóa đơn với ID đã cung cấp: " + billId);
+        }
+    }
+
     public Bill getBillById(Long id ){
         Optional<Bill> billOptional = billRepository.findById(id);
         return billOptional.orElse(null);
