@@ -7,6 +7,8 @@ import com.ecommerce.WatchStore.Repositories.ReceiptRepository;
 import com.ecommerce.WatchStore.Repositories.SupplierRepository;
 import com.ecommerce.WatchStore.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -64,9 +66,18 @@ public class ReceiptService {
             return null;
         }
     }
-
     public void deleteReceipt(Long id) {
         // Xóa Receipt theo ID
         receiptRepository.deleteById(id);
+    }
+    public List<Receipt> getReceiptsByPage(int page, int pageSize) {
+        // Trừ 1 để đảm bảo trang bắt đầu từ 0
+        PageRequest pageable = PageRequest.of(page - 1, pageSize);
+        Page<Receipt> receiptPage = receiptRepository.findAll(pageable);
+        return receiptPage.getContent(); // Lấy danh sách receipt trên trang cụ thể.
+    }
+
+    public long getTotalReceipts() {
+        return receiptRepository.count(); // Sử dụng phương thức count của JpaRepository để đếm tổng số receipt.
     }
 }

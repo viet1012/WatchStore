@@ -1,5 +1,8 @@
 package com.ecommerce.WatchStore.Controllers;
 
+import com.ecommerce.WatchStore.DTO.CategoryPageDTO;
+import com.ecommerce.WatchStore.DTO.SupplierPageDTO;
+import com.ecommerce.WatchStore.Entities.Category;
 import com.ecommerce.WatchStore.Entities.Supplier;
 import com.ecommerce.WatchStore.Response.ResponseWrapper;
 import com.ecommerce.WatchStore.Services.SupplierService;
@@ -12,17 +15,26 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/Admin/suppliers")
+@RequestMapping("/api/Admin/Supplier")
 public class SupplierController {
     @Autowired
     private SupplierService supplierService;
 
     @GetMapping("/GetAll")
-    public ResponseEntity<ResponseWrapper<List<Supplier>>> getAllSuppliers() {
-        List<Supplier> suppliers = supplierService.getAllSuppliers();
-        ResponseWrapper<List<Supplier>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Suppliers retrieved successfully", true, suppliers);
+    public ResponseEntity<ResponseWrapper<SupplierPageDTO>> getSuppliers(
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        List<Supplier> suppliers = supplierService.getSuppliersByPage(page, pageSize);
+
+        // Tính toán thông tin phân trang
+        long totalSuppliers = supplierService.getTotalSuppliers();
+        int totalPages = (int) Math.ceil(totalSuppliers / (double) pageSize);
+
+        SupplierPageDTO supplierPageDTO = new SupplierPageDTO(suppliers, page, pageSize, totalPages);
+
+        ResponseWrapper<SupplierPageDTO> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, supplierPageDTO);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")

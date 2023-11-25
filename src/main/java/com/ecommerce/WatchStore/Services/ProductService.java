@@ -201,10 +201,41 @@ public class ProductService {
         return productPage.getContent(); // Lấy danh sách sản phẩm trên trang cụ thể.
 
     }
+    public List<ProductDTO> getProductsDTOByPage(int page, int pageSize) {
+        PageRequest pageable = PageRequest.of(page - 1, pageSize);
+        Page<Product> productPage = productRepository.findAll(pageable);
 
+        List<ProductDTO> productDTOList = productPage.map(product -> {
+            ProductDTO productDTO = new ProductDTO();
+            productDTO.setProductId(product.getProductId());
+            productDTO.setProductName(product.getProductName());
+            productDTO.setImg(product.getImg());
+            productDTO.setPrice(product.getPrice());
+            productDTO.setQuantity(product.getQuantity());
+            productDTO.setBrandId(product.getBrand() != null ? product.getBrand().getIdBrand() : null);
+            productDTO.setCategoryId(product.getCategory() != null ? product.getCategory().getIdCategory() : null);
+            productDTO.setCreatedBy(product.getCreatedBy());
+            productDTO.setCreatedDate(product.getCreatedDate());
+            productDTO.setUpdatedBy(product.getUpdatedBy());
+            productDTO.setUpdatedDate(product.getUpdatedDate());
+            productDTO.setActive(product.getActive());
+            productDTO.setCode(product.getCode());
+            productDTO.setThumbnail(product.getThumbnail());
+            productDTO.setGender(product.getGender());
+            productDTO.setStatus(product.getStatus());
+            productDTO.setColor(product.getColor());
+            productDTO.setAccessoryId(product.getAccessory() != null ? product.getAccessory().getId() : null);
+            productDTO.setDescription(product.getDescription());
+
+            return productDTO;
+        }).toList();
+
+        return productDTOList;
+    }
     public List<Product> searchProductsByName(String name) {
         return productRepository.findByProductNameContaining(name);
     }
+
     public Product getProductById(Long id) {
         Optional<Product> productOptional = productRepository.findById(id);
         if (productOptional.isPresent()) {

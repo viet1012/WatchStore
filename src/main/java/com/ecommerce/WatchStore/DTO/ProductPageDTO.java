@@ -13,8 +13,8 @@ import java.util.List;
 //    private int totalPages;
 //
 //}
-public class ProductPageDTO extends Pagination<Product> {
-    public ProductPageDTO(List<Product> data, int currentPage, int pageSize, int totalPages) {
+public class ProductPageDTO extends Pagination<ProductDTO> {
+    public ProductPageDTO(List<ProductDTO> data, int currentPage, int pageSize, int totalPages) {
         super(data, currentPage, pageSize, totalPages);
     }
     // Các trường của ProductPageDTO

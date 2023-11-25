@@ -1,10 +1,9 @@
 package com.ecommerce.WatchStore.Controllers;
 
 import com.ecommerce.WatchStore.DTO.BillDTO;
-import com.ecommerce.WatchStore.Entities.Bill;
-import com.ecommerce.WatchStore.Entities.BillDetail;
-import com.ecommerce.WatchStore.Entities.Brand;
-import com.ecommerce.WatchStore.Entities.Voucher;
+import com.ecommerce.WatchStore.DTO.BillPageDTO;
+import com.ecommerce.WatchStore.DTO.SupplierPageDTO;
+import com.ecommerce.WatchStore.Entities.*;
 import com.ecommerce.WatchStore.Response.ResponseWrapper;
 import com.ecommerce.WatchStore.Services.BillService;
 import com.ecommerce.WatchStore.Services.VoucherService;
@@ -25,7 +24,25 @@ public class BillController {
     private BillService billService;
     @Autowired
     private VoucherService voucherService;
+
     @GetMapping("/GetAll")
+    public ResponseEntity<ResponseWrapper<BillPageDTO>> getSuppliers(
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
+
+        List<Bill> bills = billService.getBillsByPage(page, pageSize);
+
+        // Tính toán thông tin phân trang
+        long totalBills = billService.getTotalBills();
+        int totalPages = (int) Math.ceil(totalBills / (double) pageSize);
+
+        BillPageDTO billPageDTO = new BillPageDTO(bills, page, pageSize, totalPages);
+
+        ResponseWrapper<BillPageDTO> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, billPageDTO);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
     public ResponseEntity<ResponseWrapper<List<Bill>>> getBillList() {
         List<Bill> billList = billService.getBillList();
 

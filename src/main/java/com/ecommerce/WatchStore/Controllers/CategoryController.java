@@ -2,8 +2,10 @@ package com.ecommerce.WatchStore.Controllers;
 
 import com.ecommerce.WatchStore.DTO.BrandDTO;
 import com.ecommerce.WatchStore.DTO.CategoryDTO;
+import com.ecommerce.WatchStore.DTO.CategoryPageDTO;
 import com.ecommerce.WatchStore.Entities.Brand;
 import com.ecommerce.WatchStore.Entities.Category;
+import com.ecommerce.WatchStore.Response.ResponseWrapper;
 import com.ecommerce.WatchStore.Services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,15 +20,31 @@ public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
-
     @GetMapping("/GetAll")
+    public ResponseEntity<ResponseWrapper<CategoryPageDTO>> getCategories(
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
+
+        List<Category> categories = categoryService.getCategoriesByPage(page, pageSize);
+
+        // Tính toán thông tin phân trang
+        long totalCategories = categoryService.getTotalCategories();
+        int totalPages = (int) Math.ceil(totalCategories / (double) pageSize);
+
+        CategoryPageDTO categoryPageDTO = new CategoryPageDTO(categories, page, pageSize, totalPages);
+
+        ResponseWrapper<CategoryPageDTO> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, categoryPageDTO);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
     public ResponseEntity<List<Category>> getAllCategory() {
         List<Category> categoryList = categoryService.getAllCategory();
         return ResponseEntity.ok(categoryList);
     }
 
     @PostMapping("/Create")
-    public ResponseEntity<Category> createCategory(@RequestBody CategoryDTO categoryDTO) {
+    public ResponseEntity<ResponseWrapper<Category>> createCategory(@RequestBody CategoryDTO categoryDTO) {
         Category savedCategory = new Category();
         savedCategory.setName(categoryDTO.getName());
         savedCategory.setCreatedBy(categoryDTO.getCreatedBy());
@@ -34,23 +52,28 @@ public class CategoryController {
         savedCategory.setActive(categoryDTO.isActive());
 
         Category newCategory = categoryService.saveCategory(savedCategory);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newCategory);
+
+        ResponseWrapper<Category> response = new ResponseWrapper<>(HttpStatus.CREATED.value(), "Category created successfully", true, newCategory);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/Update/{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody Category categoryDTO) {
+    public ResponseEntity<ResponseWrapper<Category>> updateCategory(@PathVariable Long id, @RequestBody Category categoryDTO) {
         Category updatedCategory = categoryService.updateCategory(id, categoryDTO);
         if (updatedCategory != null) {
-            return ResponseEntity.ok(updatedCategory);
+            ResponseWrapper<Category> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Category updated successfully", true, updatedCategory);
+            return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
     @DeleteMapping("/Delete/{id}")
-    public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
+    public ResponseEntity<ResponseWrapper<String>> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
-        return ResponseEntity.ok().body("Category with ID " + id + " deleted successfully");
+        ResponseWrapper<String> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Category with ID " + id + " deleted successfully", true, null);
+        return ResponseEntity.ok().body(response);
     }
+
 }
 

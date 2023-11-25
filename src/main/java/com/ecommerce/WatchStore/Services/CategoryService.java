@@ -4,6 +4,8 @@ import com.ecommerce.WatchStore.Entities.Brand;
 import com.ecommerce.WatchStore.Entities.Category;
 import com.ecommerce.WatchStore.Repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -48,5 +50,16 @@ public class CategoryService {
     }
     public void deleteCategory(Long id){
         categoryRepository.deleteById(id);
+    }
+
+    public List<Category> getCategoriesByPage(int page, int pageSize) {
+        // Trừ 1 để đảm bảo trang bắt đầu từ 0
+        PageRequest pageable = PageRequest.of(page - 1, pageSize);
+        Page<Category> categoryPage = categoryRepository.findAll(pageable);
+        return categoryPage.getContent(); // Lấy danh sách category trên trang cụ thể.
+    }
+
+    public long getTotalCategories() {
+        return categoryRepository.count(); // Sử dụng phương thức count của JpaRepository để đếm tổng số category.
     }
 }

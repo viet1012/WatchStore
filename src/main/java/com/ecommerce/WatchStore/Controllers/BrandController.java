@@ -1,7 +1,10 @@
 package com.ecommerce.WatchStore.Controllers;
 
 import com.ecommerce.WatchStore.DTO.BrandDTO;
+import com.ecommerce.WatchStore.DTO.BrandPageDTO;
+import com.ecommerce.WatchStore.DTO.ProductPageDTO;
 import com.ecommerce.WatchStore.Entities.Brand;
+import com.ecommerce.WatchStore.Entities.Product;
 import com.ecommerce.WatchStore.Response.ResponseWrapper;
 import com.ecommerce.WatchStore.Services.BrandService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +22,27 @@ public class BrandController {
     @Autowired
     private BrandService brandService;
 
-    @GetMapping("/GetAll")
+
     public ResponseEntity<ResponseWrapper<List<Brand>>> getAllBrands() {
         List<Brand> brands = brandService.getAllBrands();
         ResponseWrapper<List<Brand>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Brands retrieved successfully", true, brands);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/GetAll")
+    public ResponseEntity<ResponseWrapper<BrandPageDTO>> getProducts(
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "pageSize",defaultValue = "10" ) int pageSize) {
+
+        List<Brand> brands = brandService.getBrandsByPage(page, pageSize);
+
+        // Tính toán thông tin phân trang
+        long totalProducts = brandService.getTotalBrands();
+        int totalPages = (int) Math.ceil(totalProducts / (double) pageSize);
+
+        BrandPageDTO brandPageDTO = new BrandPageDTO(brands, page ,pageSize ,totalPages);
+
+        ResponseWrapper<BrandPageDTO> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, brandPageDTO);
         return ResponseEntity.ok(response);
     }
 

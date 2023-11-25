@@ -1,15 +1,14 @@
 package com.ecommerce.WatchStore.Services;
 
 import com.ecommerce.WatchStore.DTO.BillDTO;
-import com.ecommerce.WatchStore.Entities.Bill;
-import com.ecommerce.WatchStore.Entities.BillDetail;
-import com.ecommerce.WatchStore.Entities.User;
-import com.ecommerce.WatchStore.Entities.Voucher;
+import com.ecommerce.WatchStore.Entities.*;
 import com.ecommerce.WatchStore.Repositories.BillDetailRepository;
 import com.ecommerce.WatchStore.Repositories.BillRepository;
 import com.ecommerce.WatchStore.Repositories.UserRepository;
 import com.ecommerce.WatchStore.Repositories.VoucherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -91,5 +90,14 @@ public class BillService {
 
         return billRepository.save(existingBill);
     }
+    public List<Bill> getBillsByPage(int page, int pageSize) {
+        // Trừ 1 để đảm bảo trang bắt đầu từ 0
+        PageRequest pageable = PageRequest.of(page - 1, pageSize);
+        Page<Bill> billPage = billRepository.findAll(pageable);
+        return billPage.getContent(); // Lấy danh sách receipt trên trang cụ thể.
+    }
 
+    public long getTotalBills() {
+        return billRepository.count(); // Sử dụng phương thức count của JpaRepository để đếm tổng số receipt.
+    }
 }

@@ -6,6 +6,8 @@ import com.ecommerce.WatchStore.Entities.Product;
 import com.ecommerce.WatchStore.Repositories.BrandRepository;
 import com.ecommerce.WatchStore.Repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,16 +15,18 @@ import java.util.Optional;
 
 @Service
 public class BrandService {
-        @Autowired
-        private  BrandRepository brandRepository;
-        @Autowired
-        private ProductRepository productRepository;
-        public List<Brand> getAllBrands(){
-            return brandRepository.findAll();
-        }
-        public Optional<Brand> getBrandById(long id){
-            return brandRepository.findById(id);
-        }
+    @Autowired
+    private BrandRepository brandRepository;
+    @Autowired
+    private ProductRepository productRepository;
+
+    public List<Brand> getAllBrands() {
+        return brandRepository.findAll();
+    }
+
+    public Optional<Brand> getBrandById(long id) {
+        return brandRepository.findById(id);
+    }
 
     public Brand saveBrand(BrandDTO newBrand) {
         // Kiểm tra xem tên brand đã tồn tại chưa
@@ -42,31 +46,38 @@ public class BrandService {
         return brandRepository.save(brand);
     }
 
-    public Brand updateBrand(Brand updatedBrand , long id){
-            Optional<Brand> existingBrandOptional = brandRepository.findById(id);
-            if (existingBrandOptional.isPresent()){
-                Brand existingBrand = existingBrandOptional.get();
-                existingBrand.setName(updatedBrand.getName());
-                existingBrand.setUpdatedDt(updatedBrand.getUpdatedDt());
-                existingBrand.setUpdatedBy(updatedBrand.getUpdatedBy());
-                return brandRepository.save(existingBrand);
-            }
-           else
-            {
-                throw  new RuntimeException("Không tìm thấy thương hiệu với ID: " + updatedBrand.getIdBrand());
-            }
-            
-        }
-        public void deleteBrandById(long id){
-            List<Product> products = productRepository.findProductsByBrandId(id);
-            if(products.isEmpty())
-            {
-                brandRepository.deleteById( id);
-            }
-            else {
-                throw new RuntimeException("Không thể xóa thương hiệu khi còn sản phẩm thuộc thương hiệu này.");
-            }
+    public Brand updateBrand(Brand updatedBrand, long id) {
+        Optional<Brand> existingBrandOptional = brandRepository.findById(id);
+        if (existingBrandOptional.isPresent()) {
+            Brand existingBrand = existingBrandOptional.get();
+            existingBrand.setName(updatedBrand.getName());
+            existingBrand.setUpdatedDt(updatedBrand.getUpdatedDt());
+            existingBrand.setUpdatedBy(updatedBrand.getUpdatedBy());
+            return brandRepository.save(existingBrand);
+        } else {
+            throw new RuntimeException("Không tìm thấy thương hiệu với ID: " + updatedBrand.getIdBrand());
         }
 
+    }
 
+    public void deleteBrandById(long id) {
+        List<Product> products = productRepository.findProductsByBrandId(id);
+        if (products.isEmpty()) {
+            brandRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Không thể xóa thương hiệu khi còn sản phẩm thuộc thương hiệu này.");
+        }
+    }
+
+    public List<Brand> getBrandsByPage(int page, int pageSize) {
+        // Trừ 1 để đảm bảo trang bắt đầu từ 0
+        PageRequest pageable = PageRequest.of(page - 1, pageSize);
+        Page<Brand> brandPage = brandRepository.findAll(pageable);
+        return brandPage.getContent(); // Lấy danh sách sản phẩm trên trang cụ thể.
+
+    }
+
+    public long getTotalBrands() {
+        return brandRepository.count(); // Sử dụng phương thức count của JpaRepository để đếm tổng số sản phẩm.
+    }
 }

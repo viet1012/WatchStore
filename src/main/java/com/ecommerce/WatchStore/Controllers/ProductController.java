@@ -24,7 +24,7 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
-    @GetMapping("/GetAll")
+    @GetMapping
     public ResponseEntity<ResponseWrapper<List<ProductDTO>>> getAllProducts(){
         List<ProductDTO> products = productService.getAllProduct();
         ResponseWrapper<List<ProductDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, products);
@@ -72,12 +72,13 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
+    @GetMapping("GetAll")
     public ResponseEntity<ResponseWrapper<ProductPageDTO>> getProducts(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "pageSize",defaultValue = "10" ) int pageSize) {
 
-        List<Product> products = productService.getProductsByPage(page, pageSize);
+      //  List<Product> products = productService.getProductsByPage(page, pageSize);
+        List<ProductDTO> products = productService.getProductsDTOByPage(page, pageSize);
 
         // Tính toán thông tin phân trang
         long totalProducts = productService.getTotalProducts();

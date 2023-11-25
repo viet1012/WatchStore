@@ -8,6 +8,8 @@ import com.ecommerce.WatchStore.Entities.Brand;
 import com.ecommerce.WatchStore.Entities.Product;
 import com.ecommerce.WatchStore.Repositories.BillDetailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -88,5 +90,14 @@ public class BillDetailService {
             throw new IllegalArgumentException("Không tìm thấy chi tiết hóa đơn với ID: " + billDetailId);
         }
     }
+    public List<BillDetail> getBillDetailsByPage(int page, int pageSize) {
+        // Trừ 1 để đảm bảo trang bắt đầu từ 0
+        PageRequest pageable = PageRequest.of(page - 1, pageSize);
+        Page<BillDetail> billPage = billDetailRepository.findAll(pageable);
+        return billPage.getContent(); // Lấy danh sách receipt trên trang cụ thể.
+    }
 
+    public long getTotalBillDetails() {
+        return billDetailRepository.count(); // Sử dụng phương thức count của JpaRepository để đếm tổng số receipt.
+    }
 }

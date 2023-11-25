@@ -3,6 +3,8 @@ package com.ecommerce.WatchStore.Services;
 import com.ecommerce.WatchStore.Entities.Supplier;
 import com.ecommerce.WatchStore.Repositories.SupplierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -54,4 +56,15 @@ public class SupplierService {
         // Xóa Supplier theo ID
         supplierRepository.deleteById(id);
     }
+    public List<Supplier> getSuppliersByPage(int page, int pageSize) {
+        // Trừ 1 để đảm bảo trang bắt đầu từ 0
+        PageRequest pageable = PageRequest.of(page - 1, pageSize);
+        Page<Supplier> supplierPage = supplierRepository.findAll(pageable);
+        return supplierPage.getContent(); // Lấy danh sách supplier trên trang cụ thể.
+    }
+
+    public long getTotalSuppliers() {
+        return supplierRepository.count(); // Sử dụng phương thức count của JpaRepository để đếm tổng số supplier.
+    }
+
 }
