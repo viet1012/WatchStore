@@ -24,10 +24,12 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
-    @GetMapping
+
+    @GetMapping("/GetAll")
     public ResponseEntity<ResponseWrapper<List<ProductDTO>>> getAllProducts(){
         List<ProductDTO> products = productService.getAllProduct();
-        ResponseWrapper<List<ProductDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, products);
+        long totalProducts = productService.getTotalProducts();
+        ResponseWrapper<List<ProductDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, products, totalProducts);
         return ResponseEntity.ok(response);
     }
 
@@ -72,7 +74,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("GetAll")
+    @GetMapping
     public ResponseEntity<ResponseWrapper<ProductPageDTO>> getProducts(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "pageSize",defaultValue = "10" ) int pageSize) {

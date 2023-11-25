@@ -19,6 +19,8 @@ public class ResponseWrapper<T> {
     @JsonProperty("result")
     private T result;
 
+    @JsonProperty("total")
+    private long total;
     public ResponseWrapper(int statusCode, String message, boolean isSuccess, T result) {
         this.statusCode = statusCode;
         this.message = message;
@@ -26,5 +28,11 @@ public class ResponseWrapper<T> {
         this.result = result;
     }
 
-
+    public ResponseWrapper(int statusCode, String message, boolean isSuccess, T result, long total) {
+        this.statusCode = statusCode;
+        this.message = message;
+        this.isSuccess = isSuccess;
+        this.result = result;
+        this.total = total;
+    }
 }
