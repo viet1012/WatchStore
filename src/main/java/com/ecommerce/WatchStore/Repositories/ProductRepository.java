@@ -19,5 +19,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     boolean existsByProductName(String productName);
     List<Product> findByProductNameContaining(String keyword);
     @Query("select p from product_models p where  p.brand.idBrand = :brandId")
-    List<Product> findProductsByBrandId(@Param("brandId") int brandId);
+    List<Product> findProductsByBrandId(@Param("brandId") long brandId);
 }

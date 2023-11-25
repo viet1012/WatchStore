@@ -2,6 +2,7 @@ package com.ecommerce.WatchStore.Services;
 
 import com.ecommerce.WatchStore.Common.BrandNotFoundException;
 import com.ecommerce.WatchStore.Common.ProductNotFoundException;
+import com.ecommerce.WatchStore.DTO.ProductDTO;
 import com.ecommerce.WatchStore.Entities.Accessory;
 import com.ecommerce.WatchStore.Entities.Brand;
 import com.ecommerce.WatchStore.Entities.Category;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -55,14 +57,41 @@ public class ProductService {
         return imageFileNames.toString();
     }
 
-    public Optional<Brand> getBrandByProduct(Product product){
-        return brandService.getBrandById(product.getBrand().getIdBrand());
-    }
-    public List<Product> getAllProduct(){
-        return productRepository.findAll();
-    }
 
-    public Product createProduct(Product product, int brandId, Long categoryId, Long accessoryId, List<MultipartFile> imageFiles ,List<MultipartFile> thumnailImgFiles ) {
+//    public List<Product> getAllProduct(){
+//        return productRepository.findAll();
+//    }
+    public List<ProductDTO> getAllProduct() {
+        List<Product> productList = productRepository.findAll();
+
+        List<ProductDTO> productDtoList = productList.stream().map(product -> {
+            ProductDTO productDto = new ProductDTO();
+            productDto.setProductId(product.getProductId());
+            productDto.setProductName(product.getProductName());
+            productDto.setImg(product.getImg());
+            productDto.setPrice(product.getPrice());
+            productDto.setQuantity(product.getQuantity());
+            productDto.setBrandId(product.getBrand() != null ? product.getBrand().getIdBrand() : null);
+            productDto.setCategoryId(product.getCategory() != null ? product.getCategory().getIdCategory() : null);
+            productDto.setCreatedBy(product.getCreatedBy());
+            productDto.setCreatedDate(product.getCreatedDate());
+            productDto.setUpdatedBy(product.getUpdatedBy());
+            productDto.setUpdatedDate(product.getUpdatedDate());
+            productDto.setActive(product.getActive());
+            productDto.setCode(product.getCode());
+            productDto.setThumbnail(product.getThumbnail());
+            productDto.setGender(product.getGender());
+            productDto.setStatus(product.getStatus());
+            productDto.setColor(product.getColor());
+            productDto.setAccessoryId(product.getAccessory() != null ? product.getAccessory().getId() : null);
+            productDto.setDescription(product.getDescription());
+
+            return productDto;
+        }).collect(Collectors.toList());
+
+        return productDtoList;
+    }
+    public Product createProduct(Product product, long brandId, Long categoryId, Long accessoryId, List<MultipartFile> imageFiles ,List<MultipartFile> thumnailImgFiles ) {
         if (productRepository.existsByProductName(product.getProductName())) {
             throw new ProductNotFoundException("Sản phẩm đã tồn tại với tên: " + product.getProductName());
         }
@@ -138,7 +167,7 @@ public class ProductService {
             existingProduct.setActive(updatedProduct.getActive());
 
             // Kiểm tra brand có tồn tại hay không
-            Optional<Brand> optionalBrand = brandRepository.findById(Math.toIntExact(brandId));
+            Optional<Brand> optionalBrand = brandRepository.findById(brandId);
             if (optionalBrand.isPresent()) {
                 Brand brand = optionalBrand.get();
                 existingProduct.setBrand(brand);

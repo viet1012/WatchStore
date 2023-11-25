@@ -2,6 +2,7 @@ package com.ecommerce.WatchStore.Controllers;
 
 import com.ecommerce.WatchStore.Common.BrandNotFoundException;
 import com.ecommerce.WatchStore.Common.ProductNotFoundException;
+import com.ecommerce.WatchStore.DTO.ProductDTO;
 import com.ecommerce.WatchStore.DTO.ProductPageDTO;
 import com.ecommerce.WatchStore.Entities.Brand;
 import com.ecommerce.WatchStore.Entities.Product;
@@ -24,9 +25,9 @@ public class ProductController {
     @Autowired
     private ProductService productService;
     @GetMapping("/GetAll")
-    public ResponseEntity<ResponseWrapper<List<Product>>> getAllProducts(){
-        List<Product> products = productService.getAllProduct();
-        ResponseWrapper<List<Product>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, products);
+    public ResponseEntity<ResponseWrapper<List<ProductDTO>>> getAllProducts(){
+        List<ProductDTO> products = productService.getAllProduct();
+        ResponseWrapper<List<ProductDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, products);
         return ResponseEntity.ok(response);
     }
 
@@ -81,11 +82,8 @@ public class ProductController {
         // Tính toán thông tin phân trang
         long totalProducts = productService.getTotalProducts();
         int totalPages = (int) Math.ceil(totalProducts / (double) pageSize);
-        ProductPageDTO productPageDTO = new ProductPageDTO();
-        productPageDTO.setProducts(products);
-        productPageDTO.setCurrentPage(page);
-        productPageDTO.setPageSize(pageSize);
-        productPageDTO.setTotalPages(totalPages);
+
+        ProductPageDTO productPageDTO = new ProductPageDTO(products, page ,pageSize ,totalPages);
 
         ResponseWrapper<ProductPageDTO> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, productPageDTO);
         return ResponseEntity.ok(response);

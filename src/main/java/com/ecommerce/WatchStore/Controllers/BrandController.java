@@ -46,7 +46,7 @@ public class BrandController {
     }
 
     @PutMapping("/Update/{id}")
-    public ResponseEntity<ResponseWrapper<Brand>> updateBrand(@PathVariable int id, @RequestBody Brand updateBrand) {
+    public ResponseEntity<ResponseWrapper<Brand>> updateBrand(@PathVariable long id, @RequestBody Brand updateBrand) {
         try {
             updateBrand.setIdBrand(id);
             Brand brand = brandService.updateBrand(updateBrand, id);
@@ -58,7 +58,7 @@ public class BrandController {
     }
 
     @DeleteMapping("/Delete/{id}")
-    public ResponseEntity<Void> deleteBrandById(@PathVariable int id) {
+    public ResponseEntity<Void> deleteBrandById(@PathVariable long id) {
         brandService.deleteBrandById(id);
         return ResponseEntity.noContent().build();
     }

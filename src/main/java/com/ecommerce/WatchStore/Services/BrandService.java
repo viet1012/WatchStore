@@ -20,7 +20,7 @@ public class BrandService {
         public List<Brand> getAllBrands(){
             return brandRepository.findAll();
         }
-        public Optional<Brand> getBrandById(int id){
+        public Optional<Brand> getBrandById(long id){
             return brandRepository.findById(id);
         }
 
@@ -42,8 +42,8 @@ public class BrandService {
         return brandRepository.save(brand);
     }
 
-    public Brand updateBrand(Brand updatedBrand , int id){
-            Optional<Brand> existingBrandOptional = brandRepository.findById(updatedBrand.getIdBrand());
+    public Brand updateBrand(Brand updatedBrand , long id){
+            Optional<Brand> existingBrandOptional = brandRepository.findById(id);
             if (existingBrandOptional.isPresent()){
                 Brand existingBrand = existingBrandOptional.get();
                 existingBrand.setName(updatedBrand.getName());
@@ -57,7 +57,7 @@ public class BrandService {
             }
             
         }
-        public void deleteBrandById(int id){
+        public void deleteBrandById(long id){
             List<Product> products = productRepository.findProductsByBrandId(id);
             if(products.isEmpty())
             {
