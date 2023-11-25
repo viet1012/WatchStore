@@ -42,7 +42,10 @@ public class UserService {
     public List<User> getListUser() {
         return userRepository.findAll();
     }
-
+    public long getTotalUsers()
+    {
+        return userRepository.count();
+    }
     public User getUserById(Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         return optionalUser.orElse(null);

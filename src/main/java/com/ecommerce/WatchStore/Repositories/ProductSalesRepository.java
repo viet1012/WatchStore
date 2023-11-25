@@ -30,9 +30,5 @@ public interface ProductSalesRepository extends JpaRepository<Product, Long> {
             @Param("endDate") LocalDateTime endDate
     );
 
-    @Query("SELECT bd.bill.user.id, SUM(bd.quantity)" +
-            "FROM BillDetail bd " +
-            "GROUP BY bd.bill.user.id " +
-            "ORDER BY SUM(bd.quantity) DESC")
-    List<Object[]> findUserWithMostPurchases();
+
 }

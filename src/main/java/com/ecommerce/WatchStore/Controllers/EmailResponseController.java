@@ -19,23 +19,22 @@ public class EmailResponseController {
     public EmailResponseService emailResponseService;
 
     @GetMapping("/GetAll")
-    public ResponseEntity<ResponseWrapper<List<EmailResponse>>> getAll()
-    {
+    public ResponseEntity<ResponseWrapper<List<EmailResponse>>> getAll() {
         List<EmailResponse> emailResponses = emailResponseService.getAll();
         ResponseWrapper<List<EmailResponse>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "List Email retrieved successfully", true, emailResponses);
         return ResponseEntity.ok().body(response);
     }
+
     @DeleteMapping("/DeleteAll")
-    public ResponseEntity<ResponseWrapper<String>> deleteAll()
-    {
+    public ResponseEntity<ResponseWrapper<String>> deleteAll() {
         emailResponseService.deleteAll();
         ResponseWrapper<String> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Delete Email  successfully", true, "");
         return ResponseEntity.ok().body(response);
     }
+
     @PostMapping("/Create")
-    public ResponseEntity<ResponseWrapper<EmailResponse>> SaveEmail(@RequestBody EmailResponse emailResponse)
-    {
-       EmailResponse  newEmailResponse = emailResponseService.saveEmailResponse(emailResponse);
+    public ResponseEntity<ResponseWrapper<EmailResponse>> SaveEmail(@RequestBody EmailResponse emailResponse) {
+        EmailResponse newEmailResponse = emailResponseService.saveEmailResponse(emailResponse);
         ResponseWrapper<EmailResponse> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Email retrieved successfully", true, newEmailResponse);
         return ResponseEntity.ok().body(response);
     }

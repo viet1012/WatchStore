@@ -2,6 +2,7 @@ package com.ecommerce.WatchStore.Controllers;
 
 
 import com.ecommerce.WatchStore.DTO.ReceiptPageDTO;
+import com.ecommerce.WatchStore.Entities.Brand;
 import com.ecommerce.WatchStore.Entities.Receipt;
 import com.ecommerce.WatchStore.Entities.Supplier;
 import com.ecommerce.WatchStore.Response.ResponseWrapper;
@@ -16,13 +17,21 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/Admin/receipts")
+@RequestMapping("/api/Admin/Receipts")
 public class ReceiptController {
     @Autowired
     private ReceiptService receiptService;
 
-   // @PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/GetAll")
+    public ResponseEntity<ResponseWrapper<List<Receipt>>> getAll() {
+        List<Receipt> receipts = receiptService.getAllReceipts();
+        long totalReceipts = receiptService.getTotalReceipts();
+        ResponseWrapper<List<Receipt>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Brands retrieved successfully", true, totalReceipts, receipts);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/Items")
     public ResponseEntity<ResponseWrapper<ReceiptPageDTO>> getReceipts(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {

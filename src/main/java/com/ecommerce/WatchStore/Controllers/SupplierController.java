@@ -29,7 +29,7 @@ public class SupplierController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
+    @GetMapping("/Items")
     public ResponseEntity<ResponseWrapper<SupplierPageDTO>> getSuppliers(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {

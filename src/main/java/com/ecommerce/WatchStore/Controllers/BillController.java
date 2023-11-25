@@ -25,7 +25,7 @@ public class BillController {
     @Autowired
     private VoucherService voucherService;
 
-    @GetMapping("/GetAll")
+    @GetMapping("/Items")
     public ResponseEntity<ResponseWrapper<BillPageDTO>> getSuppliers(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
@@ -42,15 +42,16 @@ public class BillController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
+    @GetMapping("/GetAll")
     public ResponseEntity<ResponseWrapper<List<Bill>>> getBillList() {
         List<Bill> billList = billService.getBillList();
+        long totalBills = billService.getTotalBills();
 
         if (billList.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
-        ResponseWrapper<List<Bill>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, billList);
+        ResponseWrapper<List<Bill>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalBills, billList);
         return ResponseEntity.ok(response);
     }
 
@@ -70,12 +71,14 @@ public class BillController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // Trả về lỗi nội bộ server nếu có lỗi khác
         }
     }
+
     @PostMapping("/Create")
-    public ResponseEntity<ResponseWrapper<Bill>> createBill(@RequestBody Bill billRequest, @RequestParam Long userId, @RequestParam(required = false, defaultValue = "1") Long voucherId ) {
-        Bill savedBill =  billService.createBill(billRequest, userId, voucherId);
+    public ResponseEntity<ResponseWrapper<Bill>> createBill(@RequestBody Bill billRequest, @RequestParam Long userId, @RequestParam(required = false, defaultValue = "1") Long voucherId) {
+        Bill savedBill = billService.createBill(billRequest, userId, voucherId);
         ResponseWrapper<Bill> response = new ResponseWrapper<>(HttpStatus.CREATED.value(), "Created", true, savedBill);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
     @PutMapping("/Update-Status/{id}")
     public ResponseEntity<ResponseWrapper<Bill>> updateBillStatus(@PathVariable Long id, @RequestBody Bill Bill) {
 
@@ -85,6 +88,7 @@ public class BillController {
         ResponseWrapper<Bill> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Updated", true, updatedBill);
         return ResponseEntity.ok(response);
     }
+
     @PutMapping("/Update/{id}")
     public ResponseEntity<ResponseWrapper<Bill>> updateBill(@PathVariable Long id, @RequestBody BillDTO billDTO) {
         Bill existingBill = billService.getBillById(id);

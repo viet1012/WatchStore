@@ -22,25 +22,26 @@ public class BrandController {
     @Autowired
     private BrandService brandService;
 
-
+    @GetMapping("/GetAll")
     public ResponseEntity<ResponseWrapper<List<Brand>>> getAllBrands() {
         List<Brand> brands = brandService.getAllBrands();
-        ResponseWrapper<List<Brand>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Brands retrieved successfully", true, brands);
+        long totalBrands = brandService.getTotalBrands();
+        ResponseWrapper<List<Brand>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Brands retrieved successfully", true, totalBrands, brands);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/GetAll")
+    @GetMapping("/Items")
     public ResponseEntity<ResponseWrapper<BrandPageDTO>> getProducts(
             @RequestParam(name = "page", defaultValue = "1") int page,
-            @RequestParam(name = "pageSize",defaultValue = "10" ) int pageSize) {
+            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
 
         List<Brand> brands = brandService.getBrandsByPage(page, pageSize);
 
         // Tính toán thông tin phân trang
-        long totalProducts = brandService.getTotalBrands();
-        int totalPages = (int) Math.ceil(totalProducts / (double) pageSize);
+        long totalBrands = brandService.getTotalBrands();
+        int totalPages = (int) Math.ceil(totalBrands / (double) pageSize);
 
-        BrandPageDTO brandPageDTO = new BrandPageDTO(brands, page ,pageSize ,totalPages);
+        BrandPageDTO brandPageDTO = new BrandPageDTO(brands, page, pageSize, totalPages);
 
         ResponseWrapper<BrandPageDTO> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, brandPageDTO);
         return ResponseEntity.ok(response);

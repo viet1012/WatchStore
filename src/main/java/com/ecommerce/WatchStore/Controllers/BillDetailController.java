@@ -1,4 +1,5 @@
 package com.ecommerce.WatchStore.Controllers;
+
 import com.ecommerce.WatchStore.DTO.BillDTO;
 import com.ecommerce.WatchStore.DTO.BillDetailDTO;
 import com.ecommerce.WatchStore.DTO.BillDetailPageDTO;
@@ -23,7 +24,8 @@ public class BillDetailController {
 
     @Autowired
     private BillDetailService billDetailService;
-    @GetMapping("/GetAll")
+
+    @GetMapping("/Items")
     public ResponseEntity<ResponseWrapper<BillDetailPageDTO>> getSuppliers(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
@@ -39,16 +41,30 @@ public class BillDetailController {
         ResponseWrapper<BillDetailPageDTO> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, billDetailPageDTO);
         return ResponseEntity.ok(response);
     }
-    @GetMapping
-    public ResponseEntity<List<BillDetail>> getListBillDetail(){
-        List<BillDetail> billDetailList =  billDetailService.getBillDetail();
-        return ResponseEntity.ok(billDetailList);
+
+    @GetMapping("/GetAll")
+    public ResponseEntity<ResponseWrapper<List<BillDetail>>> getListBillDetail() {
+        List<BillDetail> billDetailList = billDetailService.getBillDetail();
+        ResponseWrapper<List<BillDetail>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, billDetailList);
+        return ResponseEntity.ok(response);
     }
+
     @PostMapping("/Create")
-    public ResponseEntity<BillDetail> createBillDetail(@RequestBody BillDetail billDetail, @RequestParam Long billId,@RequestParam Long productId) {
-
+    public ResponseEntity<ResponseWrapper<BillDetail>> createBillDetail(@RequestBody BillDetail billDetail, @RequestParam Long billId, @RequestParam Long productId) {
         BillDetail createdBillDetail = billDetailService.createBillDetail(billDetail, billId, productId);
-
-        return new ResponseEntity<>(createdBillDetail, HttpStatus.CREATED);
+        ResponseWrapper<BillDetail> response = new ResponseWrapper<>(HttpStatus.CREATED.value(), "BillDetail created successfully", true, createdBillDetail);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    @PutMapping("/Update/")
+    public ResponseEntity<ResponseWrapper<BillDetail>> updateBillDetail(@PathVariable Long billDetailId, @RequestBody BillDetail updatedBillDetail) {
+        BillDetail updatedDetail;
+        try {
+            updatedDetail = billDetailService.updateBillDetail(billDetailId, updatedBillDetail);
+            ResponseWrapper<BillDetail> response = new ResponseWrapper<>(HttpStatus.OK.value(), "BillDetail updated successfully", true, updatedDetail);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException ex) {
+            ResponseWrapper<BillDetail> response = new ResponseWrapper<>(HttpStatus.NOT_FOUND.value(), ex.getMessage(), false, null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
     }
 }

@@ -18,6 +18,10 @@ public class SaleService {
     @Autowired
     private ProductSalesRepository productSalesRepository;
 
+    public long getTotalProductSales()
+    {
+        return productSalesRepository.count();
+    }
     public List<ProductSalesDTO> getProductSales() {
 
         List<Object[]> results = productSalesRepository.getProductSales();

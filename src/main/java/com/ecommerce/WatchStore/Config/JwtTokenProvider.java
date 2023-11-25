@@ -1,4 +1,5 @@
 package com.ecommerce.WatchStore.Config;
+
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +41,7 @@ public class JwtTokenProvider {
             return false;
         }
     }
+
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, userDetails.getUsername());

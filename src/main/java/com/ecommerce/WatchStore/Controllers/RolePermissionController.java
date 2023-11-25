@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping("/api/role-permissions")
 public class RolePermissionController {
     @Autowired
-    private  RolePermissionService rolePermissionService;
+    private RolePermissionService rolePermissionService;
 
     @PostMapping("/assign-role-permission")
     public ResponseEntity<String> assignRolePermission(
@@ -27,6 +27,7 @@ public class RolePermissionController {
         rolePermissionService.assignPermissionToRole(roleId, permissionId);
         return new ResponseEntity<>("Gán quyền thành công.", HttpStatus.OK);
     }
+
     @GetMapping
     public List<RolePermission> getAllRolePermissions() {
         return rolePermissionService.getAllRolePermissions();

@@ -21,6 +21,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -41,23 +42,23 @@ public class AuthController {
     private EmailService emailService;
 
     private final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserDTO loginRequest) {
         logger.info(loginRequest.getEmail() + "---" + loginRequest.getPassword());
-        try{
+        try {
             Authentication authentication = authenticationProvider.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
             );
             UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getEmail());
             String token = jwtTokenProvider.generateToken(authentication);
             return ResponseEntity.ok(new JwtAuthenticationResponse(token));
-        }
-        catch(AuthenticationException e )
-        {
+        } catch (AuthenticationException e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Đăng nhập không thành công "+ e.getMessage() );
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Đăng nhập không thành công " + e.getMessage());
         }
     }
+
     @PostMapping("/register")
     public ResponseEntity<?> registerUserWithRole(@RequestBody User registrationDto, @RequestParam("role_id") Long roleId) {
 
@@ -75,12 +76,11 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password")
-    public String resetPassword(@RequestBody User user)
-    {
+    public String resetPassword(@RequestBody User user) {
 
-        boolean checkOTP = userService.resetPassword(user,  user.getNewPassword());
+        boolean checkOTP = userService.resetPassword(user, user.getNewPassword());
         if (checkOTP) {
-            return "Tài khoản: "+ user.getEmail() +" đã đổi mật khẩu thành công";
+            return "Tài khoản: " + user.getEmail() + " đã đổi mật khẩu thành công";
         } else {
             return "OTP đã sai";
         }
@@ -101,10 +101,9 @@ public class AuthController {
     }
 
     @PostMapping("/re-generate-otp")
-    public String regenerateOTP(@RequestBody OTPRequest email)
-    {
+    public String regenerateOTP(@RequestBody OTPRequest email) {
         boolean check = userService.reGenerateOtp(email.getEmail());
-        if(check)
+        if (check)
             return "Đã gửi OTP thành công";
         else
             return "Gửi OTP thất bại";

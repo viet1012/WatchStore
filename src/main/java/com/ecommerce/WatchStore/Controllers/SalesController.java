@@ -1,8 +1,10 @@
 package com.ecommerce.WatchStore.Controllers;
 
 import com.ecommerce.WatchStore.DTO.ProductSalesDTO;
+import com.ecommerce.WatchStore.Entities.Bill;
 import com.ecommerce.WatchStore.Entities.Product;
 import com.ecommerce.WatchStore.Response.ResponseWrapper;
+import com.ecommerce.WatchStore.Services.BillService;
 import com.ecommerce.WatchStore.Services.SaleService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -16,28 +18,47 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+
 @RestController
-@RequestMapping("/api/Admin/sales")
+@RequestMapping("/api/Admin/Sales")
 public class SalesController {
 
     @Autowired
     private SaleService saleService;
-    @GetMapping("/GetAll")
-    public ResponseEntity<ResponseWrapper<List<ProductSalesDTO>>> getProductSales() {
-        List<ProductSalesDTO> productSales = saleService.getProductSales();
-        ResponseWrapper<List<ProductSalesDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, productSales);
+
+    @Autowired
+    private BillService billService;
+
+    @GetMapping("/Bill/GetAll")
+    public ResponseEntity<ResponseWrapper<List<Bill>>> getBillList() {
+        List<Bill> billList = billService.getBillList();
+        long totalBills = billService.getTotalBills();
+
+        if (billList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        ResponseWrapper<List<Bill>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalBills, billList);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/GetTopBuyer")
-    public ResponseEntity<ResponseWrapper<ProductSalesDTO>> getTopBuyer() {
-        ProductSalesDTO topBuyer = saleService.getUserWithMostPurchases();
-        ResponseWrapper<ProductSalesDTO> response = (topBuyer != null) ?
-                new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, topBuyer) :
-                new ResponseWrapper<>(HttpStatus.NOT_FOUND.value(), "Top buyer not found", false, null);
-
-        return (topBuyer != null) ? ResponseEntity.ok(response) : ResponseEntity.notFound().build();
+    @GetMapping("/GetAll")
+    public ResponseEntity<ResponseWrapper<List<ProductSalesDTO>>> getProductSales() {
+        List<ProductSalesDTO> productSales = saleService.getProductSales();
+        long totalProductSales = saleService.getTotalProductSales();
+        ResponseWrapper<List<ProductSalesDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalProductSales, productSales);
+        return ResponseEntity.ok(response);
     }
+
+//    @GetMapping("/GetTopBuyer")
+//    public ResponseEntity<ResponseWrapper<ProductSalesDTO>> getTopBuyer() {
+//        ProductSalesDTO topBuyer = saleService.getUserWithMostPurchases();
+//        ResponseWrapper<ProductSalesDTO> response = (topBuyer != null) ?
+//                new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, topBuyer) :
+//                new ResponseWrapper<>(HttpStatus.NOT_FOUND.value(), "Top buyer not found", false, null);
+//
+//        return (topBuyer != null) ? ResponseEntity.ok(response) : ResponseEntity.notFound().build();
+//    }
 
     @GetMapping("/by-date-range")
     public ResponseEntity<ResponseWrapper<ProductSalesDTO>> getBestSellingProductByDateRange(

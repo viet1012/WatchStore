@@ -26,7 +26,7 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/GetAll")
-    public ResponseEntity<ResponseWrapper<List<ProductDTO>>> getAllProducts(){
+    public ResponseEntity<ResponseWrapper<List<ProductDTO>>> getAllProducts() {
         List<ProductDTO> products = productService.getAllProduct();
         long totalProducts = productService.getTotalProducts();
         ResponseWrapper<List<ProductDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalProducts, products);
@@ -37,7 +37,7 @@ public class ProductController {
     public ResponseEntity<ResponseWrapper<Product>> createProduct(
             @RequestParam("brandId") int brandId,
             @RequestParam("categoryId") Long categoryId,
-            @RequestParam("accessoryId") Long  accessoryId,
+            @RequestParam("accessoryId") Long accessoryId,
             @RequestParam("imageFile") List<MultipartFile> imageFile,
             @RequestParam("thumnail") List<MultipartFile> thumnailImgFiles,
             @ModelAttribute Product product) {
@@ -46,7 +46,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping(value = "/Update/{id}",  consumes = "multipart/form-data" )
+    @PutMapping(value = "/Update/{id}", consumes = "multipart/form-data")
     public ResponseEntity<ResponseWrapper<Product>> updateProduct(@PathVariable Long id, @ModelAttribute Product updatedProduct, @RequestParam Long idBrand, List<MultipartFile> file) {
         try {
             Product product = productService.updateProduct(id, updatedProduct, idBrand, file);
@@ -61,46 +61,46 @@ public class ProductController {
     }
 
     @DeleteMapping("/Delete/{id}")
-    public ResponseEntity<ResponseWrapper<List<Product>>>  deleteProduct(@PathVariable Long id ){
+    public ResponseEntity<ResponseWrapper<List<Product>>> deleteProduct(@PathVariable Long id) {
         List<Product> products = productService.deleteProduct(id);
         ResponseWrapper<List<Product>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Deleted product successfully", true, products);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/Delete-multiple")
-    public ResponseEntity<ResponseWrapper<List<Product>>>  deleteMultipleProducts(@RequestBody List<Long> productIds) {
-        List<Product> products =  productService.deleteMultipleProducts(productIds);
+    public ResponseEntity<ResponseWrapper<List<Product>>> deleteMultipleProducts(@RequestBody List<Long> productIds) {
+        List<Product> products = productService.deleteMultipleProducts(productIds);
         ResponseWrapper<List<Product>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Deleted product successfully", true, products);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
+    @GetMapping("/Items")
     public ResponseEntity<ResponseWrapper<ProductPageDTO>> getProducts(
             @RequestParam(name = "page", defaultValue = "1") int page,
-            @RequestParam(name = "pageSize",defaultValue = "10" ) int pageSize) {
+            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
 
-      //  List<Product> products = productService.getProductsByPage(page, pageSize);
+        //  List<Product> products = productService.getProductsByPage(page, pageSize);
         List<ProductDTO> products = productService.getProductsDTOByPage(page, pageSize);
 
         // Tính toán thông tin phân trang
         long totalProducts = productService.getTotalProducts();
         int totalPages = (int) Math.ceil(totalProducts / (double) pageSize);
 
-        ProductPageDTO productPageDTO = new ProductPageDTO(products, page ,pageSize ,totalPages);
+        ProductPageDTO productPageDTO = new ProductPageDTO(products, page, pageSize, totalPages);
 
         ResponseWrapper<ProductPageDTO> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, productPageDTO);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/Price-asc")
-    public ResponseEntity<ResponseWrapper<List<Product>>> getAllProductsByPriceAsc(){
+    public ResponseEntity<ResponseWrapper<List<Product>>> getAllProductsByPriceAsc() {
         List<Product> products = productService.getAllProductsByPriceAsc();
         ResponseWrapper<List<Product>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, products);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/Price-desc")
-    public ResponseEntity<ResponseWrapper<List<Product>>> getAllProductsByPriceDesc(){
+    public ResponseEntity<ResponseWrapper<List<Product>>> getAllProductsByPriceDesc() {
         List<Product> products = productService.getAllProductsByPriceDesc();
         ResponseWrapper<List<Product>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, products);
         return ResponseEntity.ok(response);

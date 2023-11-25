@@ -17,19 +17,21 @@ import java.util.List;
 public class BestSellingProductController {
     @Autowired
     private BestSellingProductsService bestSellingProductsService;
+
     @GetMapping
     public ResponseEntity<List<BestSellingProductDTO>> getBestSellingProducts() {
         List<BestSellingProductDTO> bestSellingProducts = bestSellingProductsService.getBestSellingProducts();
         return ResponseEntity.ok(bestSellingProducts);
     }
+
     @GetMapping("/top3")
-    public ResponseEntity<List<BestSellingProductDTO>> getTop3SellingProducts(){
+    public ResponseEntity<List<BestSellingProductDTO>> getTop3SellingProducts() {
         List<BestSellingProductDTO> top3Products = bestSellingProductsService.getTop3SellingProuducts();
         return ResponseEntity.ok(top3Products);
     }
 
     @GetMapping("/price-range/")
-    public ResponseEntity<List<BestSellingProductDTO>> getBestSellingProductsByPriceRange(@RequestParam double min , @RequestParam double max){
+    public ResponseEntity<List<BestSellingProductDTO>> getBestSellingProductsByPriceRange(@RequestParam double min, @RequestParam double max) {
         List<BestSellingProductDTO> top3Products = bestSellingProductsService.getBestSellingProductsByPriceRange(min, max);
         return ResponseEntity.ok(top3Products);
     }

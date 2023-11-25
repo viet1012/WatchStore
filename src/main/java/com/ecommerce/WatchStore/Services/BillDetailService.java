@@ -81,7 +81,6 @@ public class BillDetailService {
         if (existingBillDetailOptional.isPresent()) {
             BillDetail existingBillDetail = existingBillDetailOptional.get();
             existingBillDetail.setQuantity(updatedBillDetail.getQuantity());
-            existingBillDetail.setUnitPrice(updatedBillDetail.getUnitPrice());
 
             // Cập nhật thông tin khác nếu cần
 

@@ -20,6 +20,7 @@ public class EmailController {
     private EmailService emailService;
     @Autowired
     private UserRepository userRepository;
+
     @PostMapping("/send-email-ads")
     public ResponseEntity<String> sendEmailADS(
             @RequestParam("recipientEmail") String recipientEmail
@@ -39,7 +40,7 @@ public class EmailController {
         try {
             OtpUtils otpUtils = new OtpUtils();
             String otp = otpUtils.generateOtp();
-            emailService.sendEmailWithOTP(recipientEmail,"Viet", otp);
+            emailService.sendEmailWithOTP(recipientEmail, "Viet", otp);
             return ResponseEntity.ok("Email sent successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send email");
@@ -53,19 +54,17 @@ public class EmailController {
         try {
 
             Optional<User> currentUser = userRepository.findByEmail(user.getEmail());
-            if(currentUser.isPresent()) {
+            if (currentUser.isPresent()) {
                 OtpUtils otpUtils = new OtpUtils();
                 String otp = otpUtils.generateOtp();
-                emailService.sendVerificationEmail(currentUser.get().getEmail(),otp);
+                emailService.sendVerificationEmail(currentUser.get().getEmail(), otp);
 
                 currentUser.get().setOtp(otp);
                 currentUser.get().setCreateDateOtp(LocalDateTime.now());
                 userRepository.save(currentUser.get());
 
-                return ResponseEntity.ok("Email sent to "+ currentUser.get().getEmail()+" successfully");
-            }
-            else
-            {
+                return ResponseEntity.ok("Email sent to " + currentUser.get().getEmail() + " successfully");
+            } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send email");
 
             }

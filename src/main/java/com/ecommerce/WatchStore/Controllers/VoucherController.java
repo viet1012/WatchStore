@@ -25,16 +25,19 @@ public class VoucherController {
         List<Voucher> vouchers = voucherService.getListVoucher();
         return ResponseEntity.ok(vouchers);
     }
+
     @PostMapping("/Create")
     public Voucher createVoucher(@RequestBody Voucher voucher) {
         return voucherService.createVoucher(voucher);
     }
+
     @PutMapping("/Update")
     public Voucher updateVoucher(@RequestBody Voucher voucher, @RequestParam Long voucherId) {
         return voucherService.updateVoucher(voucher, voucherId);
     }
+
     @DeleteMapping("/Delete")
     public void deleteVoucher(@RequestParam Long voucherId) {
-         voucherService.deleteVoucher(voucherId);
+        voucherService.deleteVoucher(voucherId);
     }
 }

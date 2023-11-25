@@ -5,6 +5,7 @@ import com.ecommerce.WatchStore.DTO.CategoryDTO;
 import com.ecommerce.WatchStore.DTO.CategoryPageDTO;
 import com.ecommerce.WatchStore.Entities.Brand;
 import com.ecommerce.WatchStore.Entities.Category;
+import com.ecommerce.WatchStore.Entities.Supplier;
 import com.ecommerce.WatchStore.Response.ResponseWrapper;
 import com.ecommerce.WatchStore.Services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,17 @@ public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
+
     @GetMapping("/GetAll")
+    public ResponseEntity<ResponseWrapper<List<Category>>> getAllCategory() {
+        List<Category> categoryList = categoryService.getAllCategory();
+        long totalCategories = categoryService.getTotalCategories();
+        ResponseWrapper<List<Category>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalCategories, categoryList);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/Items")
     public ResponseEntity<ResponseWrapper<CategoryPageDTO>> getCategories(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
@@ -37,11 +48,6 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
-    public ResponseEntity<List<Category>> getAllCategory() {
-        List<Category> categoryList = categoryService.getAllCategory();
-        return ResponseEntity.ok(categoryList);
-    }
 
     @PostMapping("/Create")
     public ResponseEntity<ResponseWrapper<Category>> createCategory(@RequestBody CategoryDTO categoryDTO) {
