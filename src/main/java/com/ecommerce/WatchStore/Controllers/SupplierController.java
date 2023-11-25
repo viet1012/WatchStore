@@ -3,6 +3,7 @@ package com.ecommerce.WatchStore.Controllers;
 import com.ecommerce.WatchStore.DTO.CategoryPageDTO;
 import com.ecommerce.WatchStore.DTO.SupplierPageDTO;
 import com.ecommerce.WatchStore.Entities.Category;
+import com.ecommerce.WatchStore.Entities.Product;
 import com.ecommerce.WatchStore.Entities.Supplier;
 import com.ecommerce.WatchStore.Response.ResponseWrapper;
 import com.ecommerce.WatchStore.Services.SupplierService;
@@ -21,6 +22,14 @@ public class SupplierController {
     private SupplierService supplierService;
 
     @GetMapping("/GetAll")
+    public ResponseEntity<ResponseWrapper<List<Supplier>>> getAllSuppliers() {
+        List<Supplier> suppliers = supplierService.getAllSuppliers();
+        long totalSuppliers = supplierService.getTotalSuppliers();
+        ResponseWrapper<List<Supplier>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalSuppliers, suppliers);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
     public ResponseEntity<ResponseWrapper<SupplierPageDTO>> getSuppliers(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {

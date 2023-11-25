@@ -29,7 +29,7 @@ public class ProductController {
     public ResponseEntity<ResponseWrapper<List<ProductDTO>>> getAllProducts(){
         List<ProductDTO> products = productService.getAllProduct();
         long totalProducts = productService.getTotalProducts();
-        ResponseWrapper<List<ProductDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, products, totalProducts);
+        ResponseWrapper<List<ProductDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalProducts, products);
         return ResponseEntity.ok(response);
     }
 
