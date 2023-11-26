@@ -5,7 +5,7 @@ import com.ecommerce.WatchStore.Entities.Supplier;
 import java.util.List;
 
 public class SupplierPageDTO extends Pagination<Supplier>{
-    public SupplierPageDTO(List<Supplier> data, int currentPage, int pageSize, int totalPages) {
-        super(data, currentPage, pageSize, totalPages);
+    public SupplierPageDTO(List<Supplier> data, int currentPage, int pageSize, int totalPages, long totalItems) {
+        super(data, currentPage, pageSize, totalPages,  totalItems);
     }
 }

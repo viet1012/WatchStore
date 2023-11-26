@@ -10,6 +10,7 @@ public class Pagination<T> {
     private int currentPage;
     private int pageSize;
     private int totalPages;
+    private long totalItems;
 
     // Constructors, getters, and setters
 
@@ -19,7 +20,13 @@ public class Pagination<T> {
         this.pageSize = pageSize;
         this.totalPages = totalPages;
     }
-
+    public Pagination(List<T> data, int currentPage, int pageSize, int totalPages, long totalItems) {
+        this.data = data;
+        this.currentPage = currentPage;
+        this.pageSize = pageSize;
+        this.totalPages = totalPages;
+        this.totalItems = totalItems;
+    }
     // Getters and setters
 }
 

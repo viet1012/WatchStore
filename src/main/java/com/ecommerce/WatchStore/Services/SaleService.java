@@ -54,20 +54,21 @@ public class SaleService {
         }
         return null;
     }
-    public ProductSalesDTO getUserWithMostPurchases()
-    {
-        List<Object[]> result = productSalesRepository.findUserWithMostPurchases();
-        if( result != null){
-            Object[] bestSeller = result.get(0);
-            Long userId = (Long) bestSeller[0];
-            Long totalProduct = (Long) bestSeller[1];
 
-            ProductSalesDTO productSalesDTO = new ProductSalesDTO();
-            productSalesDTO.setUserId(userId);
-            productSalesDTO.setTotalQuantitySold(totalProduct);
-            return productSalesDTO;
-        }
-        return null;
-    }
+//    public ProductSalesDTO getUserWithMostPurchases()
+//    {
+//        List<Object[]> result = productSalesRepository.findUserWithMostPurchases();
+//        if( result != null){
+//            Object[] bestSeller = result.get(0);
+//            Long userId = (Long) bestSeller[0];
+//            Long totalProduct = (Long) bestSeller[1];
+//
+//            ProductSalesDTO productSalesDTO = new ProductSalesDTO();
+//            productSalesDTO.setUserId(userId);
+//            productSalesDTO.setTotalQuantitySold(totalProduct);
+//            return productSalesDTO;
+//        }
+//        return null;
+//    }
 
 }

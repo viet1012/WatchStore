@@ -21,7 +21,7 @@ public class SupplierController {
     @Autowired
     private SupplierService supplierService;
 
-    @GetMapping("/GetAll")
+    @GetMapping("/Items")
     public ResponseEntity<ResponseWrapper<List<Supplier>>> getAllSuppliers() {
         List<Supplier> suppliers = supplierService.getAllSuppliers();
         long totalSuppliers = supplierService.getTotalSuppliers();
@@ -29,7 +29,7 @@ public class SupplierController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/Items")
+    @GetMapping("/GetAll")
     public ResponseEntity<ResponseWrapper<SupplierPageDTO>> getSuppliers(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
@@ -40,9 +40,9 @@ public class SupplierController {
         long totalSuppliers = supplierService.getTotalSuppliers();
         int totalPages = (int) Math.ceil(totalSuppliers / (double) pageSize);
 
-        SupplierPageDTO supplierPageDTO = new SupplierPageDTO(suppliers, page, pageSize, totalPages);
+        SupplierPageDTO supplierPageDTO = new SupplierPageDTO(suppliers, page, pageSize, totalPages, totalSuppliers);
 
-        ResponseWrapper<SupplierPageDTO> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, supplierPageDTO);
+        ResponseWrapper<SupplierPageDTO> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalSuppliers, supplierPageDTO);
         return ResponseEntity.ok(response);
     }
 
