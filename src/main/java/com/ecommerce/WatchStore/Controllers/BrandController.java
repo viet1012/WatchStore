@@ -41,9 +41,9 @@ public class BrandController {
         long totalBrands = brandService.getTotalBrands();
         int totalPages = (int) Math.ceil(totalBrands / (double) pageSize);
 
-        BrandPageDTO brandPageDTO = new BrandPageDTO(brands, page, pageSize, totalPages);
+        BrandPageDTO brandPageDTO = new BrandPageDTO(brands, page, pageSize, totalPages, totalBrands);
 
-        ResponseWrapper<BrandPageDTO> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, brandPageDTO);
+        ResponseWrapper<BrandPageDTO> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalBrands,brandPageDTO);
         return ResponseEntity.ok(response);
     }
 
