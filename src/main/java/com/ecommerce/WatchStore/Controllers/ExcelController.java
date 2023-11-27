@@ -19,13 +19,17 @@ public class ExcelController {
     public void exportToExcelProduct(HttpServletResponse response) throws IOException {
         excelService.exportToExcelProduct(response);
     }
+    @GetMapping("/export-category")
+    public void exportToExcelCategory(HttpServletResponse response) throws IOException {
+        excelService.exportToExcelCategory(response);
+    }
 
     @GetMapping("/export-bill")
     public void exportToExcelBill(HttpServletResponse response) throws IOException {
         excelService.exportToExcelBill(response);
     }
 
-    @GetMapping("/export-bill-details")
+    @GetMapping("/export-bill-detail")
     public void exportToExcelBillDetail(HttpServletResponse response) throws IOException {
         excelService.exportToExcelBillDetail(response);
     }
@@ -45,8 +49,12 @@ public class ExcelController {
         excelService.exportToExcelReceipt(response);
     }
 
-    @PostMapping("/import")
-    public void importFromExcel(@RequestParam("file") MultipartFile file) throws IOException {
-        excelService.importFromExcel(file);
+    @PostMapping("/import-product")
+    public void importFromExcelProduct(@RequestParam("file") MultipartFile file) throws IOException {
+        excelService.importFromExcelProduct(file);
+    }
+    @PostMapping("/import-supplier")
+    public void importFromExcelSupplier(@RequestParam("file") MultipartFile file) throws IOException {
+        excelService.importFromExcelSupplier(file);
     }
 }

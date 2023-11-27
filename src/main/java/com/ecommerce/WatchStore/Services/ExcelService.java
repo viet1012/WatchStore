@@ -19,6 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -35,6 +38,8 @@ public class ExcelService {
     private SupplierRepository supplierRepository;
     @Autowired
     private ReceiptRepository receiptRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
     @Value("${file.upload.directory}")
     private String uploadPath;
 
@@ -56,7 +61,7 @@ public class ExcelService {
         headerRow.createCell(2).setCellValue("Giá");
         headerRow.createCell(3).setCellValue("Thương hiệu");
         headerRow.createCell(4).setCellValue("Danh mục");
-        headerRow.createCell(5).setCellValue("Trạng thái");
+        headerRow.createCell(5).setCellValue("Hoạt động");
         headerRow.createCell(6).setCellValue("Tạo bởi");
         headerRow.createCell(7).setCellValue("Số lượng");
         headerRow.createCell(8).setCellValue("Phụ kiện");
@@ -71,6 +76,7 @@ public class ExcelService {
         // Lấy danh sách sản phẩm từ cơ sở dữ liệu
         List<Product> products = productRepository.findAll();
 
+
         // Điền dữ liệu sản phẩm vào Excel
         int rowNum = 1;
         for (Product product : products) {
@@ -80,7 +86,7 @@ public class ExcelService {
             row.createCell(2).setCellValue(product.getPrice());
             row.createCell(3).setCellValue(product.getBrand() != null ? product.getBrand().getName() : "");
             row.createCell(4).setCellValue(product.getCategory() != null ? product.getCategory().getName() : "");
-            row.createCell(5).setCellValue(product.getActive());
+            row.createCell(5).setCellValue(product.getActive() ? "Có" : "Không");
             row.createCell(6).setCellValue(product.getCreatedBy());
             row.createCell(7).setCellValue(product.getQuantity());
             row.createCell(8).setCellValue(product.getAccessory() != null ? product.getAccessory().getName() : "");
@@ -94,8 +100,10 @@ public class ExcelService {
 
         }
 
+
         for (int i = 0; i <= 15; i++) {
             sheet.autoSizeColumn(i);
+
         }
         // Thiết lập loại Content-Type và header cho phản hồi
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -135,7 +143,7 @@ public class ExcelService {
         headerRow.createCell(7).setCellValue("Ngày tạo");
         headerRow.createCell(8).setCellValue("Cập nhật bởi");
         headerRow.createCell(9).setCellValue("Ngày cập nhật");
-        headerRow.createCell(10).setCellValue("Trang thái");
+        headerRow.createCell(10).setCellValue("Hoạt động");
 
         // Lấy danh sách hóa đơn từ cơ sở dữ liệu
         List<Bill> bills = billRepository.findAll();
@@ -154,7 +162,8 @@ public class ExcelService {
             row.createCell(7).setCellValue(bill.getCreatedDate().toString());
             row.createCell(8).setCellValue(bill.getUpdatedBy());
             row.createCell(9).setCellValue(bill.getUpdatedDate().toString());
-            row.createCell(10).setCellValue(bill.getActive());
+            row.createCell(10).setCellValue(bill.getActive() ? "Có" : "Không");
+
         }
 
         for (int i = 0; i <= 10; i++) {
@@ -192,7 +201,7 @@ public class ExcelService {
         headerRow.createCell(6).setCellValue("Ngày tạo");
         headerRow.createCell(7).setCellValue("Được cập nhật bởi");
         headerRow.createCell(8).setCellValue("Ngày cập nhật");
-        headerRow.createCell(9).setCellValue("Trang thái");
+        headerRow.createCell(9).setCellValue("Hoạt động");
 
 
         // Lấy danh sách chi tiết hóa đơn từ cơ sở dữ liệu
@@ -201,9 +210,15 @@ public class ExcelService {
         // Điền dữ liệu chi tiết hóa đơn vào Excel
         int rowNum = 1;
         for (BillDetail billDetail : billDetails) {
+
+            if (billDetail.getBill() != null) {
+                System.out.println(billDetail.getBill().getId());
+
+            }
+
             Row row = sheet.createRow(rowNum++);
             row.createCell(0).setCellValue(billDetail.getId());
-            row.createCell(1).setCellValue(billDetail.getBill().getId());
+            row.createCell(1).setCellValue(billDetail.getBill() != null ? billDetail.getBill().getId().toString() : null);
             row.createCell(2).setCellValue(billDetail.getProduct().getProductId());
             row.createCell(3).setCellValue(billDetail.getUnitPrice());
             row.createCell(4).setCellValue(billDetail.getQuantity());
@@ -211,7 +226,7 @@ public class ExcelService {
             row.createCell(6).setCellValue(billDetail.getCreatedDate().toString());
             row.createCell(7).setCellValue(billDetail.getUpdatedBy());
             row.createCell(8).setCellValue(billDetail.getUpdatedDate().toString());
-            row.createCell(9).setCellValue(billDetail.getActive());
+            row.createCell(9).setCellValue(billDetail.getActive() ? "Có" : "Không");
         }
 
         for (int i = 0; i <= 9; i++) {
@@ -389,13 +404,98 @@ public class ExcelService {
         }
     }
 
+    public void exportToExcelCategory(HttpServletResponse response) throws IOException {
+        String excelFilePath = uploadPath + "/categories.xlsx";
+        File excelFile = new File(excelFilePath);
 
-    public void importFromExcel(MultipartFile file) throws IOException {
-        // Đọc dữ liệu từ tệp Excel được tải lên
+        // Tạo một Workbook Excel mới
+        Workbook workbook = new XSSFWorkbook();
+
+        // Tạo một trang tính mới
+        Sheet sheet = workbook.createSheet("Categories");
+
+        // Tạo hàng đầu tiên (header) trong Excel
+        Row headerRow = sheet.createRow(0);
+        headerRow.createCell(0).setCellValue("ID");
+        headerRow.createCell(1).setCellValue("Tên");
+        headerRow.createCell(2).setCellValue("Người tạo");
+        headerRow.createCell(3).setCellValue("Ngày tạo");
+        headerRow.createCell(4).setCellValue("Người cập nhật");
+        headerRow.createCell(5).setCellValue("Ngày cập nhật");
+        headerRow.createCell(6).setCellValue("Hoạt động");
+
+        // Lấy danh sách các category từ cơ sở dữ liệu
+        List<Category> categories = categoryRepository.findAll();
+
+        // Điền dữ liệu của category vào Excel
+        int rowNum = 1;
+        for (Category category : categories) {
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(category.getId());
+            row.createCell(1).setCellValue(category.getName());
+            row.createCell(2).setCellValue(category.getCreatedBy());
+            row.createCell(3).setCellValue(category.getCreatedDt().toString());
+            row.createCell(4).setCellValue(category.getUpdatedBy());
+            row.createCell(5).setCellValue(category.getUpdatedDt().toString());
+            row.createCell(6).setCellValue(category.isActive() ? "Có" : "Không");
+        }
+
+        for (int i = 0; i <= 6; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        // Thiết lập loại Content-Type và header cho phản hồi
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=categories.xlsx");
+
+        // Ghi dữ liệu từ Workbook vào HttpServletResponse
+        try (FileOutputStream fileOutputStream = new FileOutputStream(excelFilePath)) {
+            workbook.write(fileOutputStream);
+        }
+    }
+
+    public void importFromExcelSupplier(MultipartFile file) throws IOException {
         InputStream inputStream = file.getInputStream();
         Workbook workbook = new XSSFWorkbook(inputStream);
+        Sheet sheet = workbook.getSheetAt(0);
 
-        // Lấy trang tính đầu tiên (assumption: bạn chỉ có một trang tính)
+        Iterator<Row> rowIterator = sheet.iterator();
+
+        // Bỏ qua hàng tiêu đề
+        if (rowIterator.hasNext()) {
+            rowIterator.next();
+        }
+
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            // Đọc dữ liệu từ mỗi hàng và tạo đối tượng Supplier
+            Supplier supplier = new Supplier();
+            supplier.setId((long) row.getCell(0).getNumericCellValue());
+            supplier.setName(row.getCell(1).getStringCellValue());
+            supplier.setAddress(row.getCell(2).getStringCellValue());
+            supplier.setPhoneNumber(row.getCell(3).getStringCellValue());
+            supplier.setEmail(row.getCell(4).getStringCellValue());
+            supplier.setCreatedBy(row.getCell(5).getStringCellValue());
+            supplier.setCreatedDate(LocalDateTime.parse(row.getCell(6).getStringCellValue()));
+            supplier.setUpdatedBy(row.getCell(7)!= null ? row.getCell(7).getStringCellValue() : null);
+            supplier.setUpdatedDate(LocalDateTime.parse(row.getCell(8).getStringCellValue()));
+            if(row.getCell(9).getStringCellValue().equalsIgnoreCase("Có"))
+            {
+                supplier.setActive(true);
+            }
+            else{
+                supplier.setActive( false);
+            }
+
+            // Lưu Supplier vào cơ sở dữ liệu thông qua repository
+            supplierRepository.save(supplier);
+        }
+        workbook.close();
+    }
+
+    public void importFromExcelProduct(MultipartFile file) throws IOException {
+        InputStream inputStream = file.getInputStream();
+        Workbook workbook = new XSSFWorkbook(inputStream);
         Sheet sheet = workbook.getSheetAt(0);
 
         for (Row row : sheet) {
@@ -404,17 +504,46 @@ public class ExcelService {
                 continue;
             }
 
-            // Đọc dữ liệu từ từng ô trong hàng và lưu vào cơ sở dữ liệu
-            Long id = (long) row.getCell(0).getNumericCellValue();
-            String name = row.getCell(1).getStringCellValue();
-            float price = (float) row.getCell(2).getNumericCellValue();
-
-            // Tạo và lưu sản phẩm vào cơ sở dữ liệu
             Product product = new Product();
-            product.setProductId(id);
-            product.setProductName(name);
-            product.setPrice(price);
+            product.setProductId((long) row.getCell(0).getNumericCellValue());
+            product.setProductName(row.getCell(1).getStringCellValue());
+            product.setPrice((float) row.getCell(2).getNumericCellValue());
+            product.setQuantity((int) row.getCell(3).getNumericCellValue());
 
+            // Đoạn code sau sẽ lấy thông tin Brand từ cột 4 của file Excel
+            Brand brand = new Brand();
+            brand.setName(row.getCell(4).getStringCellValue());
+            product.setBrand(brand);
+
+            // Đoạn code sau sẽ lấy thông tin Category từ cột 5 của file Excel
+            Category category = new Category();
+            category.setName(row.getCell(5).getStringCellValue());
+            product.setCategory(category);
+
+            product.setCreatedBy(row.getCell(6).getStringCellValue());
+
+            // Lấy thông tin thời gian tạo
+            Date createdDateTime = row.getCell(7).getDateCellValue();
+            product.setCreatedDate(createdDateTime);
+
+            product.setUpdatedBy(row.getCell(8).getStringCellValue());
+
+            // Lấy thông tin thời gian cập nhật
+            Date updatedDateTime = row.getCell(9).getDateCellValue();
+            product.setUpdatedDate(updatedDateTime);
+
+            // Xác định trạng thái Active hoặc Inactive từ cột 10
+            String active = row.getCell(10).getStringCellValue();
+            product.setActive(active.equalsIgnoreCase("Có"));
+
+            product.setCode(row.getCell(11).getStringCellValue());
+            product.setThumbnail(row.getCell(12).getStringCellValue());
+            product.setGender(row.getCell(13).getStringCellValue());
+            product.setStatus(row.getCell(14).getStringCellValue());
+            product.setColor(row.getCell(15).getStringCellValue());
+            product.setDescription(row.getCell(16).getStringCellValue());
+
+            // Lưu đối tượng Product vào cơ sở dữ liệu
             productRepository.save(product);
         }
 

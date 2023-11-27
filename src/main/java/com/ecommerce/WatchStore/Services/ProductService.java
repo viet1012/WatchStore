@@ -72,7 +72,7 @@ public class ProductService {
             productDto.setPrice(product.getPrice());
             productDto.setQuantity(product.getQuantity());
             productDto.setBrandId(product.getBrand() != null ? product.getBrand().getIdBrand() : null);
-            productDto.setCategoryId(product.getCategory() != null ? product.getCategory().getIdCategory() : null);
+            productDto.setCategoryId(product.getCategory() != null ? product.getCategory().getId() : null);
             productDto.setCreatedBy(product.getCreatedBy());
             productDto.setCreatedDate(product.getCreatedDate());
             productDto.setUpdatedBy(product.getUpdatedBy());
@@ -213,7 +213,7 @@ public class ProductService {
             productDTO.setPrice(product.getPrice());
             productDTO.setQuantity(product.getQuantity());
             productDTO.setBrandId(product.getBrand() != null ? product.getBrand().getIdBrand() : null);
-            productDTO.setCategoryId(product.getCategory() != null ? product.getCategory().getIdCategory() : null);
+            productDTO.setCategoryId(product.getCategory() != null ? product.getCategory().getId() : null);
             productDTO.setCreatedBy(product.getCreatedBy());
             productDTO.setCreatedDate(product.getCreatedDate());
             productDTO.setUpdatedBy(product.getUpdatedBy());

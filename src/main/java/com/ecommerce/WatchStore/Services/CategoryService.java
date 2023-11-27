@@ -45,7 +45,7 @@ public class CategoryService {
             return categoryRepository.save(existingCategory);
         }else
         {
-            throw  new RuntimeException("Không tìm thấy danh mục với ID: " + updatedCategory.getIdCategory());
+            throw  new RuntimeException("Không tìm thấy danh mục với ID: " + updatedCategory.getId());
         }
     }
     public void deleteCategory(Long id){
