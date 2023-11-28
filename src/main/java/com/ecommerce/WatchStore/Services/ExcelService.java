@@ -20,12 +20,15 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 @Service
 public class ExcelService {
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     private ProductRepository productRepository;
     @Autowired
@@ -115,10 +118,10 @@ public class ExcelService {
         }
 
         // Ghi dữ liệu từ Workbook vào HttpServletResponse
-//        OutputStream outputStream = response.getOutputStream();
-//        workbook.write(outputStream);
-//        outputStream.close();
-//        workbook.close();
+        OutputStream outputStream = response.getOutputStream();
+        workbook.write(outputStream);
+        outputStream.close();
+        workbook.close();
     }
 
     public void exportToExcelBill(HttpServletResponse response) throws IOException {
@@ -348,6 +351,10 @@ public class ExcelService {
         try (FileOutputStream fileOutputStream = new FileOutputStream(excelFilePath)) {
             workbook.write(fileOutputStream);
         }
+        OutputStream outputStream = response.getOutputStream();
+        workbook.write(outputStream);
+        outputStream.close();
+        workbook.close();
     }
 
     public void exportToExcelReceipt(HttpServletResponse response) throws IOException {
@@ -490,6 +497,50 @@ public class ExcelService {
             // Lưu Supplier vào cơ sở dữ liệu thông qua repository
             supplierRepository.save(supplier);
         }
+        workbook.close();
+    }
+    public void importFromExcelReceipt(MultipartFile file) throws IOException {
+        InputStream inputStream = file.getInputStream();
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        Sheet sheet = workbook.getSheetAt(0);
+
+        for (Row row : sheet) {
+            if (row.getRowNum() == 0) {
+                // Bỏ qua hàng header
+                continue;
+            }
+
+            Receipt receipt = new Receipt();
+
+            // Đọc dữ liệu từ từng ô trong hàng và gán cho các trường tương ứng của Receipt
+            receipt.setId((long) row.getCell(0).getNumericCellValue());
+            // Đọc nhà cung cấp từ cell 1
+            String supplierName = row.getCell(1).getStringCellValue();
+            Supplier supplier = supplierRepository.findByName(supplierName);
+            receipt.setSupplier(supplier);
+            // Đọc người dùng từ cell 2
+            String username = row.getCell(2).getStringCellValue();
+            User user = userRepository.findByDisplayName(username);
+            receipt.setUser(user);
+            // Đọc tổng từ cell 3
+            receipt.setTotal((float) row.getCell(3).getNumericCellValue());
+            // Đọc người tạo từ cell 4
+            receipt.setCreatedBy(row.getCell(4).getStringCellValue());
+            // Đọc ngày tạo từ cell 5
+            Date createdDate = row.getCell(5).getDateCellValue();
+            receipt.setCreatedDate(createdDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+            // Đọc người cập nhật từ cell 6
+            receipt.setUpdatedBy(row.getCell(6).getStringCellValue());
+            // Đọc ngày cập nhật từ cell 7
+            Date updatedDate = row.getCell(7).getDateCellValue();
+            receipt.setUpdatedDate(updatedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+            // Đọc trạng thái hoạt động từ cell 8
+            String activeValue = row.getCell(8).getStringCellValue();
+            receipt.setActive(activeValue.equalsIgnoreCase("Có"));
+
+            receiptRepository.save(receipt);
+        }
+
         workbook.close();
     }
 

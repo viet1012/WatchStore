@@ -62,8 +62,9 @@ public class ProductService {
 //        return productRepository.findAll();
 //    }
     public List<ProductDTO> getAllProduct() {
-        List<Product> productList = productRepository.findAll();
 
+//        List<Product> productList = productRepository.findAll();
+        List<Product> productList = productRepository.findAllByActiveTrue();
         List<ProductDTO> productDtoList = productList.stream().map(product -> {
             ProductDTO productDto = new ProductDTO();
             productDto.setProductId(product.getProductId());
