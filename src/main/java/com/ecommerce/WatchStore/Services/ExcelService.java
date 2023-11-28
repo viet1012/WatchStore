@@ -181,6 +181,10 @@ public class ExcelService {
         try (FileOutputStream fileOutputStream = new FileOutputStream(excelFilePath)) {
             workbook.write(fileOutputStream);
         }
+        OutputStream outputStream = response.getOutputStream();
+        workbook.write(outputStream);
+        outputStream.close();
+        workbook.close();
     }
 
     public void exportToExcelBillDetail(HttpServletResponse response) throws IOException {
@@ -244,6 +248,10 @@ public class ExcelService {
         try (FileOutputStream fileOutputStream = new FileOutputStream(excelFilePath)) {
             workbook.write(fileOutputStream);
         }
+        OutputStream outputStream = response.getOutputStream();
+        workbook.write(outputStream);
+        outputStream.close();
+        workbook.close();
     }
 
     public void exportToExcelBrand(HttpServletResponse response) throws IOException {
@@ -295,6 +303,10 @@ public class ExcelService {
         try (FileOutputStream fileOutputStream = new FileOutputStream(excelFilePath)) {
             workbook.write(fileOutputStream);
         }
+        OutputStream outputStream = response.getOutputStream();
+        workbook.write(outputStream);
+        outputStream.close();
+        workbook.close();
     }
 
     public void exportToExcelSupplier(HttpServletResponse response) throws IOException {
@@ -404,11 +416,15 @@ public class ExcelService {
         // Thiết lập loại Content-Type và header cho phản hồi
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=receipts.xlsx");
-
         // Ghi dữ liệu từ Workbook vào HttpServletResponse
         try (FileOutputStream fileOutputStream = new FileOutputStream(excelFilePath)) {
             workbook.write(fileOutputStream);
         }
+        OutputStream outputStream = response.getOutputStream();
+        workbook.write(outputStream);
+        outputStream.close();
+        workbook.close();
+
     }
 
     public void exportToExcelCategory(HttpServletResponse response) throws IOException {
@@ -459,6 +475,10 @@ public class ExcelService {
         try (FileOutputStream fileOutputStream = new FileOutputStream(excelFilePath)) {
             workbook.write(fileOutputStream);
         }
+        OutputStream outputStream = response.getOutputStream();
+        workbook.write(outputStream);
+        outputStream.close();
+        workbook.close();
     }
 
     public void importFromExcelSupplier(MultipartFile file) throws IOException {
@@ -484,14 +504,12 @@ public class ExcelService {
             supplier.setEmail(row.getCell(4).getStringCellValue());
             supplier.setCreatedBy(row.getCell(5).getStringCellValue());
             supplier.setCreatedDate(LocalDateTime.parse(row.getCell(6).getStringCellValue()));
-            supplier.setUpdatedBy(row.getCell(7)!= null ? row.getCell(7).getStringCellValue() : null);
+            supplier.setUpdatedBy(row.getCell(7) != null ? row.getCell(7).getStringCellValue() : null);
             supplier.setUpdatedDate(LocalDateTime.parse(row.getCell(8).getStringCellValue()));
-            if(row.getCell(9).getStringCellValue().equalsIgnoreCase("Có"))
-            {
+            if (row.getCell(9).getStringCellValue().equalsIgnoreCase("Có")) {
                 supplier.setActive(true);
-            }
-            else{
-                supplier.setActive( false);
+            } else {
+                supplier.setActive(false);
             }
 
             // Lưu Supplier vào cơ sở dữ liệu thông qua repository
@@ -499,6 +517,7 @@ public class ExcelService {
         }
         workbook.close();
     }
+
     public void importFromExcelReceipt(MultipartFile file) throws IOException {
         InputStream inputStream = file.getInputStream();
         Workbook workbook = new XSSFWorkbook(inputStream);
