@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/Admin/Receipts")
+@RequestMapping("/api/Admin/Receipt")
 public class ReceiptController {
     @Autowired
     private ReceiptService receiptService;

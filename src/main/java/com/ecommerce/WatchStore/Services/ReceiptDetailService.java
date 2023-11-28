@@ -1,7 +1,12 @@
 package com.ecommerce.WatchStore.Services;
 
+import com.ecommerce.WatchStore.DTO.ReceiptDetailDTO;
+import com.ecommerce.WatchStore.Entities.Product;
+import com.ecommerce.WatchStore.Entities.Receipt;
 import com.ecommerce.WatchStore.Entities.ReceiptDetail;
+import com.ecommerce.WatchStore.Repositories.ProductRepository;
 import com.ecommerce.WatchStore.Repositories.ReceiptDetailRepository;
+import com.ecommerce.WatchStore.Repositories.ReceiptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +17,10 @@ import java.util.Optional;
 public class ReceiptDetailService {
     @Autowired
     private ReceiptDetailRepository receiptDetailRepository;
+    @Autowired
+    private ReceiptRepository receiptRepository;
+    @Autowired
+    private ProductRepository productRepository;
 
     public List<ReceiptDetail> getAllReceiptDetails() {
         return receiptDetailRepository.findAll();
@@ -21,9 +30,40 @@ public class ReceiptDetailService {
         return receiptDetailRepository.findById(id);
     }
 
-    public ReceiptDetail createReceiptDetail(ReceiptDetail receiptDetail) {
-        // Thực hiện các kiểm tra hoặc xử lý trước khi lưu vào cơ sở dữ liệu
-        return receiptDetailRepository.save(receiptDetail);
+    public ReceiptDetail createReceiptDetail(ReceiptDetail receiptDetail, long receiptId , long productId) {
+        Optional<Receipt> optionalReceipt = receiptRepository.findById(receiptId);
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+
+        Product product = optionalProduct.get();
+
+        ReceiptDetail newReceiptDetail = new ReceiptDetail();
+
+        if(optionalReceipt.isEmpty())
+        {
+            newReceiptDetail.setReceipt(null);
+        }
+        else {
+            newReceiptDetail.setReceipt(optionalReceipt.get());
+        }
+        if(optionalProduct.isEmpty())
+        {
+            newReceiptDetail.setProduct(null);
+        }
+        else {
+
+            newReceiptDetail.setProduct(product);
+        }
+        newReceiptDetail.setQuantity(receiptDetail.getQuantity());
+        optionalProduct.get().setQuantity(newReceiptDetail.getQuantity());
+
+        newReceiptDetail.setPrice(receiptDetail.getPrice());
+        optionalProduct.get().setPrice((float) newReceiptDetail.getPrice());
+
+        productRepository.save(optionalProduct.get());
+        newReceiptDetail.setActive(true);
+        return receiptDetailRepository.save(newReceiptDetail);
+
+
     }
 
     public ReceiptDetail updateReceiptDetail(Long id, ReceiptDetail updatedReceiptDetail) {

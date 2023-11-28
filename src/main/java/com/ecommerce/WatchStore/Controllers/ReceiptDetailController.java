@@ -1,5 +1,6 @@
 package com.ecommerce.WatchStore.Controllers;
 
+import com.ecommerce.WatchStore.DTO.ReceiptDetailDTO;
 import com.ecommerce.WatchStore.Entities.ReceiptDetail;
 import com.ecommerce.WatchStore.Services.ReceiptDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/Admin/receipt-details")
+@RequestMapping("/api/Admin/Receipt-details")
 public class ReceiptDetailController {
     @Autowired
     private ReceiptDetailService receiptDetailService;
@@ -31,9 +32,17 @@ public class ReceiptDetailController {
     }
 
     @PostMapping("/Create")
-    public ResponseEntity<ReceiptDetail> createReceiptDetail(@RequestBody ReceiptDetail receiptDetail) {
-        ReceiptDetail createdReceiptDetail = receiptDetailService.createReceiptDetail(receiptDetail);
-        return new ResponseEntity<>(createdReceiptDetail, HttpStatus.CREATED);
+    public ResponseEntity<ReceiptDetailDTO> createReceiptDetail(@RequestBody ReceiptDetail receiptDetail, @RequestParam long receiptId, @RequestParam long productId) {
+        ReceiptDetail createdReceiptDetail = receiptDetailService.createReceiptDetail(receiptDetail, receiptId ,productId);
+
+        ReceiptDetailDTO receiptDetailDTO = new ReceiptDetailDTO();
+        receiptDetailDTO.setId(createdReceiptDetail.getId());
+        receiptDetailDTO.setReceiptId(createdReceiptDetail.getReceipt().getId());
+        receiptDetailDTO.setProductId(createdReceiptDetail.getProduct().getProductId());
+        receiptDetailDTO.setQuantity(createdReceiptDetail.getQuantity());
+        receiptDetailDTO.setPrice(createdReceiptDetail.getPrice());
+
+        return new ResponseEntity<>(receiptDetailDTO, HttpStatus.CREATED);
     }
 
     @PutMapping("/Update/{id}")

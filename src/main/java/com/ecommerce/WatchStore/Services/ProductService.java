@@ -71,7 +71,9 @@ public class ProductService {
             productDto.setProductName(product.getProductName());
             productDto.setImg(product.getImg());
             productDto.setPrice(product.getPrice());
-            productDto.setQuantity(product.getQuantity());
+
+            productDto.setQuantity(0);
+
             productDto.setBrandId(product.getBrand() != null ? product.getBrand().getIdBrand() : null);
             productDto.setCategoryId(product.getCategory() != null ? product.getCategory().getId() : null);
             productDto.setCreatedBy(product.getCreatedBy());
@@ -111,8 +113,8 @@ public class ProductService {
             newProduct.setActive(true);
             newProduct.setCreatedBy(product.getCreatedBy());
             newProduct.setProductName(product.getProductName());
-            newProduct.setPrice(product.getPrice());
-            newProduct.setQuantity(product.getQuantity());
+            newProduct.setPrice(0);
+            newProduct.setQuantity(0);
             newProduct.setAccessory(accessory);
             newProduct.setImg(formatFileNames(imageFiles));
             newProduct.setThumbnail(formatFileNames(thumnailImgFiles));
