@@ -46,6 +46,10 @@ public class UserService {
     {
         return userRepository.count();
     }
+    public long getUserIdFromEmail(String email){
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        return optionalUser.map(User::getId).orElse(null);
+    }
     public User getUserById(Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         return optionalUser.orElse(null);

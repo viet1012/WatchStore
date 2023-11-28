@@ -1,5 +1,6 @@
 package com.ecommerce.WatchStore.Controllers;
 
+import com.ecommerce.WatchStore.Config.CustomUserDetails;
 import com.ecommerce.WatchStore.Config.JwtAuthenticationResponse;
 import com.ecommerce.WatchStore.Config.JwtTokenProvider;
 import com.ecommerce.WatchStore.DTO.AuthResponse;
@@ -10,9 +11,13 @@ import com.ecommerce.WatchStore.Entities.User;
 import com.ecommerce.WatchStore.Response.ResponseWrapper;
 import com.ecommerce.WatchStore.Services.EmailService;
 import com.ecommerce.WatchStore.Services.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +32,16 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @GetMapping("/profile")
+    public ResponseEntity<?>  getUserProfile(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+
+        // Sử dụng user_id trong xử lý của bạn
+        // Ví dụ: userService.doSomethingWithUserId(userId);
+
+        return ResponseEntity.ok("Processed with user_id: " + userId);
+    }
 
     @GetMapping("/GetAll")
     public ResponseEntity<ResponseWrapper<List<User>>> getListUser() {

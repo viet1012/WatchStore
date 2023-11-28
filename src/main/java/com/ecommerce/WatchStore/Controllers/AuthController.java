@@ -45,13 +45,16 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserDTO loginRequest) {
-        logger.info(loginRequest.getEmail() + "---" + loginRequest.getPassword());
+        logger.info(userService.getUserIdFromEmail(loginRequest.getEmail()) + "----" +loginRequest.getEmail() + "---" + loginRequest.getPassword());
         try {
             Authentication authentication = authenticationProvider.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
             );
             UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getEmail());
             String token = jwtTokenProvider.generateToken(authentication);
+            // Gọi handleSuccessfulLogin để lưu thông tin địa chỉ sau khi đăng nhập thành công
+            jwtTokenProvider.handleSuccessfulLogin(authentication , userService.getUserIdFromEmail(loginRequest.getEmail()));
+
             return ResponseEntity.ok(new JwtAuthenticationResponse(token));
         } catch (AuthenticationException e) {
             e.printStackTrace();
