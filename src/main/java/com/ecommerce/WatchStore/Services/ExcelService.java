@@ -2,6 +2,14 @@ package com.ecommerce.WatchStore.Services;
 
 import com.ecommerce.WatchStore.Entities.*;
 import com.ecommerce.WatchStore.Repositories.*;
+import com.itextpdf.text.*;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.log.Logger;
+import com.itextpdf.text.log.LoggerFactory;
+import com.itextpdf.text.pdf.*;
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -10,12 +18,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.awt.*;
+
 import java.io.IOException;
 
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.web.multipart.MultipartFile;
+
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -24,6 +31,11 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+
+
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import org.springframework.stereotype.Component;
 
 @Service
 public class ExcelService {
@@ -45,6 +57,7 @@ public class ExcelService {
     private CategoryRepository categoryRepository;
     @Value("${file.upload.directory}")
     private String uploadPath;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExcelService.class);
 
     public void exportToExcelProduct(HttpServletResponse response) throws IOException {
 
@@ -497,7 +510,7 @@ public class ExcelService {
             Row row = rowIterator.next();
             // Đọc dữ liệu từ mỗi hàng và tạo đối tượng Supplier
             Supplier supplier = new Supplier();
-            supplier.setId((long) row.getCell(0).getNumericCellValue());
+            supplier.setId(row.getCell(0) != null ? (long) row.getCell(0).getNumericCellValue() : null);
             supplier.setName(row.getCell(1).getStringCellValue());
             supplier.setAddress(row.getCell(2).getStringCellValue());
             supplier.setPhoneNumber(row.getCell(3).getStringCellValue());
@@ -511,9 +524,16 @@ public class ExcelService {
             } else {
                 supplier.setActive(false);
             }
+            Supplier existingSupplier = supplierRepository.findByName(supplier.getName());
+            if (existingSupplier == null) {
+                // Lưu Supplier vào cơ sở dữ liệu nếu không tồn tại
+                supplierRepository.save(supplier);
+            } else {
 
+                LOGGER.error("Nhà cung cấp đã tồn tại: " + supplier.getName());
+            }
             // Lưu Supplier vào cơ sở dữ liệu thông qua repository
-            supplierRepository.save(supplier);
+
         }
         workbook.close();
     }
@@ -533,27 +553,19 @@ public class ExcelService {
 
             // Đọc dữ liệu từ từng ô trong hàng và gán cho các trường tương ứng của Receipt
             receipt.setId((long) row.getCell(0).getNumericCellValue());
-            // Đọc nhà cung cấp từ cell 1
             String supplierName = row.getCell(1).getStringCellValue();
             Supplier supplier = supplierRepository.findByName(supplierName);
             receipt.setSupplier(supplier);
-            // Đọc người dùng từ cell 2
             String username = row.getCell(2).getStringCellValue();
             User user = userRepository.findByDisplayName(username);
             receipt.setUser(user);
-            // Đọc tổng từ cell 3
             receipt.setTotal((float) row.getCell(3).getNumericCellValue());
-            // Đọc người tạo từ cell 4
             receipt.setCreatedBy(row.getCell(4).getStringCellValue());
-            // Đọc ngày tạo từ cell 5
             Date createdDate = row.getCell(5).getDateCellValue();
             receipt.setCreatedDate(createdDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-            // Đọc người cập nhật từ cell 6
             receipt.setUpdatedBy(row.getCell(6).getStringCellValue());
-            // Đọc ngày cập nhật từ cell 7
             Date updatedDate = row.getCell(7).getDateCellValue();
             receipt.setUpdatedDate(updatedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-            // Đọc trạng thái hoạt động từ cell 8
             String activeValue = row.getCell(8).getStringCellValue();
             receipt.setActive(activeValue.equalsIgnoreCase("Có"));
 
@@ -619,4 +631,96 @@ public class ExcelService {
 
         workbook.close();
     }
+
+    public void exportToPdf(HttpServletResponse response) {
+        try {
+            // Tạo một document mới
+            Document document = new Document(PageSize.A4);
+
+            // Tạo một ByteArrayOutputStream để lưu dữ liệu PDF
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            // Tạo PdfWriter để ghi dữ liệu vào document và ByteArrayOutputStream
+            // PdfWriter writer = PdfWriter.getInstance(document, baos);
+            String pdfFilePath = uploadPath + "/receipts.pdf";
+            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdfFilePath));
+
+            // Thiết lập font chữ và màu sắc
+            Font font = new Font(Font.FontFamily.TIMES_ROMAN, 14, Font.NORMAL);
+            Font boldFont = new Font(Font.FontFamily.TIMES_ROMAN, 14, Font.BOLD);
+            Font titleFont = new Font(Font.FontFamily.TIMES_ROMAN, 20, Font.BOLD, BaseColor.LIGHT_GRAY);
+            // Mở document để bắt đầu ghi dữ liệu
+            document.open();
+
+            Paragraph title = new Paragraph("Receipts Report", titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            document.add(title);
+            document.add(Chunk.NEWLINE);
+            document.add(Chunk.NEWLINE);
+
+            // Lấy danh sách các receipt từ cơ sở dữ liệu
+            List<Receipt> receipts = receiptRepository.findAll();
+
+            // Viết dữ liệu của mỗi receipt vào document
+            for (Receipt receipt : receipts) {
+                Paragraph paragraph = new Paragraph();
+
+                // Thêm các thông tin receipt vào document với font tương ứng
+                paragraph.add(new Chunk("ID: ", boldFont));
+                paragraph.add(new Chunk(receipt.getId() + "\n", font));
+
+                paragraph.add(new Chunk("Supplier: ", boldFont));
+                paragraph.add(new Chunk(receipt.getSupplier().getName() + "\n", font));
+
+                paragraph.add(new Chunk("User: ", boldFont));
+                paragraph.add(new Chunk(receipt.getUser().getDisplayName() + "\n", font));
+
+                paragraph.add(new Chunk("Total: ", boldFont));
+                paragraph.add(new Chunk(String.valueOf(receipt.getTotal()) + "\n", font));
+
+                paragraph.add(new Chunk("Created By: ", boldFont));
+                paragraph.add(new Chunk(receipt.getCreatedBy() + "\n", font));
+
+                paragraph.add(new Chunk("Created Date: ", boldFont));
+                paragraph.add(new Chunk(receipt.getCreatedDate().toString() + "\n", font));
+
+                paragraph.add(new Chunk("Updated By: ", boldFont));
+                paragraph.add(new Chunk(receipt.getUpdatedBy() + "\n", font));
+
+                paragraph.add(new Chunk("Updated Date: ", boldFont));
+                paragraph.add(new Chunk(receipt.getUpdatedDate().toString() + "\n", font));
+
+                paragraph.add(new Chunk("Active: ", boldFont));
+                paragraph.add(new Chunk((receipt.isActive() ? "Yes" : "No") + "\n", font));
+
+                document.add(paragraph);
+                document.add(Chunk.NEWLINE);
+            }
+
+            // Đóng document
+            document.close();
+
+            // Thiết lập loại Content-Type và header cho phản hồi
+            response.setContentType("application/pdf");
+            response.setHeader("Content-Disposition", "attachment; filename=receipts.pdf");
+
+
+            // Gửi dữ liệu PDF về phản hồi HTTP
+            OutputStream outputStream = response.getOutputStream();
+            FileInputStream fileInputStream = new FileInputStream(pdfFilePath);
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            outputStream.flush();
+            fileInputStream.close();
+            outputStream.close();
+
+        } catch (DocumentException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

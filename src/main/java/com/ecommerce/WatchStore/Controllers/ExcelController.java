@@ -15,6 +15,10 @@ public class ExcelController {
     @Autowired
     private ExcelService excelService;
 
+    @GetMapping("/export-receipt-pdf")
+    public void exportToPdfReceipt(HttpServletResponse response) throws IOException {
+        excelService.exportToPdf(response);
+    }
     @GetMapping("/export-product")
     public void exportToExcelProduct(HttpServletResponse response) throws IOException {
         excelService.exportToExcelProduct(response);
