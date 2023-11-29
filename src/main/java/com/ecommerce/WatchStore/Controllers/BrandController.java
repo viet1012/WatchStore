@@ -79,8 +79,16 @@ public class BrandController {
     }
 
     @DeleteMapping("/Delete/{id}")
-    public ResponseEntity<Void> deleteBrandById(@PathVariable long id) {
-        brandService.deleteBrandById(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ResponseWrapper<List<Brand>>> deleteProduct(@PathVariable Long id) {
+        List<Brand> brands = brandService.deleteBrand(id);
+        ResponseWrapper<List<Brand>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Deleted product successfully", true, brands);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/Delete-multiple")
+    public ResponseEntity<ResponseWrapper<List<Brand>>> deleteMultipleProducts(@RequestBody List<Long> brandsId) {
+        List<Brand> brands = brandService.deleteMultipleBrands(brandsId);
+        ResponseWrapper<List<Brand>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Deleted product successfully", true, brands);
+        return ResponseEntity.ok(response);
     }
 }

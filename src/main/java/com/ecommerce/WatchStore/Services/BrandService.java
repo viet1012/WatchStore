@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -21,7 +22,8 @@ public class BrandService {
     private ProductRepository productRepository;
 
     public List<Brand> getAllBrands() {
-        return brandRepository.findAll();
+//        return brandRepository.findAll();
+        return brandRepository.findAllByActiveTrue();
     }
 
     public Optional<Brand> getBrandById(long id) {
@@ -60,15 +62,33 @@ public class BrandService {
 
     }
 
-    public void deleteBrandById(long id) {
-        List<Product> products = productRepository.findProductsByBrandId(id);
-        if (products.isEmpty()) {
-            brandRepository.deleteById(id);
+    public List<Brand> deleteBrand(Long id) {
+        Optional<Brand> brandOptional = brandRepository.findById(id);
+
+        if (brandOptional.isPresent()) {
+            Brand currentBrand = brandOptional.get();
+            currentBrand.setActive(false);
+            brandRepository.save(currentBrand);
         } else {
-            throw new RuntimeException("Không thể xóa thương hiệu khi còn sản phẩm thuộc thương hiệu này.");
+            throw new NoSuchElementException("Không tìm thấy thương hiệu với ID: " + id);
         }
+
+        // Lấy danh sách tất cả thương hiệu có trạng thái active = true
+        return brandRepository.findAllByActiveTrue();
     }
 
+    public List<Brand> deleteMultipleBrands(List<Long> brandIds) {
+        List<Brand> brands = brandRepository.findAllById(brandIds);
+
+        for (Brand brand : brands) {
+            brand.setActive(false);
+        }
+
+        brandRepository.saveAll(brands);
+
+        // Lấy danh sách tất cả thương hiệu có trạng thái active = true
+        return brandRepository.findAllByActiveTrue();
+    }
     public List<Brand> getBrandsByPage(int page, int pageSize) {
         // Trừ 1 để đảm bảo trang bắt đầu từ 0
         PageRequest pageable = PageRequest.of(page - 1, pageSize);

@@ -1,10 +1,14 @@
 package com.ecommerce.WatchStore.Config;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
+@Getter
+@Setter
 public class CustomUserDetails implements UserDetails {
 
     public void setUsername(String username) {
@@ -12,11 +16,12 @@ public class CustomUserDetails implements UserDetails {
     }
 
     private String username;
-
+    private long userId;
 
     // Constructor
-    public CustomUserDetails(String username) {
+    public CustomUserDetails(String username, long userId) {
         this.username = username;
+        this.userId = userId;
     }
     public CustomUserDetails() {
 

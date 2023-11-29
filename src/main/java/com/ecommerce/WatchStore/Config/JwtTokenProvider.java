@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,24 +28,43 @@ public class JwtTokenProvider {
     private final SecretKey secretKey;
 
     public JwtTokenProvider(@Value("${app.jwtSecret}") String jwtSecret) {
-        // Generate a secure key using Keys.secretKeyFor
+        // Tạo secretKey từ jwtSecret được cung cấp từ properties
         this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     }
 
 
+
     public boolean verifyToken(String token) {
         try {
-            // Parse token và lấy ra thông tin claims
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
             return true;
         } catch (ExpiredJwtException ex) {
-            // Token đã hết hạn
+            // Token hết hạn
+            System.out.println("Token hết hạn: " + ex.getMessage());
+            return false;
+        } catch (UnsupportedJwtException ex) {
+            // Token không được hỗ trợ
+            System.out.println("Token không được hỗ trợ: " + ex.getMessage());
+            return false;
+        } catch (MalformedJwtException ex) {
+            // Token không đúng định dạng
+            System.out.println("Token không đúng định dạng: " + ex.getMessage());
+            return false;
+        } catch (SignatureException ex) {
+            // Lỗi chữ ký không hợp lệ
+            System.out.println("Lỗi chữ ký không hợp lệ: " + ex.getMessage());
+            return false;
+        } catch (IllegalArgumentException ex) {
+            // Token rỗng hoặc không hợp lệ
+            System.out.println("Token rỗng hoặc không hợp lệ: " + ex.getMessage());
             return false;
         } catch (Exception ex) {
-            // Token không hợp lệ hoặc không thể xác minh
+            // Các lỗi khác
+            System.out.println("Lỗi xác minh token: " + ex.getMessage());
             return false;
         }
     }
+
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
@@ -63,6 +83,7 @@ public class JwtTokenProvider {
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
+
     public String generateTokenWithUserId(UserDetails userDetails, long userId) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId); // Thêm userId vào claims
@@ -73,6 +94,7 @@ public class JwtTokenProvider {
     public Long getUserIdFromToken(String token) {
         Claims claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
         Number userId = (Number) claims.get("userId");
+        System.out.println("USER ID WHEN GET CLAIM : " + userId);
         if (userId != null) {
             return userId.longValue();
         }
@@ -80,15 +102,15 @@ public class JwtTokenProvider {
     }
 
 
-    public void handleSuccessfulLogin(Authentication authentication , long id) {
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        Long userId = getUserIdFromToken(generateTokenWithUserId(userDetails, id)); // Thay YOUR_USER_ID bằng giá trị thực của userId
+//    public void handleSuccessfulLogin(Authentication authentication, long id) {
+//        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+//        Long userId = getUserIdFromToken(generateTokenWithUserId(userDetails, id)); // Thay YOUR_USER_ID bằng giá trị thực của userId
+//
+//
+//    }
 
-        // Lưu thông tin địa chỉ của người dùng sau khi đăng nhập thành công
-    }
 
-
-    public String generateToken(Authentication authentication) {
+    public String generate_Token(Authentication authentication) {
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Date now = new Date();
@@ -100,12 +122,32 @@ public class JwtTokenProvider {
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
+    public String generateToken(Authentication authentication, long userId) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String handleSuccessfulLogin(Authentication authentication, long userId) {
+        return generateToken(authentication, userId);
+    }
 
 
     public Authentication getAuthentication(String token) {
         UserDetails userDetails = getUserDetailsFromToken(token);
-        if (userDetails != null) {
 
+        if (userDetails != null) {
             return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
         }
         return null;
@@ -114,12 +156,15 @@ public class JwtTokenProvider {
     private CustomUserDetails getUserDetailsFromToken(String token) {
         Claims claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
         String username = claims.getSubject();
-        // Lấy thông tin khác từ token nếu cần
-        // Ví dụ: String password = ...;
+        Long userId = claims.get("userId", Long.class); // Trích xuất userId từ claims
 
-        System.out.println("User Name: " + username);
+
         CustomUserDetails userDetails = new CustomUserDetails();
         userDetails.setUsername(username);
+        userDetails.setUserId(userId);
+
+        System.out.println("User Name: " + username);
+        System.out.println("User ID: " + userId);
         // userDetails.setPassword(password);
         // Nếu có thông tin khác cần set
 

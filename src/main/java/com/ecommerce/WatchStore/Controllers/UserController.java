@@ -33,14 +33,19 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
     @GetMapping("/profile")
-    public ResponseEntity<?>  getUserProfile(HttpServletRequest request) {
+    public ResponseEntity<?> getUserProfile(HttpServletRequest request) {
+
         Long userId = (Long) request.getAttribute("userId");
-
-        // Sử dụng user_id trong xử lý của bạn
-        // Ví dụ: userService.doSomethingWithUserId(userId);
-
-        return ResponseEntity.ok("Processed with user_id: " + userId);
+        if (userId != null) {
+            // Thực hiện xử lý dữ liệu của user với userId đã lấy được
+            return ResponseEntity.ok("Processed with user_id: " + userId);
+        } else {
+            // Xử lý khi không có userId
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User ID not found");
+        }
     }
 
     @GetMapping("/GetAll")

@@ -51,9 +51,7 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
             );
             UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getEmail());
-            String token = jwtTokenProvider.generateToken(authentication);
-            // Gọi handleSuccessfulLogin để lưu thông tin địa chỉ sau khi đăng nhập thành công
-            jwtTokenProvider.handleSuccessfulLogin(authentication , userService.getUserIdFromEmail(loginRequest.getEmail()));
+            String token = jwtTokenProvider.generateToken(authentication ,  userService.getUserIdFromEmail(loginRequest.getEmail()));
 
             return ResponseEntity.ok(new JwtAuthenticationResponse(token));
         } catch (AuthenticationException e) {
