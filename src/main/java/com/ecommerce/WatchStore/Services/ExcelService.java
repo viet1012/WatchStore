@@ -31,6 +31,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 
 import com.itextpdf.text.pdf.PdfPTable;
@@ -524,8 +525,10 @@ public class ExcelService {
             } else {
                 supplier.setActive(false);
             }
-            Supplier existingSupplier = supplierRepository.findByName(supplier.getName());
-            if (existingSupplier == null) {
+            Supplier existingNameSupplier = supplierRepository.findByName(supplier.getName());
+            Optional<Supplier> existingSupplierId = supplierRepository.findById(supplier.getId());
+
+            if (existingNameSupplier == null && existingSupplierId.isEmpty()) {
                 // Lưu Supplier vào cơ sở dữ liệu nếu không tồn tại
                 supplierRepository.save(supplier);
             } else {

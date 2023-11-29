@@ -37,11 +37,10 @@ public class ProductController {
     public ResponseEntity<ResponseWrapper<Product>> createProduct(
             @RequestParam("brandId") int brandId,
             @RequestParam("categoryId") Long categoryId,
-            @RequestParam("accessoryId") Long accessoryId,
             @RequestParam("imageFile") List<MultipartFile> imageFile,
             @RequestParam("thumnail") List<MultipartFile> thumnailImgFiles,
             @ModelAttribute Product product) {
-        Product createdProduct = productService.createProduct(product, brandId, categoryId, accessoryId, imageFile, thumnailImgFiles);
+        Product createdProduct = productService.createProduct(product, brandId, categoryId, imageFile, thumnailImgFiles);
         ResponseWrapper<Product> response = new ResponseWrapper<>(HttpStatus.CREATED.value(), "Product created successfully", true, createdProduct);
         return ResponseEntity.ok(response);
     }

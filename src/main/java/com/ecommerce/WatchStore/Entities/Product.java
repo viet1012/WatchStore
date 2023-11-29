@@ -73,7 +73,7 @@ public class Product {
 
     @ManyToOne
     @JoinColumn(name = "accessory_id", referencedColumnName = "id")
-    private Accessory accessory; // Kiểu dữ liệu tùy theo thiết kế cơ sở dữ liệu
+    private Accessory accessory;
 
     @Column(name = "description")
     private String description;

@@ -94,18 +94,17 @@ public class ProductService {
 
         return productDtoList;
     }
-    public Product createProduct(Product product, long brandId, Long categoryId, Long accessoryId, List<MultipartFile> imageFiles ,List<MultipartFile> thumnailImgFiles ) {
+    public Product createProduct(Product product, long brandId, Long categoryId,  List<MultipartFile> imageFiles ,List<MultipartFile> thumnailImgFiles ) {
         if (productRepository.existsByProductName(product.getProductName())) {
             throw new ProductNotFoundException("Sản phẩm đã tồn tại với tên: " + product.getProductName());
         }
         Optional<Brand> brandOptional = brandRepository.findById(brandId);
         Optional<Category> categoryOptional = categoryRepository.findById(categoryId);
-        Optional<Accessory> accessoryOptional = accessoryRepository.findById(accessoryId);
 
         if (brandOptional.isPresent() && categoryOptional.isPresent()) {
             Brand brand = brandOptional.get();
             Category category = categoryOptional.get();
-            Accessory accessory = accessoryOptional.get();
+
 
             Product newProduct = new Product();
             newProduct.setCategory(category);
@@ -115,7 +114,7 @@ public class ProductService {
             newProduct.setProductName(product.getProductName());
             newProduct.setPrice(0);
             newProduct.setQuantity(0);
-            newProduct.setAccessory(accessory);
+            newProduct.setAccessory(null);
             newProduct.setImg(formatFileNames(imageFiles));
             newProduct.setThumbnail(formatFileNames(thumnailImgFiles));
             newProduct.setGender(product.getGender());
