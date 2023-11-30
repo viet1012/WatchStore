@@ -24,7 +24,7 @@ public class FileStorageService {
             // Lưu tệp vào hệ thống tệp của máy chủ
             file.transferTo(targetFile);
 
-            return uploadPath + "/" + fileName;
+            return "http://localhost:8080/uploads/" +fileName;
         } catch (IOException ex) {
             throw new RuntimeException("Không thể lưu tệp " + file.getOriginalFilename(), ex);
         }
