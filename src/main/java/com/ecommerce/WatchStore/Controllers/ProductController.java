@@ -130,4 +130,16 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/GetById/{id}")
+    public ResponseEntity<ResponseWrapper<Product>> searchProducts(@PathVariable long id) {
+        Product product = productService.getProductById(id);
+        if (product == null)
+            return ResponseEntity.badRequest().build();
+        else {
+            ResponseWrapper<Product> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, product);
+            return ResponseEntity.ok(response);
+        }
+
+    }
+
 }

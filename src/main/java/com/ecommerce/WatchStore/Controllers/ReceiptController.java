@@ -26,17 +26,17 @@ public class ReceiptController {
     private ReceiptService receiptService;
 
     // @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/GetAllReceipts")
+    @GetMapping("/GetAll_Receipts")
     public ResponseEntity<ResponseWrapper<List<Receipt>>> GetAllReceipts() {
         List<Receipt> receipts = receiptService.getAllReceipts();
         long totalReceipts = receiptService.getTotalReceipts();
-        ResponseWrapper<List<Receipt>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Brands retrieved successfully", true, totalReceipts, receipts);
+        ResponseWrapper<List<Receipt>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Successfully", true, totalReceipts, receipts);
         return ResponseEntity.ok(response);
     }
     @GetMapping("/GetAll")
     public ResponseEntity<ResponseWrapper<List<ReceiptDTO>>> getAll() {
         List<ReceiptDTO> receipts = receiptService.getAllReceiptDetailsWithTotalAndSupplierId();
-        ResponseWrapper<List<ReceiptDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Brands retrieved successfully", true, receipts);
+        ResponseWrapper<List<ReceiptDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Successfully", true, receipts);
         return ResponseEntity.ok(response);
     }
     @GetMapping("/Items")
