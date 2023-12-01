@@ -29,13 +29,14 @@ public class ReceiptController {
     @GetMapping("/GetAll_Receipts")
     public ResponseEntity<ResponseWrapper<List<Receipt>>> GetAllReceipts() {
         List<Receipt> receipts = receiptService.getAllReceipts();
+        System.out.println("Count: " + receipts.size());
         long totalReceipts = receiptService.getTotalReceipts();
         ResponseWrapper<List<Receipt>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Successfully", true, totalReceipts, receipts);
         return ResponseEntity.ok(response);
     }
     @GetMapping("/GetAll")
     public ResponseEntity<ResponseWrapper<List<ReceiptDTO>>> getAll() {
-        List<ReceiptDTO> receipts = receiptService.getAllReceiptDetailsWithTotalAndSupplierId();
+        List<ReceiptDTO> receipts = receiptService.getAll();
         ResponseWrapper<List<ReceiptDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Successfully", true, receipts);
         return ResponseEntity.ok(response);
     }

@@ -10,9 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,6 +65,36 @@ public class ReceiptService {
 
         return receiptInfoList;
     }
+    public List<ReceiptDTO> getAll() {
+        List<Object[]> results = receiptRepository.getAllReceiptDetailsWithTotalAndSupplierId();
+        Map<Long, ReceiptDTO> receiptMap = new HashMap<>();
+
+        for (Object[] result : results) {
+            long id = (long) result[0];
+            double total = (Double) result[1]; // Lấy total từ kết quả trả về
+            Long supplierId = (Long) result[2]; // Lấy supplierId từ kết quả trả về
+
+            ReceiptDetail receiptDetail = (ReceiptDetail) result[3];
+
+            ReceiptDTO receiptInfo = receiptMap.getOrDefault(id, new ReceiptDTO());
+            receiptInfo.setId(id);
+            receiptInfo.setTotal(total);
+            receiptInfo.setSupplierId(supplierId);
+
+            List<ReceiptDetailDTO> receiptDetailDTOs = receiptInfo.getReceiptDetails();
+            if (receiptDetailDTOs == null) {
+                receiptDetailDTOs = new ArrayList<>();
+            }
+
+            receiptDetailDTOs.add(modelMapper.map(receiptDetail, ReceiptDetailDTO.class));
+            receiptInfo.setReceiptDetails(receiptDetailDTOs);
+
+            receiptMap.put(id, receiptInfo);
+        }
+
+        return new ArrayList<>(receiptMap.values());
+    }
+
     public Optional<Receipt> getReceiptById(Long id) {
         return receiptRepository.findById(id);
     }
