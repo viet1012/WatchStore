@@ -1,9 +1,12 @@
 package com.ecommerce.WatchStore.Controllers;
 
 
+import com.ecommerce.WatchStore.DTO.ReceiptDTO;
+import com.ecommerce.WatchStore.DTO.ReceiptDetailDTO;
 import com.ecommerce.WatchStore.DTO.ReceiptPageDTO;
 import com.ecommerce.WatchStore.Entities.Brand;
 import com.ecommerce.WatchStore.Entities.Receipt;
+import com.ecommerce.WatchStore.Entities.ReceiptDetail;
 import com.ecommerce.WatchStore.Entities.Supplier;
 import com.ecommerce.WatchStore.Response.ResponseWrapper;
 import com.ecommerce.WatchStore.Services.ReceiptService;
@@ -23,14 +26,19 @@ public class ReceiptController {
     private ReceiptService receiptService;
 
     // @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/GetAll")
-    public ResponseEntity<ResponseWrapper<List<Receipt>>> getAll() {
+    @GetMapping("/GetAllReceipts")
+    public ResponseEntity<ResponseWrapper<List<Receipt>>> GetAllReceipts() {
         List<Receipt> receipts = receiptService.getAllReceipts();
         long totalReceipts = receiptService.getTotalReceipts();
         ResponseWrapper<List<Receipt>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Brands retrieved successfully", true, totalReceipts, receipts);
         return ResponseEntity.ok(response);
     }
-
+    @GetMapping("/GetAll")
+    public ResponseEntity<ResponseWrapper<List<ReceiptDTO>>> getAll() {
+        List<ReceiptDTO> receipts = receiptService.getAllReceiptDetailsWithTotalAndSupplierId();
+        ResponseWrapper<List<ReceiptDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Brands retrieved successfully", true, receipts);
+        return ResponseEntity.ok(response);
+    }
     @GetMapping("/Items")
     public ResponseEntity<ResponseWrapper<ReceiptPageDTO>> getReceipts(
             @RequestParam(name = "page", defaultValue = "1") int page,
@@ -61,12 +69,32 @@ public class ReceiptController {
         }
     }
 
+//    @PostMapping("/Create")
+//    public ResponseEntity<ResponseWrapper<Receipt>> createReceipt(@RequestBody Receipt receipt, @RequestParam Long userId, @RequestParam Long supplierId) {
+//        Receipt createdReceipt = receiptService.createReceipt(receipt, userId, supplierId);
+//        ResponseWrapper<Receipt> response = new ResponseWrapper<>(HttpStatus.CREATED.value(), "Receipt created successfully", true, createdReceipt);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+//    }
+
     @PostMapping("/Create")
-    public ResponseEntity<ResponseWrapper<Receipt>> createReceipt(@RequestBody Receipt receipt, @RequestParam Long userId, @RequestParam Long supplierId) {
-        Receipt createdReceipt = receiptService.createReceipt(receipt, userId, supplierId);
-        ResponseWrapper<Receipt> response = new ResponseWrapper<>(HttpStatus.CREATED.value(), "Receipt created successfully", true, createdReceipt);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<?> createReceipt(
+            @RequestParam long userId,
+            @RequestParam long supplierId,
+            @RequestBody List<ReceiptDetailDTO> receiptDetail
+    ) {
+        try {
+            Receipt createdReceipt = receiptService.createReceipt(
+                    userId,
+                    supplierId,
+                    receiptDetail
+            );
+            return ResponseEntity.ok("Receipt created successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to create receipt " + e.getMessage());
+        }
     }
+
 
     @PutMapping("/Update/{id}")
     public ResponseEntity<ResponseWrapper<Receipt>> updateReceipt(@PathVariable Long id, @RequestBody Receipt updatedReceipt) {

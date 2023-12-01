@@ -7,7 +7,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,6 +19,14 @@ public class Receipt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToMany(mappedBy = "receipt", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReceiptDetail> receiptDetails = new ArrayList<>();
+
+    public void addReceiptDetail(ReceiptDetail receiptDetail) {
+        receiptDetails.add(receiptDetail);
+        receiptDetail.setReceipt(this);
+    }
 
     @ManyToOne
     @JoinColumn(name = "supplier_id", referencedColumnName = "id")

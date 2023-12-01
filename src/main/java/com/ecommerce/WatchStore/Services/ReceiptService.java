@@ -1,51 +1,112 @@
 package com.ecommerce.WatchStore.Services;
 
-import com.ecommerce.WatchStore.Entities.Receipt;
-import com.ecommerce.WatchStore.Entities.Supplier;
-import com.ecommerce.WatchStore.Entities.User;
-import com.ecommerce.WatchStore.Repositories.ReceiptRepository;
-import com.ecommerce.WatchStore.Repositories.SupplierRepository;
-import com.ecommerce.WatchStore.Repositories.UserRepository;
+import com.ecommerce.WatchStore.DTO.ReceiptDTO;
+import com.ecommerce.WatchStore.DTO.ReceiptDetailDTO;
+import com.ecommerce.WatchStore.Entities.*;
+import com.ecommerce.WatchStore.Repositories.*;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ReceiptService {
     @Autowired
     private ReceiptRepository receiptRepository;
-
+    @Autowired
+    private ReceiptDetailRepository receiptDetailRepository;
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private ProductRepository productRepository;
     @Autowired
     private SupplierRepository supplierRepository;
-
+    @Autowired
+    private ModelMapper modelMapper;
     public List<Receipt> getAllReceipts() {
         return receiptRepository.findAll();
     }
+    public List<ReceiptDTO> getAllReceiptDetailsWithTotalAndSupplierId() {
+        List<Object[]> results = receiptRepository.getAllReceiptDetailsWithTotalAndSupplierId();
+        List<ReceiptDTO> receiptInfoList = new ArrayList<>();
 
+        for (Object[] result : results) {
+            long id = (long) result[0];
+            double total = (Double) result[1]; // Lấy total từ kết quả trả về
+            Long supplierId = (Long) result[2]; // Lấy supplierId từ kết quả trả về
+
+            List<ReceiptDetail> receiptDetails = new ArrayList<>();
+
+            // Kiểm tra xem result[2] có phải là một ReceiptDetail không
+            if (result[3] instanceof ReceiptDetail) {
+                ReceiptDetail singleReceiptDetail = (ReceiptDetail) result[3];
+                receiptDetails.add(singleReceiptDetail);
+            } else if (result[3] instanceof List<?>) {
+                // Nếu result[2] trả về một danh sách các ReceiptDetail
+                receiptDetails = (List<ReceiptDetail>) result[3];
+            }
+
+            List<ReceiptDetailDTO> receiptDetailDTOs = receiptDetails.stream()
+                    .map(receiptDetail -> modelMapper.map(receiptDetail, ReceiptDetailDTO.class))
+                    .collect(Collectors.toList());
+
+            ReceiptDTO receiptInfo = new ReceiptDTO();
+            receiptInfo.setId(id);
+            receiptInfo.setTotal(total);
+            receiptInfo.setSupplierId(supplierId);
+            receiptInfo.setReceiptDetails(receiptDetailDTOs);
+
+            receiptInfoList.add(receiptInfo);
+        }
+
+        return receiptInfoList;
+    }
     public Optional<Receipt> getReceiptById(Long id) {
         return receiptRepository.findById(id);
     }
 
-    public Receipt createReceipt(Receipt receipt, long userId, long supplierId) {
-        // Thực hiện các kiểm tra hoặc xử lý trước khi lưu vào cơ sở dữ liệu
+    public Receipt createReceipt(long userId, long supplierId, List<ReceiptDetailDTO> receiptDetails) {
+
+        System.out.println("SupplierId " + supplierId);
+        double total = 0;
         Optional<Supplier> supplier = supplierRepository.findById(supplierId);
+        Supplier supplierObj = supplier.orElseThrow(() -> new IllegalArgumentException("Supplier not found"));
+
         Optional<User> userOptional = userRepository.findById(userId);
+        User user = userOptional.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         Receipt newReceipt = new Receipt();
-        newReceipt.setTotal(receipt.getTotal());
-        newReceipt.setSupplier(supplier.get());
-        newReceipt.setCreatedBy(userOptional.get().getDisplayName());
-        newReceipt.setUser(userOptional.get());
+        newReceipt.setSupplier(supplierObj);
+        newReceipt.setCreatedBy(user.getDisplayName());
+        newReceipt.setUser(user);
+
+
+        List<ReceiptDetail> savedReceiptDetails = new ArrayList<>();
+
+        for (ReceiptDetailDTO detailDTO : receiptDetails) {
+
+            ReceiptDetail detail = new ReceiptDetail();
+            Optional<Product> optionalProduct = productRepository.findById(detailDTO.getProductId());
+            total += detailDTO.getPrice() * detailDTO.getQuantity();
+            detail.setReceipt(newReceipt);
+            detail.setProduct(optionalProduct.get());
+            detail.setQuantity(detailDTO.getQuantity());
+            detail.setPrice(detailDTO.getPrice());
+            savedReceiptDetails.add(detail);
+        }
+        newReceipt.setTotal(total);
+        newReceipt.setReceiptDetails(savedReceiptDetails);
 
         return receiptRepository.save(newReceipt);
     }
+
+
 
     public Receipt updateReceipt(Long id, Receipt updatedReceipt) {
         // Kiểm tra xem Receipt có tồn tại không

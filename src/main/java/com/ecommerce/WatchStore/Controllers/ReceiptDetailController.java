@@ -18,8 +18,8 @@ public class ReceiptDetailController {
     private ReceiptDetailService receiptDetailService;
 
     @GetMapping("/GetAll")
-    public ResponseEntity<List<ReceiptDetail>> getAllReceiptDetails() {
-        List<ReceiptDetail> receiptDetails = receiptDetailService.getAllReceiptDetails();
+    public ResponseEntity<List<ReceiptDetailDTO>> getAllReceiptDetails() {
+        List<ReceiptDetailDTO> receiptDetails = receiptDetailService.getAllReceiptDetails();
         return new ResponseEntity<>(receiptDetails, HttpStatus.OK);
     }
 

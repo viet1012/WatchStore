@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 @Service
 public class ReceiptDetailService {
     @Autowired
@@ -22,8 +24,19 @@ public class ReceiptDetailService {
     @Autowired
     private ProductRepository productRepository;
 
-    public List<ReceiptDetail> getAllReceiptDetails() {
-        return receiptDetailRepository.findAll();
+
+    @Autowired
+    private ModelMapper modelMapper;
+
+    public List<ReceiptDetailDTO> getAllReceiptDetails() {
+        List<ReceiptDetail> receiptDetails = receiptDetailRepository.findAll();
+        return receiptDetails.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    private ReceiptDetailDTO convertToDto(ReceiptDetail receiptDetail) {
+        return modelMapper.map(receiptDetail, ReceiptDetailDTO.class);
     }
 
     public Optional<ReceiptDetail> getReceiptDetailById(Long id) {
