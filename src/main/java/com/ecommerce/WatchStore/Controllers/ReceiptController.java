@@ -78,15 +78,12 @@ public class ReceiptController {
 
     @PostMapping("/Create")
     public ResponseEntity<?> createReceipt(
-            @RequestParam long userId,
-            @RequestParam long supplierId,
-            @RequestBody List<ReceiptDetailDTO> receiptDetail
+            @RequestBody ReceiptDTO receiptDTO
     ) {
         try {
             Receipt createdReceipt = receiptService.createReceipt(
-                    userId,
-                    supplierId,
-                    receiptDetail
+                    receiptDTO
+
             );
             return ResponseEntity.ok("Receipt created successfully");
         } catch (Exception e) {

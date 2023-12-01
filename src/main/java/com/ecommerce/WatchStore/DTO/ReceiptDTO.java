@@ -12,6 +12,7 @@ import java.util.List;
 public class ReceiptDTO {
     private Long id;
     private double total;
+    private long userId;
     private long supplierId;
     private List<ReceiptDetailDTO> receiptDetails;
 

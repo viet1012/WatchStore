@@ -71,14 +71,14 @@ public class ReceiptService {
         return receiptRepository.findById(id);
     }
 
-    public Receipt createReceipt(long userId, long supplierId, List<ReceiptDetailDTO> receiptDetails) {
+    public Receipt createReceipt(ReceiptDTO receiptDTO) {
 
-        System.out.println("SupplierId " + supplierId);
+        System.out.println("SupplierId " + receiptDTO.getSupplierId());
         double total = 0;
-        Optional<Supplier> supplier = supplierRepository.findById(supplierId);
+        Optional<Supplier> supplier = supplierRepository.findById(receiptDTO.getSupplierId());
         Supplier supplierObj = supplier.orElseThrow(() -> new IllegalArgumentException("Supplier not found"));
 
-        Optional<User> userOptional = userRepository.findById(userId);
+        Optional<User> userOptional = userRepository.findById(receiptDTO.getUserId());
         User user = userOptional.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         Receipt newReceipt = new Receipt();
@@ -89,7 +89,7 @@ public class ReceiptService {
 
         List<ReceiptDetail> savedReceiptDetails = new ArrayList<>();
 
-        for (ReceiptDetailDTO detailDTO : receiptDetails) {
+        for (ReceiptDetailDTO detailDTO : receiptDTO.getReceiptDetails()) {
 
             ReceiptDetail detail = new ReceiptDetail();
             Optional<Product> optionalProduct = productRepository.findById(detailDTO.getProductId());
