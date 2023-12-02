@@ -15,8 +15,6 @@ import java.util.Optional;
 public class CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
-    @Autowired
-    private UserRepository userRepository;
 
     public List<Customer> getAllCustomers()
     {
@@ -28,6 +26,10 @@ public class CustomerService {
         return customerRepository.count();
     }
 
+    public Customer getUserFromCustomer(long id)
+    {
+        return customerRepository.findByUserId(id);
+    }
     public Customer createCustomer(CustomerDTO customerDTO, User user) {
         Customer customer = new Customer();
 //        Optional<User> optionalUser = userRepository.findById(userId);

@@ -3,6 +3,7 @@ package com.ecommerce.WatchStore.Services;
 import com.ecommerce.WatchStore.Config.JwtTokenProvider;
 import com.ecommerce.WatchStore.DTO.CustomerDTO;
 import com.ecommerce.WatchStore.DTO.UserDTO;
+import com.ecommerce.WatchStore.Entities.Customer;
 import com.ecommerce.WatchStore.Entities.Role;
 import com.ecommerce.WatchStore.Entities.User;
 import com.ecommerce.WatchStore.Entities.UserRoles;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,8 +44,25 @@ public class UserService {
     private JwtTokenProvider jwtTokenProvider;
 
 
-    public List<User> getListUser() {
-        return userRepository.findAll();
+    public List<UserDTO> getListUser() {
+        List<UserDTO> userDTOList = new ArrayList<>();
+        List<User> users = userRepository.findAll();
+        UserDTO userDTO = new UserDTO();
+        for (User user : users) {
+            userDTO.setId(user.getId());
+            userDTO.setEmail(user.getEmail());
+            userDTO.setPassword(user.getPassword());
+            userDTO.setDisplayName(user.getDisplayName());
+            userDTO.setCreatedDate(user.getCreatedDate());
+            Customer customer = customerService.getUserFromCustomer(user.getId());
+            userDTO.setCustomerId(customer != null ? customer.getId() :  null);
+            userDTO.setRoleId(user.getRole()!= null ? user.getRole().getId() : null);
+            userDTO.setActive(user.getActive());
+
+            userDTOList.add(userDTO);
+
+        }
+        return userDTOList;
     }
 
     public long getTotalUsers() {

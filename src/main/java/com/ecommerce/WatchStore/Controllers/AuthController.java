@@ -59,11 +59,10 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUserWithRole( @RequestParam("role_id") Long roleId, @RequestBody CustomerDTO request) {
+    public ResponseEntity<?> registerUserWithRole( @RequestParam(name = "role_id", defaultValue = "2") Long roleId , @RequestBody CustomerDTO request) {
 
 
         System.out.println("User: " + request.getEmail());
-
         System.out.println("Fullname: " + request.getFullname());
         // Tạo một người dùng mới
         User registeredUser = userService.registerUser( roleId ,request);

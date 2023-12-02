@@ -6,7 +6,5 @@ import lombok.*;
 @Getter
 @Setter
 public class UserRegistrationRequest {
-    private User user;
-    private CustomerDTO customerDTO;
 
 }

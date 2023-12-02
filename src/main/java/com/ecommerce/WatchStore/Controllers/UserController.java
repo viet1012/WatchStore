@@ -49,10 +49,10 @@ public class UserController {
     }
 
     @GetMapping("/GetAll")
-    public ResponseEntity<ResponseWrapper<List<User>>> getListUser() {
-        List<User> users = userService.getListUser();
+    public ResponseEntity<ResponseWrapper<List<UserDTO>>> getListUser() {
+        List<UserDTO> users = userService.getListUser();
         long totalUsers = userService.getTotalUsers();
-        ResponseWrapper<List<User>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalUsers, users);
+        ResponseWrapper<List<UserDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalUsers, users);
         return ResponseEntity.ok(response);
     }
 
