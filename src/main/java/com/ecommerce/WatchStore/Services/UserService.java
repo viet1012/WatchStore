@@ -47,8 +47,8 @@ public class UserService {
     public List<UserDTO> getListUser() {
         List<UserDTO> userDTOList = new ArrayList<>();
         List<User> users = userRepository.findAll();
-        UserDTO userDTO = new UserDTO();
         for (User user : users) {
+            UserDTO userDTO = new UserDTO();
             userDTO.setId(user.getId());
             userDTO.setEmail(user.getEmail());
             userDTO.setPassword(user.getPassword());
@@ -84,9 +84,9 @@ public class UserService {
         User user = new User();
 
         user.setEmail(userDTO.getEmail());
-        user.setPhoneNumber(userDTO.getPhoneNumber());
+        //user.setPhoneNumber(userDTO.getPhoneNumber());
         user.setDisplayName(userDTO.getDisplayName());
-        user.setCreatedBy(userDTO.getCreatedBy());
+      //  user.setCreatedBy(userDTO.getCreatedBy());
         user.setCreatedDate(userDTO.getCreatedDate());
         user.setActive(true);
         return userRepository.save(user);
@@ -157,7 +157,7 @@ public class UserService {
             LocalDateTime currentDateTime = LocalDateTime.now();
             newUser.setOtp(otp);
             newUser.setCreateDateOtp(currentDateTime);
-
+            newUser.setActive(true);
             savedUser = userRepository.save(newUser);
             customerService.createCustomer(customerDTO, savedUser);
             // sending otp to your email
