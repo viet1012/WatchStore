@@ -23,7 +23,7 @@ public class BrandService {
 
     public List<Brand> getAllBrands() {
         return brandRepository.findAll();
-       // return brandRepository.findAllByActiveTrue();
+        // return brandRepository.findAllByActiveTrue();
     }
 
     public Optional<Brand> getBrandById(long id) {
@@ -89,6 +89,7 @@ public class BrandService {
         // Lấy danh sách tất cả thương hiệu có trạng thái active = true
         return brandRepository.findAllByActiveTrue();
     }
+
     public List<Brand> getBrandsByPage(int page, int pageSize) {
         // Trừ 1 để đảm bảo trang bắt đầu từ 0
         PageRequest pageable = PageRequest.of(page - 1, pageSize);

@@ -18,10 +18,10 @@ public class SaleService {
     @Autowired
     private ProductSalesRepository productSalesRepository;
 
-    public long getTotalProductSales()
-    {
+    public long getTotalProductSales() {
         return productSalesRepository.count();
     }
+
     public List<ProductSalesDTO> getProductSales() {
 
         List<Object[]> results = productSalesRepository.getProductSales();
@@ -37,10 +37,10 @@ public class SaleService {
         }
         return productSales;
     }
-    public ProductSalesDTO getBestSellingProductByDateRange(LocalDateTime startDate, LocalDateTime endDate)
-    {
-        List<Object[]> result = productSalesRepository.findBestSellingProductByDateRange(startDate,endDate);
-        if( result != null){
+
+    public ProductSalesDTO getBestSellingProductByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        List<Object[]> result = productSalesRepository.findBestSellingProductByDateRange(startDate, endDate);
+        if (result != null) {
             Object[] bestSellingProductByDate = result.get(0);
             Long productId = (Long) bestSellingProductByDate[0];
             Long totalProduct = (Long) bestSellingProductByDate[1];

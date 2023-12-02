@@ -56,8 +56,8 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping()
-    public ResponseEntity<ResponseWrapper<User>> findUserById(@RequestParam Long id) {
+    @GetMapping("/GetById/{id}")
+    public ResponseEntity<ResponseWrapper<User>> findUserById(@PathVariable Long id) {
         User user = userService.getUserById(id);
         ResponseWrapper<User> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, user);
         return ResponseEntity.ok(response);

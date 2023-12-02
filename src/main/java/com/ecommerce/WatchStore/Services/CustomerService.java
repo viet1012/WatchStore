@@ -8,6 +8,7 @@ import com.ecommerce.WatchStore.DTO.CustomerDTO;
 import com.ecommerce.WatchStore.Entities.Customer;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -16,14 +17,24 @@ public class CustomerService {
     private CustomerRepository customerRepository;
     @Autowired
     private UserRepository userRepository;
-    public Customer createCustomer(CustomerDTO customerDTO, Long userId) {
-        Customer customer = new Customer();
-        Optional<User> optionalUser = userRepository.findById(userId);
-        if(optionalUser.isPresent())
-        {
-            User user = optionalUser.get();
-            customer.setUser(user);
 
+    public List<Customer> getAllCustomers()
+    {
+        return customerRepository.findAll();
+    }
+
+    public long getTotalCustomers()
+    {
+        return customerRepository.count();
+    }
+
+    public Customer createCustomer(CustomerDTO customerDTO, User user) {
+        Customer customer = new Customer();
+//        Optional<User> optionalUser = userRepository.findById(userId);
+        if(user != null)
+        {
+         //   User user = optionalUser.get();
+            customer.setUser(user);
             customer.setFullname(customerDTO.getFullname());
             customer.setCode(customerDTO.getCode());
             customer.setLastName(customerDTO.getLastName());
@@ -31,10 +42,10 @@ public class CustomerService {
             customer.setGender(customerDTO.getGender());
             customer.setDateOfBirth(customerDTO.getDateOfBirth());
             customer.setAddress(customerDTO.getAddress());
-            customer.setEmail(customerDTO.getEmail());
+            customer.setEmail(user.getEmail());
             customer.setPhoneNumber(customerDTO.getPhoneNumber());
-            customer.setCreatedBy(customerDTO.getCreatedBy());
-            customer.setActive(customerDTO.getActive());
+            customer.setCreatedBy(customerDTO.getFullname());
+            customer.setActive(true);
             return customerRepository.save(customer);
         }
         else{

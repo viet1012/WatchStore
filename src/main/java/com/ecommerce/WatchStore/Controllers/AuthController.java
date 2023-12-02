@@ -3,9 +3,7 @@ package com.ecommerce.WatchStore.Controllers;
 
 import com.ecommerce.WatchStore.Config.JwtAuthenticationResponse;
 import com.ecommerce.WatchStore.Config.JwtTokenProvider;
-import com.ecommerce.WatchStore.DTO.AuthResponse;
-import com.ecommerce.WatchStore.DTO.OTPRequest;
-import com.ecommerce.WatchStore.DTO.UserDTO;
+import com.ecommerce.WatchStore.DTO.*;
 import com.ecommerce.WatchStore.Entities.User;
 import com.ecommerce.WatchStore.Services.EmailService;
 import com.ecommerce.WatchStore.Services.UserService;
@@ -61,10 +59,14 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUserWithRole(@RequestBody User registrationDto, @RequestParam("role_id") Long roleId) {
+    public ResponseEntity<?> registerUserWithRole( @RequestParam("role_id") Long roleId, @RequestBody CustomerDTO request) {
 
+
+        System.out.println("User: " + request.getEmail());
+
+        System.out.println("Fullname: " + request.getFullname());
         // Tạo một người dùng mới
-        User registeredUser = userService.registerUser(registrationDto, roleId);
+        User registeredUser = userService.registerUser( roleId ,request);
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(registeredUser.getEmail());
         String token = jwtTokenProvider.generateToken(userDetails);

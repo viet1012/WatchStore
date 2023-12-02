@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -25,8 +26,7 @@ public class BillService {
     public Bill createBill(Bill bill, Long userId, Long voucherId) {
 
         Optional<User> userOptional = userRepository.findById(userId);
-        if( userOptional.isPresent())
-        {
+        if (userOptional.isPresent()) {
             User user = userOptional.get();
 
             Bill newBill = new Bill();
@@ -40,12 +40,13 @@ public class BillService {
 
 
             return savedBill;
-        }else {
-            System.out.println("Không tìm thấy userID : "+ userId);
+        } else {
+            System.out.println("Không tìm thấy userID : " + userId);
         }
         return null;
 
     }
+
     // Phương thức để cập nhật trạng thái của hóa đơn
     public Bill updateBillStatus(Long billId, String newStatus) {
         Optional<Bill> billOptional = billRepository.findById(billId);
@@ -64,7 +65,7 @@ public class BillService {
         }
     }
 
-    public Bill getBillById(Long id ){
+    public Bill getBillById(Long id) {
         Optional<Bill> billOptional = billRepository.findById(id);
         return billOptional.orElse(null);
     }
@@ -77,12 +78,12 @@ public class BillService {
 //        return bill.getBillDetails();
 //    }
 
-    public List<Bill> getBillList(){
+    public List<Bill> getBillList() {
         return billRepository.findAll();
     }
 
-    public Bill updateBill(Long id , Bill bill){
-        Bill existingBill = billRepository.findById(id).orElseThrow(() ->  new IllegalArgumentException("Không tìm thấy hóa đơn với id: " + id));
+    public Bill updateBill(Long id, Bill bill) {
+        Bill existingBill = billRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Không tìm thấy hóa đơn với id: " + id));
         existingBill.setDeliverAddress(bill.getDeliverAddress());
         existingBill.setActive(true);
         existingBill.setUpdatedBy(bill.getUpdatedBy());
@@ -90,6 +91,7 @@ public class BillService {
 
         return billRepository.save(existingBill);
     }
+
     public List<Bill> getBillsByPage(int page, int pageSize) {
         // Trừ 1 để đảm bảo trang bắt đầu từ 0
         PageRequest pageable = PageRequest.of(page - 1, pageSize);

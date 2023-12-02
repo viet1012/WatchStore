@@ -1,6 +1,7 @@
 package com.ecommerce.WatchStore.Services;
 
 import com.ecommerce.WatchStore.Config.JwtTokenProvider;
+import com.ecommerce.WatchStore.DTO.CustomerDTO;
 import com.ecommerce.WatchStore.DTO.UserDTO;
 import com.ecommerce.WatchStore.Entities.Role;
 import com.ecommerce.WatchStore.Entities.User;
@@ -34,6 +35,8 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
+    private CustomerService customerService;
+    @Autowired
     private EmailService emailService;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -42,14 +45,16 @@ public class UserService {
     public List<User> getListUser() {
         return userRepository.findAll();
     }
-    public long getTotalUsers()
-    {
+
+    public long getTotalUsers() {
         return userRepository.count();
     }
-    public long getUserIdFromEmail(String email){
+
+    public long getUserIdFromEmail(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         return optionalUser.map(User::getId).orElse(null);
     }
+
     public User getUserById(Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         return optionalUser.orElse(null);
@@ -84,19 +89,49 @@ public class UserService {
     }
 
 
-    public User registerUser(User user, Long roleId) {
-        Optional<User> isUserExist = userRepository.findByEmail(user.getEmail());
-        User newUser = new User();
+    //    public User registerUser(User user, Long roleId, CustomerDTO customerDTO) {
+//
+//        Optional<User> isUserExist = userRepository.findByEmail(user.getEmail());
+//        User newUser = new User();
+//
+//        if (isUserExist.isPresent()) {
+//            System.out.println("Email: " + user.getEmail() + " đã tồn tại");
+//        } else {
+//            Optional<Role> userRole = roleRepository.findById(roleId);
+//            newUser.setEmail(user.getEmail());
+//            String encodedPassword = passwordEncoder.encode(user.getPassword());
+//            newUser.setPassword(encodedPassword);
+//            newUser.setDisplayName(user.getDisplayName());
+//            newUser.setCreatedBy(user.getDisplayName());
+//            newUser.setRole(userRole.get());
+//            OtpUtils otpUtils = new OtpUtils();
+//            String otp = otpUtils.generateOtp();
+//            LocalDateTime currentDateTime = LocalDateTime.now();
+//            newUser.setOtp(otp);
+//            newUser.setCreateDateOtp(currentDateTime);
+//
+//            customerService.createCustomer(customerDTO ,newUser);
+//            // sending otp to your email
+//            emailService.sendEmailWithOTP(newUser.getEmail(), newUser.getDisplayName(), newUser.getOtp());
+//        }
+//        System.out.println("Email: " + newUser.getEmail() + "OTP: " + newUser.getOtp());
+//        return userRepository.save(newUser);
+//
+//    }
+    public User registerUser(Long roleId, CustomerDTO customerDTO) {
 
+        Optional<User> isUserExist = userRepository.findByEmail(customerDTO.getEmail());
+        User newUser = new User();
+        User savedUser = new User();
         if (isUserExist.isPresent()) {
-            System.out.println("Email: " + user.getEmail() + " đã tồn tại");
+            System.out.println("Email: " + customerDTO.getEmail() + " đã tồn tại");
         } else {
             Optional<Role> userRole = roleRepository.findById(roleId);
-            newUser.setEmail(user.getEmail());
-            String encodedPassword = passwordEncoder.encode(user.getPassword());
+            newUser.setEmail(customerDTO.getEmail());
+            String encodedPassword = passwordEncoder.encode(customerDTO.getPassword());
             newUser.setPassword(encodedPassword);
-            newUser.setDisplayName(user.getDisplayName());
-            newUser.setCreatedBy(user.getDisplayName());
+            newUser.setDisplayName(customerDTO.getDisplayName());
+            newUser.setCreatedBy(customerDTO.getDisplayName());
             newUser.setRole(userRole.get());
             OtpUtils otpUtils = new OtpUtils();
             String otp = otpUtils.generateOtp();
@@ -104,11 +139,13 @@ public class UserService {
             newUser.setOtp(otp);
             newUser.setCreateDateOtp(currentDateTime);
 
+            savedUser = userRepository.save(newUser);
+            customerService.createCustomer(customerDTO, savedUser);
             // sending otp to your email
             emailService.sendEmailWithOTP(newUser.getEmail(), newUser.getDisplayName(), newUser.getOtp());
         }
-        System.out.println("Email: "+ newUser.getEmail() + "OTP: "+ newUser.getOtp());
-        return userRepository.save(newUser);
+        System.out.println("Email: " + newUser.getEmail() + "OTP: " + newUser.getOtp());
+        return savedUser;
 
     }
 
@@ -140,7 +177,7 @@ public class UserService {
         if (optionalUser.isPresent()) {
             User existingUser = optionalUser.get();
             isVerifyOTP = verifyOtp(existingUser.getEmail(), existingUser.getOtp());
-            System.out.println("User: " + existingUser.getEmail() + " OTP: " + existingUser.getOtp() + "new Password "+ newPassword);
+            System.out.println("User: " + existingUser.getEmail() + " OTP: " + existingUser.getOtp() + "new Password " + newPassword);
 
             if (isVerifyOTP) {
                 try {
@@ -180,7 +217,7 @@ public class UserService {
             if (minutesDiff <= 10 && user.getOtp().equals(otp)) {
                 isVerify = true;
             } else {
-                System.out.println("OTP: "+ otp +" đã hết hạn!");
+                System.out.println("OTP: " + otp + " đã hết hạn!");
             }
         }
 

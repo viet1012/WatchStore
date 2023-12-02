@@ -27,6 +27,7 @@ public class RoleService {
         // Nếu không trùng lặp, thì mới lưu vào cơ sở dữ liệu
         return roleRepository.save(role);
     }
+
     @Transactional
     public Role updateRole(Long id, Role updatedRole) {
         Optional<Role> roleOptional = roleRepository.findById(id);
