@@ -37,8 +37,8 @@ public class ReviewProductController {
     }
 
     @GetMapping("/GetByProductId/{id}")
-    public ResponseEntity< List<ReviewProduct>> getReviewByProductId(@PathVariable Long id) {
-        List<ReviewProduct> review = reviewProductService.getReviewsByProductId(id);
+    public ResponseEntity< List<ReviewProductDTO>> getReviewByProductId(@PathVariable Long id) {
+        List<ReviewProductDTO> review = reviewProductService.getReviewsByProductId(id);
         if (review != null) {
             return new ResponseEntity<>(review, HttpStatus.OK);
         }

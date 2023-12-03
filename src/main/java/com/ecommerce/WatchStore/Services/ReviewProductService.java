@@ -40,8 +40,21 @@ public class ReviewProductService {
         }
         return reviewProductDTOS;
     }
-    public List<ReviewProduct> getReviewsByProductId(Long productId) {
-        return reviewProductRepository.findByProductId(productId);
+    public List<ReviewProductDTO> getReviewsByProductId(Long productId) {
+        List<ReviewProduct> reviewProducts =  reviewProductRepository.findByProductId(productId);
+        List<ReviewProductDTO> reviewProductDTOS  = new ArrayList<>();
+        for (ReviewProduct reviewProduct : reviewProducts)
+        {
+            ReviewProductDTO reviewProductDTO = new ReviewProductDTO();
+            reviewProductDTO.setId(reviewProduct.getId());
+            reviewProductDTO.setProductId(reviewProduct.getProduct() !=null ? reviewProduct.getProduct().getProductId() : null);
+            reviewProductDTO.setRating(reviewProduct.getRating());
+            reviewProductDTO.setUserId(reviewProduct.getUser() != null ? reviewProduct.getUser().getId() : null);
+            reviewProductDTO.setComment(reviewProduct.getComment());
+            reviewProductDTO.setCreatedDt(reviewProduct.getCreatedDt());
+            reviewProductDTOS.add(reviewProductDTO);
+        }
+        return reviewProductDTOS;
     }
     public ReviewProduct getReviewById(Long id) {
         return reviewProductRepository.findById(id).orElse(null);
