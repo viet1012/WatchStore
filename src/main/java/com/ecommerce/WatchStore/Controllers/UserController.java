@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.http.HttpHeaders;
 
 @RestController
 @RequestMapping("/api/User")
@@ -36,7 +37,7 @@ public class UserController {
     @Autowired
     JwtTokenProvider jwtTokenProvider;
     @GetMapping("/profile")
-    public ResponseEntity<?> getUserProfile(HttpServletRequest request) {
+    public ResponseEntity<?> getUserProfile(HttpServletRequest request ) {
 
         Long userId = (Long) request.getAttribute("userId");
         if (userId != null) {

@@ -44,18 +44,26 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserDTO loginRequest) {
         logger.info(userService.getUserIdFromEmail(loginRequest.getEmail()) + "----" +loginRequest.getEmail() + "---" + loginRequest.getPassword());
-        try {
-            Authentication authentication = authenticationProvider.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
-            );
-            UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getEmail());
-            String token = jwtTokenProvider.generateToken(authentication ,  userService.getUserIdFromEmail(loginRequest.getEmail()));
+       User userLogin = userService.getUserFromEmail(loginRequest.getEmail());
+       if(!userLogin.getActive())
+       {
+           return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Đăng nhập không thành công ");
+       }
+       else {
+           try {
+               Authentication authentication = authenticationProvider.authenticate(
+                       new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+               );
+               UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getEmail());
+               String token = jwtTokenProvider.generateToken(authentication ,  userService.getUserIdFromEmail(loginRequest.getEmail()));
 
-            return ResponseEntity.ok(new JwtAuthenticationResponse(token));
-        } catch (AuthenticationException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Đăng nhập không thành công " + e.getMessage());
-        }
+               return ResponseEntity.ok(new JwtAuthenticationResponse(token));
+           } catch (AuthenticationException e) {
+               e.printStackTrace();
+               return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Đăng nhập không thành công " + e.getMessage());
+           }
+       }
+
     }
 
     @PostMapping("/register")
@@ -92,10 +100,14 @@ public class AuthController {
     public String validateOTP(@RequestBody OTPRequest otpRequest) {
         String email = otpRequest.getEmail();
         String otp = otpRequest.getOtp();
-
+        User user = userService.getUserFromEmail(email);
         boolean check = userService.verifyOtp(email, otp);
         if (check) {
             emailService.sendEmailWithAds(otpRequest.getEmail());
+            System.out.println("Hello: " + user.getEmail() + "Id: " +user.getId() );
+            user.setActive(true);
+            userService.savedUser(user);
+            System.out.println("Active: " + user.getActive() );
             return "Tạo tài khoản thành công";
         } else {
             return "OTP đã quá 10 phút";

@@ -43,7 +43,10 @@ public class UserService {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-
+    public void savedUser(User user)
+    {
+        userRepository.save(user);
+    }
     public List<UserDTO> getListUser() {
         List<UserDTO> userDTOList = new ArrayList<>();
         List<User> users = userRepository.findAll();
@@ -74,7 +77,16 @@ public class UserService {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         return optionalUser.map(User::getId).orElse(null);
     }
-
+    public User getUserFromEmail(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if(optionalUser.isPresent())
+        {
+            return optionalUser.get();
+        }
+        else {
+            return null;
+        }
+    }
     public User getUserById(Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         return optionalUser.orElse(null);
@@ -152,13 +164,14 @@ public class UserService {
             newUser.setPassword(encodedPassword);
             newUser.setDisplayName(customerDTO.getDisplayName());
             newUser.setCreatedBy(customerDTO.getDisplayName());
+            newUser.setPhoneNumber(customerDTO.getPhoneNumber());
             newUser.setRole(userRole.get());
             OtpUtils otpUtils = new OtpUtils();
             String otp = otpUtils.generateOtp();
             LocalDateTime currentDateTime = LocalDateTime.now();
             newUser.setOtp(otp);
             newUser.setCreateDateOtp(currentDateTime);
-            newUser.setActive(true);
+            newUser.setActive(false);
             savedUser = userRepository.save(newUser);
             customerService.createCustomer(customerDTO, savedUser);
             // sending otp to your email
