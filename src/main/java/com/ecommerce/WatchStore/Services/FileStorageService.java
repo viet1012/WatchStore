@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -24,7 +26,13 @@ public class FileStorageService {
             // Lưu tệp vào hệ thống tệp của máy chủ
             file.transferTo(targetFile);
 
-            return "http://localhost:8080/uploads/" +fileName;
+            // Tạo đường dẫn URL linh hoạt sử dụng ServletUriComponentsBuilder
+            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/uploads/")
+                    .path(fileName)
+                    .toUriString();
+
+            return fileDownloadUri;
         } catch (IOException ex) {
             throw new RuntimeException("Không thể lưu tệp " + file.getOriginalFilename(), ex);
         }
