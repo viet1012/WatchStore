@@ -54,6 +54,7 @@ public class UserService {
             userDTO.setPassword(user.getPassword());
             userDTO.setDisplayName(user.getDisplayName());
             userDTO.setCreatedDate(user.getCreatedDate());
+            userDTO.setPhoneNumber(user.getPhoneNumber());
             Customer customer = customerService.getUserFromCustomer(user.getId());
             userDTO.setCustomerId(customer != null ? customer.getId() :  null);
             userDTO.setRoleId(user.getRole()!= null ? user.getRole().getId() : null);

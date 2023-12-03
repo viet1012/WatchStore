@@ -37,7 +37,7 @@ public class CustomerService {
         {
          //   User user = optionalUser.get();
             customer.setUser(user);
-            customer.setFullname(customerDTO.getFullname());
+            customer.setFullname(customerDTO.getFirstName()+ " "+  customerDTO.getLastName());
             customer.setCode(customerDTO.getCode());
             customer.setLastName(customerDTO.getLastName());
             customer.setFirstName(customerDTO.getFirstName());

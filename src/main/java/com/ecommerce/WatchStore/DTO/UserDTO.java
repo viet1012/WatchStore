@@ -10,7 +10,7 @@ public class UserDTO {
     private Long id;
     private String email;
     private String password;
-  //  private String phoneNumber;
+    private String phoneNumber;
     private String displayName;
   //  private LocalDateTime lastOnline;
     private Long roleId;
