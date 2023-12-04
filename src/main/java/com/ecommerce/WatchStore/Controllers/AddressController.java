@@ -1,5 +1,6 @@
 package com.ecommerce.WatchStore.Controllers;
 
+import com.ecommerce.WatchStore.DTO.AddressDTO;
 import com.ecommerce.WatchStore.DTO.ProductDTO;
 import com.ecommerce.WatchStore.Entities.Address;
 import com.ecommerce.WatchStore.Entities.Product;
@@ -32,12 +33,12 @@ public class AddressController {
     }
 
     @PostMapping("/Create")
-    public ResponseEntity<ResponseWrapper<Address>> addAddressForUser(@RequestBody Address address, HttpServletRequest request) {
+    public ResponseEntity<ResponseWrapper<Address>> addAddressForUser(@RequestBody AddressDTO address) {
         try {
-            Long userId = (Long) request.getAttribute("userId");
+          //  Long userId = (Long) request.getAttribute("userId");
 
-            System.out.println("ID User khi POST: " + userId);
-            Address newAddress = addressService.addAddressForUser(address, userId);
+//            System.out.println("ID User khi POST: " + userId);
+            Address newAddress = addressService.addAddressForUser(address);
             long totalAddresses = addressService.Total();
 
             ResponseWrapper<Address> response = new ResponseWrapper<>(HttpStatus.CREATED.value(), "Address created successfully", true, totalAddresses, newAddress);

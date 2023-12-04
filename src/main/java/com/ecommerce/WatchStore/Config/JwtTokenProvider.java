@@ -1,18 +1,14 @@
 package com.ecommerce.WatchStore.Config;
 
-import com.ecommerce.WatchStore.Entities.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -98,7 +94,7 @@ public class JwtTokenProvider {
         if (userId != null) {
             return userId.longValue();
         }
-        return null; // Hoặc giá trị mặc định khác tùy thuộc vào logic của bạn
+        return null;
     }
 
 
@@ -109,19 +105,19 @@ public class JwtTokenProvider {
 //
 //    }
 
-
-    public String generate_Token(Authentication authentication) {
-
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
-        return Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(secretKey, SignatureAlgorithm.HS256)
-                .compact();
+    public Long getUserIdFromGeneratedToken(String generatedToken) {
+        try {
+            Claims claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(generatedToken).getBody();
+            Number userId = (Number) claims.get("userId");
+            if (userId != null) {
+                return userId.longValue();
+            }
+        } catch (Exception ex) {
+            System.out.println("Lỗi xác minh hoặc trích xuất userId từ token: " + ex.getMessage());
+        }
+        return null;
     }
+
     public String generateToken(Authentication authentication, long userId) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Date now = new Date();

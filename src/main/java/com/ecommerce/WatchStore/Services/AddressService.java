@@ -1,5 +1,7 @@
 package com.ecommerce.WatchStore.Services;
 
+import com.ecommerce.WatchStore.Config.JwtTokenProvider;
+import com.ecommerce.WatchStore.DTO.AddressDTO;
 import com.ecommerce.WatchStore.Repositories.AddressRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,8 @@ public class AddressService {
 
     @Autowired
     private AddressRepository addressRepository;
-
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
 
     public List<Address> getAll()
     {
@@ -25,14 +28,15 @@ public class AddressService {
     {
         return addressRepository.count();
     }
-    public Address addAddressForUser(Address address , long userId) {
+    public Address addAddressForUser(AddressDTO addressDTO) {
         Address newAddress = new Address();
+        Long userId = jwtTokenProvider.getUserIdFromGeneratedToken(addressDTO.getToken());
         newAddress.setUserId(userId);
-        newAddress.setWard(address.getWard());
-        newAddress.setDistrict(address.getDistrict());
-        newAddress.setHouseNumber(address.getHouseNumber());
-        newAddress.setNote(address.getNote());
-        newAddress.setActive(address.isActive());
+        newAddress.setWard(addressDTO.getWard());
+        newAddress.setDistrict(addressDTO.getDistrict());
+        newAddress.setHouseNumber(addressDTO.getHouseNumber());
+        newAddress.setNote(addressDTO.getNote());
+        newAddress.setActive(true);
 
         return addressRepository.save(newAddress);
     }

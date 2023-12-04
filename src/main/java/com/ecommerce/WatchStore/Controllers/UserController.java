@@ -37,10 +37,13 @@ public class UserController {
     @Autowired
     JwtTokenProvider jwtTokenProvider;
     @GetMapping("/profile")
-    public ResponseEntity<?> getUserProfile(HttpServletRequest request ) {
+    public ResponseEntity<?> getUserProfile(HttpServletRequest request , @RequestParam String token ) {
 
-        Long userId = (Long) request.getAttribute("userId");
+//        Long userId = (Long) request.getAttribute("userId");
+        Long userId = jwtTokenProvider.getUserIdFromGeneratedToken(token);
+
         if (userId != null) {
+
             // Thực hiện xử lý dữ liệu của user với userId đã lấy được
             return ResponseEntity.ok("Processed with user_id: " + userId);
         } else {

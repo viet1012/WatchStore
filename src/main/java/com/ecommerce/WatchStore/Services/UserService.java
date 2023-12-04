@@ -43,6 +43,7 @@ public class UserService {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
+
     public void savedUser(User user)
     {
         userRepository.save(user);

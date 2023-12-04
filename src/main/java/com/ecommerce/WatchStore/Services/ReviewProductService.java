@@ -1,5 +1,6 @@
 package com.ecommerce.WatchStore.Services;
 
+import com.ecommerce.WatchStore.Config.JwtTokenProvider;
 import com.ecommerce.WatchStore.DTO.ReviewProductDTO;
 import com.ecommerce.WatchStore.Entities.Product;
 import com.ecommerce.WatchStore.Entities.ReviewProduct;
@@ -16,22 +17,23 @@ public class ReviewProductService {
     @Autowired
     private ReviewProductRepository reviewProductRepository;
     @Autowired
-    private  ProductService productService;
+    private ProductService productService;
     @Autowired
-    private  UserService userService;
+    private UserService userService;
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
-    public long getTotal()
-    {
+    public long getTotal() {
         return reviewProductRepository.count();
     }
+
     public List<ReviewProductDTO> getAllReviews() {
-        List<ReviewProduct> reviewProducts =  reviewProductRepository.findAll();
-        List<ReviewProductDTO> reviewProductDTOS  = new ArrayList<>();
-        for (ReviewProduct reviewProduct : reviewProducts)
-        {
+        List<ReviewProduct> reviewProducts = reviewProductRepository.findAll();
+        List<ReviewProductDTO> reviewProductDTOS = new ArrayList<>();
+        for (ReviewProduct reviewProduct : reviewProducts) {
             ReviewProductDTO reviewProductDTO = new ReviewProductDTO();
             reviewProductDTO.setId(reviewProduct.getId());
-            reviewProductDTO.setProductId(reviewProduct.getProduct() !=null ? reviewProduct.getProduct().getProductId() : null);
+            reviewProductDTO.setProductId(reviewProduct.getProduct() != null ? reviewProduct.getProduct().getProductId() : null);
             reviewProductDTO.setRating(reviewProduct.getRating());
             reviewProductDTO.setUserId(reviewProduct.getUser() != null ? reviewProduct.getUser().getId() : null);
             reviewProductDTO.setComment(reviewProduct.getComment());
@@ -40,14 +42,14 @@ public class ReviewProductService {
         }
         return reviewProductDTOS;
     }
+
     public List<ReviewProductDTO> getReviewsByProductId(Long productId) {
-        List<ReviewProduct> reviewProducts =  reviewProductRepository.findByProductId(productId);
-        List<ReviewProductDTO> reviewProductDTOS  = new ArrayList<>();
-        for (ReviewProduct reviewProduct : reviewProducts)
-        {
+        List<ReviewProduct> reviewProducts = reviewProductRepository.findByProductId(productId);
+        List<ReviewProductDTO> reviewProductDTOS = new ArrayList<>();
+        for (ReviewProduct reviewProduct : reviewProducts) {
             ReviewProductDTO reviewProductDTO = new ReviewProductDTO();
             reviewProductDTO.setId(reviewProduct.getId());
-            reviewProductDTO.setProductId(reviewProduct.getProduct() !=null ? reviewProduct.getProduct().getProductId() : null);
+            reviewProductDTO.setProductId(reviewProduct.getProduct() != null ? reviewProduct.getProduct().getProductId() : null);
             reviewProductDTO.setRating(reviewProduct.getRating());
             reviewProductDTO.setUserId(reviewProduct.getUser() != null ? reviewProduct.getUser().getId() : null);
             reviewProductDTO.setComment(reviewProduct.getComment());
@@ -56,14 +58,16 @@ public class ReviewProductService {
         }
         return reviewProductDTOS;
     }
+
     public ReviewProduct getReviewById(Long id) {
         return reviewProductRepository.findById(id).orElse(null);
     }
 
     public ReviewProduct createReview(ReviewProductDTO reviewProductDTO) {
-        ReviewProduct savedRP =  new ReviewProduct();
+        ReviewProduct savedRP = new ReviewProduct();
+        Long userId = jwtTokenProvider.getUserIdFromGeneratedToken(reviewProductDTO.getToken());
         Product product = productService.getProductById(reviewProductDTO.getProductId());
-        User user = userService.getUserById(reviewProductDTO.getUserId());
+        User user = userService.getUserById(userId);
         savedRP.setProduct(product);
         savedRP.setComment(reviewProductDTO.getComment());
         savedRP.setRating(reviewProductDTO.getRating());

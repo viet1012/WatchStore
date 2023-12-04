@@ -8,6 +8,7 @@ import com.ecommerce.WatchStore.Entities.User;
 public class AuthResponse {
     private User user;
     private String accessToken;
+    private String token;
     public AuthResponse(){
 
     }
