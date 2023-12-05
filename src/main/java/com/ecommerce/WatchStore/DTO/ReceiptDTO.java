@@ -11,6 +11,7 @@ import java.util.List;
 @Setter
 public class ReceiptDTO {
     private Long id;
+    private String token;
     private double total;
     private long userId;
     private long supplierId;

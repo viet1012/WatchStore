@@ -1,5 +1,6 @@
 package com.ecommerce.WatchStore.Services;
 
+import com.ecommerce.WatchStore.Config.JwtTokenProvider;
 import com.ecommerce.WatchStore.DTO.ReceiptDTO;
 import com.ecommerce.WatchStore.DTO.ReceiptDetailDTO;
 import com.ecommerce.WatchStore.Entities.*;
@@ -27,6 +28,8 @@ public class ReceiptService {
     private SupplierRepository supplierRepository;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
     public List<Receipt> getAllReceipts() {
         return receiptRepository.findAll();
     }
@@ -106,7 +109,7 @@ public class ReceiptService {
         Optional<Supplier> supplier = supplierRepository.findById(receiptDTO.getSupplierId());
         Supplier supplierObj = supplier.orElseThrow(() -> new IllegalArgumentException("Supplier not found"));
 
-        Optional<User> userOptional = userRepository.findById(receiptDTO.getUserId());
+        Optional<User> userOptional = userRepository.findById(jwtTokenProvider.getUserIdFromGeneratedToken(receiptDTO.getToken()));
         User user = userOptional.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         Receipt newReceipt = new Receipt();
