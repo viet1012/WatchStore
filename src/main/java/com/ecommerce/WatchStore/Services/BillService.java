@@ -42,7 +42,7 @@ public class BillService {
             // Mapping data from the query result to the BillDTO fields
             billDTO.setId((Long) billDetail[0]); // Assuming id is at index 0 in the query result
             billDTO.setTotalPrice((float) billDetail[1]); // Assuming totalPrice is at index 1 in the query result
-            billDTO.setUser_id((Long) billDetail[2]); // Assuming user_id is at index 2 in the query result
+            billDTO.setUserId((Long) billDetail[2]); // Assuming user_id is at index 2 in the query result
             billDTO.setDeliverAddress((String) billDetail[3]); // Assuming deliverAddress is at index 3 in the query result
 
             // Extract receipt details similarly to the getAllReceiptDetailsWithTotalAndSupplierId method
@@ -68,7 +68,7 @@ public class BillService {
     }
     public Bill createBill(BillDTO billDTO) {
 
-        Optional<User> userOptional = userRepository.findById(billDTO.getUser_id());
+        Optional<User> userOptional = userRepository.findById(billDTO.getUserId());
         User user = userOptional.get();
         System.out.println("username: " + user.getDisplayName());
         Bill newBill = new Bill();

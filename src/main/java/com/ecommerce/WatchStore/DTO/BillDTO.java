@@ -10,7 +10,7 @@ import java.util.List;
 public class BillDTO {
     private Long id;
     private String token;
-    private Long user_id;
+    private Long userId;
     private String deliverAddress;
     private LocalDateTime createDate;
     private Long voucherId;
