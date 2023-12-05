@@ -25,34 +25,42 @@ public class VoucherService {
         return now.isAfter(voucher.getStartDate()) && now.isBefore(voucher.getEndDate());
     }
 
-    public Bill applyVoucherDiscount(Long billId, Long voucherId) {
+    public Voucher getVoucherFromId(Long voucherId) {
+        Optional<Voucher> voucherOptional = voucherRepository.findById(voucherId);
+        if (voucherOptional.isEmpty()) {
+            throw new IllegalArgumentException("Voucher không hợp lệ.");
+        } else {
+            return voucherOptional.get();
+        }
+    }
+
+    public void applyVoucherDiscount(Long billId, Long voucherId) {
         Optional<Bill> billOptional = billRepository.findById(billId);
         Optional<Voucher> voucherOptional = voucherRepository.findById(voucherId);
 
 
-        if(voucherOptional.isEmpty())
-        {
+        if (voucherOptional.isEmpty()) {
             throw new IllegalArgumentException("Voucher không hợp lệ.");
         }
         Voucher voucher = voucherOptional.get();
         if (billOptional.isPresent()) {
             Bill bill = billOptional.get();
 
-            System.out.println("Bill :" +bill.getTotalPrice() + " Voucher: " + voucher.getValue());
+            System.out.println("Bill :" + bill.getTotalPrice() + " Voucher: " + voucher.getValue());
             if (bill.getTotalPrice() < 0) {
                 throw new IllegalArgumentException("Tổng tiền hóa đơn không phù hợp điều kiện áp dụng voucher.");
             }
 
             if (isVoucherValid(voucher)) {
-               // float discountPercentage = voucher.getValue() / 100.0f; // Chuyển phần trăm thành tỷ lệ
-               // float discountAmount = bill.getTotalPrice() * discountPercentage;
+                // float discountPercentage = voucher.getValue() / 100.0f; // Chuyển phần trăm thành tỷ lệ
+                // float discountAmount = bill.getTotalPrice() * discountPercentage;
 
                 float discountAmount = voucher.getValue();
                 // Giảm giá chỉ khi discountAmount không vượt quá tổng hóa đơn
                 if (discountAmount <= bill.getTotalPrice()) {
                     float newTotalPrice = bill.getTotalPrice() - discountAmount;
                     bill.setTotalPrice(newTotalPrice);
-                    return billRepository.save(bill);
+                    billRepository.save(bill);
                 } else {
                     throw new IllegalArgumentException("Số tiền giảm giá vượt quá tổng giá trị hóa đơn.");
                 }
@@ -64,6 +72,39 @@ public class VoucherService {
         }
     }
 
+    public void applyVoucher(Bill bill, Long voucherId) {
+        Optional<Voucher> voucherOptional = voucherRepository.findById(voucherId);
+
+
+        if (voucherOptional.isEmpty()) {
+            throw new IllegalArgumentException("Voucher không hợp lệ.");
+        }else{
+            Voucher voucher = voucherOptional.get();
+
+            if (bill.getTotalPrice() < 0) {
+                throw new IllegalArgumentException("Tổng tiền hóa đơn không phù hợp điều kiện áp dụng voucher.");
+            }
+
+            if (isVoucherValid(voucher)) {
+
+                float discountAmount = voucher.getValue();
+                // Giảm giá chỉ khi discountAmount không vượt quá tổng hóa đơn
+                if (discountAmount <= bill.getTotalPrice()) {
+                    float newTotalPrice = bill.getTotalPrice() - discountAmount;
+                    bill.setVoucher(voucher);
+                    bill.setTotalPrice(newTotalPrice);
+
+                } else {
+                    throw new IllegalArgumentException("Số tiền giảm giá vượt quá tổng giá trị hóa đơn.");
+                }
+            }
+            else {
+                throw new IllegalArgumentException("Voucher đã hết hạn sử dụng.");
+
+            }
+        }
+
+    }
 
     public List<Voucher> getListVoucher() {
         return voucherRepository.findAll();
@@ -75,7 +116,7 @@ public class VoucherService {
 
     public Voucher updateVoucher(Voucher voucher, Long voucherId) {
         Optional<Voucher> voucherOptional = voucherRepository.findById(voucherId);
-        if(voucherOptional.isPresent()){
+        if (voucherOptional.isPresent()) {
             Voucher updatedVoucher = voucherOptional.get();
             updatedVoucher.setCode(voucher.getCode());
             updatedVoucher.setValue(voucher.getValue());
@@ -89,6 +130,6 @@ public class VoucherService {
     }
 
     public void deleteVoucher(Long voucherId) {
-         voucherRepository.deleteById(voucherId);
+        voucherRepository.deleteById(voucherId);
     }
 }

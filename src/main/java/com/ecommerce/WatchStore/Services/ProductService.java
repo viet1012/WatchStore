@@ -72,7 +72,7 @@ public class ProductService {
             productDto.setImg(product.getImg());
             productDto.setPrice(product.getPrice());
 
-            productDto.setQuantity(0);
+            productDto.setQuantity(product.getQuantity());
 
             productDto.setBrandId(product.getBrand() != null ? product.getBrand().getIdBrand() : null);
             productDto.setCategoryId(product.getCategory() != null ? product.getCategory().getId() : null);

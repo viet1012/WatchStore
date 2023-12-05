@@ -109,7 +109,7 @@ public class ReceiptService {
         Optional<Supplier> supplier = supplierRepository.findById(receiptDTO.getSupplierId());
         Supplier supplierObj = supplier.orElseThrow(() -> new IllegalArgumentException("Supplier not found"));
 
-        Optional<User> userOptional = userRepository.findById(jwtTokenProvider.getUserIdFromGeneratedToken(receiptDTO.getToken()));
+        Optional<User> userOptional = userRepository.findById(receiptDTO.getUserId());
         User user = userOptional.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         Receipt newReceipt = new Receipt();
@@ -124,12 +124,18 @@ public class ReceiptService {
 
             ReceiptDetail detail = new ReceiptDetail();
             Optional<Product> optionalProduct = productRepository.findById(detailDTO.getProductId());
+            Product product = optionalProduct.get();
             total += detailDTO.getPrice() * detailDTO.getQuantity();
             detail.setReceipt(newReceipt);
-            detail.setProduct(optionalProduct.get());
+            detail.setProduct(product);
             detail.setQuantity(detailDTO.getQuantity());
             detail.setPrice(detailDTO.getPrice());
+
+            product.setQuantity(detailDTO.getQuantity());
+            product.setPrice((float)detailDTO.getPrice());
+            productRepository.save(product);
             savedReceiptDetails.add(detail);
+
         }
         newReceipt.setTotal(total);
         newReceipt.setReceiptDetails(savedReceiptDetails);

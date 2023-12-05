@@ -43,26 +43,36 @@ public class BillController {
     }
 
     @GetMapping("/GetAll")
-    public ResponseEntity<ResponseWrapper<List<Bill>>> getBillList() {
-        List<Bill> billList = billService.getBillList();
+//    public ResponseEntity<ResponseWrapper<List<Bill>>> getBillList() {
+//        List<Bill> billList = billService.getBillList();
+//        long totalBills = billService.getTotalBills();
+//
+//        if (billList.isEmpty()) {
+//            return ResponseEntity.noContent().build();
+//        }
+//
+//        ResponseWrapper<List<Bill>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalBills, billList);
+//        return ResponseEntity.ok(response);
+//    }
+    public ResponseEntity<ResponseWrapper<List<BillDTO>>> getBillList() {
+        List<BillDTO> billList = billService.getAll();
         long totalBills = billService.getTotalBills();
 
         if (billList.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
-        ResponseWrapper<List<Bill>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalBills, billList);
+        ResponseWrapper<List<BillDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalBills, billList);
         return ResponseEntity.ok(response);
     }
-
     @PostMapping("/Apply-voucher/{id}")
     public ResponseEntity<Object> applyVoucherToBill(
             @PathVariable Long id,
             @RequestParam Long voucherId) {
 
         try {
-            Bill updatedBill = voucherService.applyVoucherDiscount(id, voucherId);
-            return ResponseEntity.ok(updatedBill); // Trả về hóa đơn sau khi áp dụng voucher thành công
+            voucherService.applyVoucherDiscount(id, voucherId);
+            return ResponseEntity.ok().build(); // Trả về hóa đơn sau khi áp dụng voucher thành công
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage()); // Trả về lỗi khi áp dụng voucher không thành công
         } catch (NoSuchElementException e) {
@@ -72,11 +82,17 @@ public class BillController {
         }
     }
 
+//    @PostMapping("/Create")
+//    public ResponseEntity<ResponseWrapper<Bill>> createBill(@RequestBody Bill billRequest, @RequestParam Long userId, @RequestParam(required = false, defaultValue = "1") Long voucherId) {
+//        Bill savedBill = billService.createBill(billRequest, userId, voucherId);
+//        ResponseWrapper<Bill> response = new ResponseWrapper<>(HttpStatus.CREATED.value(), "Created", true, savedBill);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+//    }
+
     @PostMapping("/Create")
-    public ResponseEntity<ResponseWrapper<Bill>> createBill(@RequestBody Bill billRequest, @RequestParam Long userId, @RequestParam(required = false, defaultValue = "1") Long voucherId) {
-        Bill savedBill = billService.createBill(billRequest, userId, voucherId);
-        ResponseWrapper<Bill> response = new ResponseWrapper<>(HttpStatus.CREATED.value(), "Created", true, savedBill);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<Bill> createBill(@RequestBody BillDTO billRequest) {
+        Bill savedBill = billService.createBill(billRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedBill);
     }
 
     @PutMapping("/Update-Status/{id}")
