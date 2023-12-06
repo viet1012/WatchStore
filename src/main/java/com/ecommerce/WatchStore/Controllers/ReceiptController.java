@@ -56,7 +56,18 @@ public class ReceiptController {
         ResponseWrapper<ReceiptPageDTO> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, receiptPageDTO);
         return ResponseEntity.ok(response);
     }
+    @GetMapping("GetById/{id}")
+    public ResponseEntity<ResponseWrapper<ReceiptDTO>> getById(@PathVariable Long id) {
+        ReceiptDTO receipt = receiptService.getById(id);
 
+        if (receipt!= null) {
+            ResponseWrapper<ReceiptDTO> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, receipt);
+            return ResponseEntity.ok(response);
+        } else {
+            ResponseWrapper<ReceiptDTO> response = new ResponseWrapper<>(HttpStatus.NOT_FOUND.value(), "Receipt not found", false, null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
     @GetMapping("/{id}")
     public ResponseEntity<ResponseWrapper<Receipt>> getReceiptById(@PathVariable Long id) {
         Optional<Receipt> receipt = receiptService.getReceiptById(id);

@@ -2,7 +2,9 @@ package com.ecommerce.WatchStore.Controllers;
 
 
 import com.ecommerce.WatchStore.Entities.Bill;
+import com.ecommerce.WatchStore.Entities.Receipt;
 import com.ecommerce.WatchStore.Entities.Voucher;
+import com.ecommerce.WatchStore.Response.ResponseWrapper;
 import com.ecommerce.WatchStore.Services.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,9 +23,12 @@ public class VoucherController {
 
 
     @GetMapping("/GetAll")
-    public ResponseEntity<List<Voucher>> listVoucher() {
+    public ResponseEntity<ResponseWrapper<List<Voucher>>> listVoucher() {
         List<Voucher> vouchers = voucherService.getListVoucher();
-        return ResponseEntity.ok(vouchers);
+        Long totalVouchers = voucherService.total();
+        ResponseWrapper<List<Voucher>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Successfully", true, totalVouchers, vouchers);
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/Create")

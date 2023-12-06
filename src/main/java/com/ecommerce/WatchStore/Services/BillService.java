@@ -83,7 +83,7 @@ public class BillService {
 
 
 
-        float total = 0;
+        //float total = 0;
         for (BillDetailDTO billDetailDTO : billDTO.getBillDetailDTOList()) {
             Product product = productService.getProductById(billDetailDTO.getProductId());
             BillDetail billDetail = new BillDetail();
@@ -93,18 +93,20 @@ public class BillService {
             billDetail.setQuantity(billDetailDTO.getQuantity());
             float unitPrice = product.getPrice();
             billDetail.setUnitPrice(unitPrice);
-            total += unitPrice * billDetailDTO.getQuantity();
+            //total += unitPrice * billDetailDTO.getQuantity();
 
             billDetail.setActive(true);
             savedBillDetails.add(billDetail);
 
         }
-        System.out.println("total: " + total);
+      //  System.out.println("total: " + total);
 
-        newBill.setTotalPrice(total);
-        if (billDTO.getVoucherId() != null ) {
-            voucherService.applyVoucher(newBill, billDTO.getVoucherId());
-        }
+        newBill.setTotalPrice(billDTO.getTotalPrice());
+        Voucher voucher = voucherService.getVoucherFromId(billDTO.getVoucherId());
+        newBill.setVoucher(voucher);
+//        if (billDTO.getVoucherId() != null ) {
+//            voucherService.applyVoucher(newBill, billDTO.getVoucherId());
+//        }
         newBill.setBillDetailList(savedBillDetails);
         Bill savedBill = billRepository.save(newBill);
 

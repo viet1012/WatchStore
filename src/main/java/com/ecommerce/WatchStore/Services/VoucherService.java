@@ -20,6 +20,10 @@ public class VoucherService {
     @Autowired
     private BillRepository billRepository;
 
+    public Long total()
+    {
+        return voucherRepository.count();
+    }
     public boolean isVoucherValid(Voucher voucher) {
         LocalDateTime now = LocalDateTime.now();
         return now.isAfter(voucher.getStartDate()) && now.isBefore(voucher.getEndDate());

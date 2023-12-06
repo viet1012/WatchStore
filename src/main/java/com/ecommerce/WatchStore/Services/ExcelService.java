@@ -1,5 +1,6 @@
 package com.ecommerce.WatchStore.Services;
 
+import com.ecommerce.WatchStore.DTO.ReceiptDTO;
 import com.ecommerce.WatchStore.Entities.*;
 import com.ecommerce.WatchStore.Repositories.*;
 import com.itextpdf.text.*;
@@ -56,6 +57,9 @@ public class ExcelService {
     private ReceiptRepository receiptRepository;
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private ReceiptService receiptService;
     @Value("${file.upload.directory}")
     private String uploadPath;
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelService.class);
@@ -635,7 +639,8 @@ public class ExcelService {
         workbook.close();
     }
 
-    public void exportToPdf(HttpServletResponse response) {
+
+    public void exportToPdf(HttpServletResponse response, Long receiptId) {
         try {
             // Tạo một document mới
             Document document = new Document(PageSize.A4);
@@ -662,10 +667,13 @@ public class ExcelService {
             document.add(Chunk.NEWLINE);
 
             // Lấy danh sách các receipt từ cơ sở dữ liệu
-            List<Receipt> receipts = receiptRepository.findAll();
+          //  List<Receipt> receipts = receiptRepository.findAll();
 
+            Optional<Receipt> optionalReceipt = receiptRepository.findById(receiptId);
+            Receipt receipt = optionalReceipt.get();
             // Viết dữ liệu của mỗi receipt vào document
-            for (Receipt receipt : receipts) {
+
+//            for (Receipt receipt : receipts) {
                 Paragraph paragraph = new Paragraph();
 
                 // Thêm các thông tin receipt vào document với font tương ứng
@@ -698,7 +706,7 @@ public class ExcelService {
 
                 document.add(paragraph);
                 document.add(Chunk.NEWLINE);
-            }
+            //}
 
             // Đóng document
             document.close();

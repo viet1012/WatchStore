@@ -68,6 +68,37 @@ public class ReceiptService {
 
         return receiptInfoList;
     }
+
+    public ReceiptDTO getById(long id) {
+        List<Object[]> results = receiptRepository.getAllReceiptDetailsWithTotalAndSupplierId();
+        Map<Long, ReceiptDTO> receiptMap = new HashMap<>();
+
+        for (Object[] result : results) {
+            long receiptId = (long) result[0];
+            double total = (Double) result[1]; // Lấy total từ kết quả trả về
+            Long supplierId = (Long) result[2]; // Lấy supplierId từ kết quả trả về
+
+            ReceiptDetail receiptDetail = (ReceiptDetail) result[3];
+
+            ReceiptDTO receiptInfo = receiptMap.getOrDefault(receiptId, new ReceiptDTO());
+            receiptInfo.setId(receiptId);
+            receiptInfo.setTotal(total);
+            receiptInfo.setSupplierId(supplierId);
+
+            List<ReceiptDetailDTO> receiptDetailDTOs = receiptInfo.getReceiptDetails();
+            if (receiptDetailDTOs == null) {
+                receiptDetailDTOs = new ArrayList<>();
+            }
+
+            receiptDetailDTOs.add(modelMapper.map(receiptDetail, ReceiptDetailDTO.class));
+            receiptInfo.setReceiptDetails(receiptDetailDTOs);
+
+            receiptMap.put(receiptId, receiptInfo);
+        }
+
+        return receiptMap.get(id);
+    }
+
     public List<ReceiptDTO> getAll() {
         List<Object[]> results = receiptRepository.getAllReceiptDetailsWithTotalAndSupplierId();
         Map<Long, ReceiptDTO> receiptMap = new HashMap<>();

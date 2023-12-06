@@ -30,8 +30,8 @@ public class AddressService {
     }
     public Address addAddressForUser(AddressDTO addressDTO) {
         Address newAddress = new Address();
-        Long userId = jwtTokenProvider.getUserIdFromGeneratedToken(addressDTO.getToken());
-        newAddress.setUserId(userId);
+//        Long userId = jwtTokenProvider.getUserIdFromGeneratedToken(addressDTO.getToken());
+        newAddress.setUserId(addressDTO.getUserId());
         newAddress.setWard(addressDTO.getWard());
         newAddress.setDistrict(addressDTO.getDistrict());
         newAddress.setHouseNumber(addressDTO.getHouseNumber());
