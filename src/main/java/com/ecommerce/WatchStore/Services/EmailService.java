@@ -180,6 +180,7 @@ public class EmailService {
                 + "    <p>Chúng tôi đã nhận được yêu cầu xác thực tài khoản của bạn. Dưới đây là mã OTP của bạn:</p>\n"
                 + "    <p><strong>Mã OTP:</strong> <u><span style='color: blue;'>" + otp + "</span></u></p>\n"
                 + "    <p>Mã OTP này sẽ có hiệu lực trong vòng 10 phút kể từ thời điểm bạn nhận được email này. Vui lòng không chia sẻ mã OTP này với bất kỳ ai khác.</p>\n"
+                + "     <p>Nếu bạn muốn truy cập vào trang web của chúng tôi, vui lòng nhấp vào <a href='http://localhost:3000/verify'>đây</a>.</p>"
                 + "    <p>Xin cảm ơn.</p>";
         try {
 
@@ -201,6 +202,7 @@ public class EmailService {
             message.setRecipients(
                     Message.RecipientType.TO, InternetAddress.parse(emailTo));
             message.setSubject(subject);
+
 
             MimeBodyPart mimeBodyPart = new MimeBodyPart();
             mimeBodyPart.setContent(body, "text/html; charset=utf-8");
