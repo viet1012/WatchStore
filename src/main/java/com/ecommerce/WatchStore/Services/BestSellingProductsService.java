@@ -26,7 +26,7 @@ public class BestSellingProductsService {
             dto.setProductId((Long) result[0]);
             dto.setProductName((String) result[1]);
             dto.setTotalQuantitySold((Long) result[2]);
-            dto.setBrandId((int) result[3]);
+            dto.setBrandId((Long) result[3]);
             dto.setBrandName((String) result[4]);
             bestSellingProducts.add(dto);
         }
@@ -42,7 +42,7 @@ public class BestSellingProductsService {
             dto.setProductId((Long) result[0]);
             dto.setProductName((String) result[1]);
             dto.setTotalQuantitySold((Long) result[2]);
-            dto.setBrandId((int) result[3]);
+            dto.setBrandId((Long) result[3]);
             dto.setBrandName((String) result[4]);
             top3Products.add(dto);
         }
@@ -58,7 +58,7 @@ public class BestSellingProductsService {
             dto.setProductId((Long) result[0]);
             dto.setProductName((String) result[1]);
             dto.setQuantity((int) result[2]);
-            dto.setBrandId((int) result[3]);
+            dto.setBrandId((Long) result[3]);
             dto.setBrandName((String) result[4]);
             dto.setPrice((float) result[5]);
             bestSellingProducts.add(dto);
@@ -76,7 +76,7 @@ public class BestSellingProductsService {
             dto.setProductId((Long) result[0]);
             dto.setProductName((String) result[1]);
             dto.setTotalQuantitySold((Long) result[2]);
-            dto.setBrandId((int) result[3]);
+            dto.setBrandId((Long) result[3]);
             dto.setBrandName((String) result[4]);
             bestSellingProducts.add(dto);
         }

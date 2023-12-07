@@ -167,14 +167,33 @@ public class UserService {
             newUser.setCreatedBy(customerDTO.getDisplayName());
             newUser.setPhoneNumber(customerDTO.getPhoneNumber());
             newUser.setRole(userRole.get());
+
             OtpUtils otpUtils = new OtpUtils();
             String otp = otpUtils.generateOtp();
             LocalDateTime currentDateTime = LocalDateTime.now();
             newUser.setOtp(otp);
             newUser.setCreateDateOtp(currentDateTime);
             newUser.setActive(false);
+
+            Customer customer = new Customer();
+
+            customer.setUser(newUser);
+            customer.setFullname(customerDTO.getFirstName()+ " "+  customerDTO.getLastName());
+            customer.setCode(customerDTO.getCode());
+            customer.setLastName(customerDTO.getLastName());
+            customer.setFirstName(customerDTO.getFirstName());
+            customer.setGender(customerDTO.getGender());
+            customer.setDateOfBirth(customerDTO.getDateOfBirth());
+            customer.setAddress(customerDTO.getAddress());
+            customer.setEmail(newUser.getEmail());
+            customer.setPhoneNumber(customerDTO.getPhoneNumber());
+            customer.setCreatedBy(customerDTO.getFullname());
+            customer.setActive(true);
+
+            newUser.setCustomer(customer);
+            newUser.setCustomer_id(customer);
             savedUser = userRepository.save(newUser);
-            customerService.createCustomer(customerDTO, savedUser);
+            //customerService.createCustomer(customerDTO, savedUser);
             // sending otp to your email
             emailService.sendEmailWithOTP(newUser.getEmail(), newUser.getDisplayName(), newUser.getOtp());
         }

@@ -1,5 +1,7 @@
 package com.ecommerce.WatchStore.Entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -21,6 +23,15 @@ public class User {
 
     @Column(name = "email")
     private String email;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Customer customer;
+
+    @OneToOne
+    @JoinColumn(name = "customer_id", referencedColumnName = "id" )
+    @JsonBackReference
+    private Customer customer_id;
 
     @Column(name = "password")
     private String password;

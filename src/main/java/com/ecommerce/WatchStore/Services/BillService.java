@@ -102,8 +102,12 @@ public class BillService {
       //  System.out.println("total: " + total);
 
         newBill.setTotalPrice(billDTO.getTotalPrice());
-        Voucher voucher = voucherService.getVoucherFromId(billDTO.getVoucherId());
-        newBill.setVoucher(voucher);
+        if( billDTO.getVoucherId() != null)
+        {
+            Voucher voucher = voucherService.getVoucherFromId(billDTO.getVoucherId());
+            newBill.setVoucher(voucher);
+        }
+
 //        if (billDTO.getVoucherId() != null ) {
 //            voucherService.applyVoucher(newBill, billDTO.getVoucherId());
 //        }
