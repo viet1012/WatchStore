@@ -86,41 +86,39 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password")
-    public String resetPassword(@RequestBody User user) {
-
+    public ResponseEntity<String> resetPassword(@RequestBody User user) {
         boolean checkOTP = userService.resetPassword(user, user.getNewPassword());
         if (checkOTP) {
-            return "Tài khoản: " + user.getEmail() + " đã đổi mật khẩu thành công";
+            return ResponseEntity.ok("Tài khoản: " + user.getEmail() + " đã đổi mật khẩu thành công");
         } else {
-            return "OTP đã sai";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("OTP đã sai");
         }
     }
 
     @PostMapping("/verify-otp-registration")
-    public String validateOTP(@RequestBody OTPRequest otpRequest) {
+    public ResponseEntity<String> validateOTP(@RequestBody OTPRequest otpRequest) {
         String email = otpRequest.getEmail();
         String otp = otpRequest.getOtp();
         User user = userService.getUserFromEmail(email);
         boolean check = userService.verifyOtp(email, otp);
         if (check) {
             emailService.sendEmailWithAds(otpRequest.getEmail());
-            System.out.println("Hello: " + user.getEmail() + "Id: " +user.getId() );
             user.setActive(true);
             userService.savedUser(user);
-            System.out.println("Active: " + user.getActive() );
-            return "Tạo tài khoản thành công";
+            return ResponseEntity.ok("Tạo tài khoản thành công");
         } else {
-            return "OTP đã quá 10 phút";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("OTP đã quá 10 phút");
         }
     }
 
     @PostMapping("/re-generate-otp")
-    public String regenerateOTP(@RequestBody OTPRequest email) {
+    public ResponseEntity<String>  regenerateOTP(@RequestBody OTPRequest email) {
         boolean check = userService.reGenerateOtp(email.getEmail());
         if (check)
-            return "Đã gửi OTP thành công";
+            return ResponseEntity.ok("Đã gửi OTP thành công");
         else
-            return "Gửi OTP thất bại";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("OTP đã quá 10 phút");
+
     }
 
 
