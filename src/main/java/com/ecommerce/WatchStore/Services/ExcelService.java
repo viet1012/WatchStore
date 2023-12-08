@@ -594,43 +594,31 @@ public class ExcelService {
             }
 
             Product product = new Product();
-            product.setProductId((long) row.getCell(0).getNumericCellValue());
-            product.setProductName(row.getCell(1).getStringCellValue());
-            product.setPrice((float) row.getCell(2).getNumericCellValue());
-            product.setQuantity((int) row.getCell(3).getNumericCellValue());
+            int cellIndex = 0; // Số thứ tự của cell trong mỗi hàng
 
-            // Đoạn code sau sẽ lấy thông tin Brand từ cột 4 của file Excel
+            // Thiết lập dữ liệu cho từng thuộc tính của product tương ứng với thứ tự cột trong file export
+            product.setProductId((long) row.getCell(cellIndex++).getNumericCellValue());
+            product.setProductName(row.getCell(cellIndex++).getStringCellValue());
+            product.setPrice((float) row.getCell(cellIndex++).getNumericCellValue());
             Brand brand = new Brand();
-            brand.setName(row.getCell(4).getStringCellValue());
+            brand.setName(row.getCell(cellIndex++).getStringCellValue());
             product.setBrand(brand);
-
-            // Đoạn code sau sẽ lấy thông tin Category từ cột 5 của file Excel
             Category category = new Category();
-            category.setName(row.getCell(5).getStringCellValue());
+            category.setName(row.getCell(cellIndex++).getStringCellValue());
             product.setCategory(category);
+            product.setActive(row.getCell(cellIndex++).getStringCellValue().equalsIgnoreCase("Có"));
+            product.setCreatedBy(row.getCell(cellIndex++).getStringCellValue());
+            product.setQuantity((int) row.getCell(cellIndex++).getNumericCellValue());
+            product.setUpdatedBy(row.getCell(cellIndex++).getStringCellValue());
+            product.setCreatedDate(row.getCell(cellIndex++).getDateCellValue());
+            product.setUpdatedDate(row.getCell(cellIndex++).getDateCellValue());
+            product.setCode(row.getCell(cellIndex++).getStringCellValue());
+            product.setThumbnail(row.getCell(cellIndex++).getStringCellValue());
+            product.setGender(row.getCell(cellIndex++).getStringCellValue());
+            product.setStatus(row.getCell(cellIndex++).getStringCellValue());
+            product.setColor(row.getCell(cellIndex++).getStringCellValue());
+            product.setDescription(row.getCell(cellIndex++).getStringCellValue());
 
-            product.setCreatedBy(row.getCell(6).getStringCellValue());
-
-            // Lấy thông tin thời gian tạo
-            Date createdDateTime = row.getCell(7).getDateCellValue();
-            product.setCreatedDate(createdDateTime);
-
-            product.setUpdatedBy(row.getCell(8).getStringCellValue());
-
-            // Lấy thông tin thời gian cập nhật
-            Date updatedDateTime = row.getCell(9).getDateCellValue();
-            product.setUpdatedDate(updatedDateTime);
-
-            // Xác định trạng thái Active hoặc Inactive từ cột 10
-            String active = row.getCell(10).getStringCellValue();
-            product.setActive(active.equalsIgnoreCase("Có"));
-
-            product.setCode(row.getCell(11).getStringCellValue());
-            product.setThumbnail(row.getCell(12).getStringCellValue());
-            product.setGender(row.getCell(13).getStringCellValue());
-            product.setStatus(row.getCell(14).getStringCellValue());
-            product.setColor(row.getCell(15).getStringCellValue());
-            product.setDescription(row.getCell(16).getStringCellValue());
 
             // Lưu đối tượng Product vào cơ sở dữ liệu
             productRepository.save(product);

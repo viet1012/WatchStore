@@ -42,6 +42,10 @@ public class ProductService {
     @Autowired
     private FileStorageService fileStorageService;
 
+    public void saveProduct(Product product)
+    {
+        productRepository.save(product);
+    }
 
     private String formatFileNames(List<MultipartFile> imageFiles) {
         StringBuilder imageFileNames = new StringBuilder();
@@ -167,7 +171,7 @@ public class ProductService {
             existingProduct.setCode(updatedProduct.getCode());
             existingProduct.setColor(updatedProduct.getColor());
             existingProduct.setActive(updatedProduct.getActive());
-
+            existingProduct.setImg(formatFileNames(updateImage));
             // Kiểm tra brand có tồn tại hay không
             Optional<Brand> optionalBrand = brandRepository.findById(brandId);
             if (optionalBrand.isPresent()) {

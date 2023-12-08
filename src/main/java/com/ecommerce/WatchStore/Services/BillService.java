@@ -32,6 +32,8 @@ public class BillService {
     private ProductService productService;
     @Autowired
     private ModelMapper modelMapper;
+
+
     public List<BillDTO> getAll() {
         List<Object[]> billDetails = billRepository.getAllBillDetails();
         List<BillDTO> billDTOList = new ArrayList<>();
@@ -66,6 +68,7 @@ public class BillService {
 
         return billDTOList;
     }
+
     public Bill createBill(BillDTO billDTO) {
 
         Optional<User> userOptional = userRepository.findById(billDTO.getUserId());
@@ -82,13 +85,23 @@ public class BillService {
         List<BillDetail> savedBillDetails = new ArrayList<>();
 
 
-
         //float total = 0;
         for (BillDetailDTO billDetailDTO : billDTO.getBillDetailDTOList()) {
             Product product = productService.getProductById(billDetailDTO.getProductId());
             BillDetail billDetail = new BillDetail();
             billDetail.setBill(newBill);
             billDetail.setProduct(product);
+            int quantityToSubtract = billDetailDTO.getQuantity();
+            int currentQuantity = product.getQuantity();
+            int updatedQuantity = currentQuantity - quantityToSubtract;
+            if (updatedQuantity >= 0) {
+                product.setQuantity(updatedQuantity);
+                productService.saveProduct(product); // Cập nhật số lượng sản phẩm trong kho
+                billDetail.setActive(true);
+                savedBillDetails.add(billDetail);
+            } else {
+                new Exception("Số lượng sản phẩm không đủ để thực hiện giao dịch!");
+            }
 
             billDetail.setQuantity(billDetailDTO.getQuantity());
             float unitPrice = product.getPrice();
@@ -99,11 +112,10 @@ public class BillService {
             savedBillDetails.add(billDetail);
 
         }
-      //  System.out.println("total: " + total);
+        //  System.out.println("total: " + total);
 
         newBill.setTotalPrice(billDTO.getTotalPrice());
-        if( billDTO.getVoucherId() != null)
-        {
+        if (billDTO.getVoucherId() != null) {
             Voucher voucher = voucherService.getVoucherFromId(billDTO.getVoucherId());
             newBill.setVoucher(voucher);
         }
