@@ -66,7 +66,7 @@ public class BillController {
         ResponseWrapper<List<BillDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalBills, billList);
         return ResponseEntity.ok(response);
     }
-    @GetMapping("/GetById/{userId}")
+    @GetMapping("/GetBillByUserId/{userId}")
 
     public ResponseEntity<ResponseWrapper<List<BillDTO>>> getBillFromUserId(@PathVariable Long userId) {
         List<BillDTO> billList = billService.getBillFromUserId(userId);
