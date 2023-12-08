@@ -102,6 +102,14 @@ public class BillService {
 
         return billDTOList;
     }
+
+    public Bill cancelbill(Long billId)
+    {
+        Bill bill = getBillById(billId);
+        bill.setStatus("Đã hủy");
+        return billRepository.save(bill);
+    }
+
     public Bill createBill(BillDTO billDTO) {
 
         Optional<User> userOptional = userRepository.findById(billDTO.getUserId());

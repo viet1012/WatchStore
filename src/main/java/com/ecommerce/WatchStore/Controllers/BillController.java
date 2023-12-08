@@ -108,6 +108,12 @@ public class BillController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedBill);
     }
 
+    @PostMapping("/CancelOrder/{id}")
+    public ResponseEntity<Bill> cancelBill(@PathVariable Long billId) {
+        Bill savedBill = billService.cancelbill(billId);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(savedBill);
+    }
+
     @PutMapping("/Update-Status/{id}")
     public ResponseEntity<ResponseWrapper<Bill>> updateBillStatus(@PathVariable Long id, @RequestBody Bill Bill) {
 
