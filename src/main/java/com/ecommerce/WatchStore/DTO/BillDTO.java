@@ -8,13 +8,13 @@ import java.util.List;
 @Getter
 @Setter
 public class BillDTO {
-    private Long id;
+    public Long id;
     private String token;
     private Long userId;
     private String deliverAddress;
     private LocalDateTime createDate;
     private Long voucherId;
-    private float totalPrice;
+    public float totalPrice;
     private String createdBy;
     private LocalDateTime updateDate;
     private String updatedBy;
