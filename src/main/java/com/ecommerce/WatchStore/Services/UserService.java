@@ -88,6 +88,13 @@ public class UserService {
             return null;
         }
     }
+    public void BlockAccount(Long userId)
+    {
+        User user = getUserById(userId);
+        user.setActive(false);
+
+        userRepository.save(user);
+    }
     public User getUserById(Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         return optionalUser.orElse(null);

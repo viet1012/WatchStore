@@ -52,6 +52,12 @@ public class UserController {
         }
     }
 
+    @PostMapping("/BlockAccount/{id}")
+    public void blockAccount (@RequestBody User user ) {
+
+        userService.BlockAccount(user.getId());
+    }
+
     @GetMapping("/GetAll")
     public ResponseEntity<ResponseWrapper<List<UserDTO>>> getListUser() {
         List<UserDTO> users = userService.getListUser();

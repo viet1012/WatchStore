@@ -54,6 +54,7 @@ public class BillController {
 //        ResponseWrapper<List<Bill>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalBills, billList);
 //        return ResponseEntity.ok(response);
 //    }
+
     public ResponseEntity<ResponseWrapper<List<BillDTO>>> getBillList() {
         List<BillDTO> billList = billService.getAll();
         long totalBills = billService.getTotalBills();
@@ -63,6 +64,18 @@ public class BillController {
         }
 
         ResponseWrapper<List<BillDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalBills, billList);
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/GetById/{userId}")
+
+    public ResponseEntity<ResponseWrapper<List<BillDTO>>> getBillFromUserId(@PathVariable Long userId) {
+        List<BillDTO> billList = billService.getBillFromUserId(userId);
+
+        if (billList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        ResponseWrapper<List<BillDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true,  billList);
         return ResponseEntity.ok(response);
     }
     @PostMapping("/Apply-voucher/{id}")
