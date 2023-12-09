@@ -65,9 +65,8 @@ public class ReviewProductService {
 
     public ReviewProduct createReview(ReviewProductDTO reviewProductDTO) {
         ReviewProduct savedRP = new ReviewProduct();
-        Long userId = jwtTokenProvider.getUserIdFromGeneratedToken(reviewProductDTO.getToken());
         Product product = productService.getProductById(reviewProductDTO.getProductId());
-        User user = userService.getUserById(userId);
+        User user = userService.getUserById(reviewProductDTO.getUserId());
         savedRP.setProduct(product);
         savedRP.setComment(reviewProductDTO.getComment());
         savedRP.setRating(reviewProductDTO.getRating());
