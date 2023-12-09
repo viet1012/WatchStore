@@ -14,7 +14,7 @@ public class BillDTO {
     private String deliverAddress;
     private LocalDateTime createDate;
     private Long voucherId;
-    private float totalPrice;
+    public float totalPrice;
     private String createdBy;
     private LocalDateTime updateDate;
     private String updatedBy;
