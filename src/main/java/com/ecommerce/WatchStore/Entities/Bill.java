@@ -61,6 +61,12 @@ public class Bill {
     @Column(name = "active")
     private Boolean active;
 
+    @Column(name = "payment_method ")
+    private String paymentMethod ;
+
+    @Column(name = "temp ivoice total")
+    private float tempInvoiceTotal;
+
 
 }
 
