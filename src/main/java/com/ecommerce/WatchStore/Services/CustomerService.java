@@ -55,5 +55,27 @@ public class CustomerService {
         }
 
     }
+    public Customer updateCustomer(CustomerDTO customerDTO) {
+        Optional<Customer> optionalUser = customerRepository.findById(customerDTO.getId());
+
+        if(optionalUser.isPresent())
+        {
+            Customer customer = optionalUser.get();
+            customer.setFullname(customerDTO.getFullname());
+            customer.setCode(customerDTO.getCode());
+            customer.setLastName(customer.getLastName());
+            customer.setFirstName(customerDTO.getFirstName());
+            customer.setGender(customerDTO.getGender());
+            customer.setDateOfBirth(customerDTO.getDateOfBirth());
+            customer.setEmail(customerDTO.getEmail());
+            customer.setPhoneNumber(customerDTO.getPhoneNumber());
+            return customerRepository.save(customer);
+
+        }
+        else {
+            new Exception("ID khách hàng không hợp lệ");
+        }
+        return null;
+    }
 
 }

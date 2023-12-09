@@ -81,8 +81,8 @@ public class UserController {
     }
 
     @PutMapping("/Update")
-    public ResponseEntity<ResponseWrapper<User>> updateUser(@RequestBody User user, @RequestParam Long userId) {
-        User updatedUser = userService.updateUser(user, userId);
+    public ResponseEntity<ResponseWrapper<User>> updateUser(@RequestBody UserDTO user) {
+        User updatedUser = userService.updateUser(user);
         ResponseWrapper<User> response = new ResponseWrapper<>(HttpStatus.ACCEPTED.value(), "User updated successfully", true, updatedUser);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }

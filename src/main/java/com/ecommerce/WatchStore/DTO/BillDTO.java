@@ -18,6 +18,7 @@ public class BillDTO {
     private String createdBy;
     private LocalDateTime updateDate;
     private String updatedBy;
+    private String status;
     private List<BillDetailDTO> billDetailDTOList;
 
 }

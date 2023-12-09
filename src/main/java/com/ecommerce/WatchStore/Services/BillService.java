@@ -57,6 +57,8 @@ public class BillService {
                 billDetailList = (List<BillDetail>) billDetail[4];
             }
             billDTO.setVoucherId((Long) billDetail[5]);
+            billDTO.setCreateDate((LocalDateTime) billDetail[6]);
+            billDTO.setStatus((String) billDetail[7]);
             List<BillDetailDTO> billDetailDTOs = billDetailList.stream()
                     .map(billDetailItem -> modelMapper.map(billDetailItem, BillDetailDTO.class))
                     .collect(Collectors.toList());
@@ -91,6 +93,9 @@ public class BillService {
                 billDetailList = (List<BillDetail>) billDetail[4];
             }
             billDTO.setVoucherId((Long) billDetail[5]);
+            billDTO.setCreateDate((LocalDateTime) billDetail[6]);
+            billDTO.setStatus((String) billDetail[7]);
+
             List<BillDetailDTO> billDetailDTOs = billDetailList.stream()
                     .map(billDetailItem -> modelMapper.map(billDetailItem, BillDetailDTO.class))
                     .collect(Collectors.toList());
@@ -118,7 +123,6 @@ public class BillService {
         Bill newBill = new Bill();
         newBill.setUser(user);
         newBill.setDeliverAddress(billDTO.getDeliverAddress());
-
         newBill.setCreatedBy(user.getDisplayName());
         newBill.setActive(true);
         newBill.setStatus("Đã đặt hàng");

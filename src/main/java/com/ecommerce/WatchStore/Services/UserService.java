@@ -7,6 +7,7 @@ import com.ecommerce.WatchStore.Entities.Customer;
 import com.ecommerce.WatchStore.Entities.Role;
 import com.ecommerce.WatchStore.Entities.User;
 import com.ecommerce.WatchStore.Entities.UserRoles;
+import com.ecommerce.WatchStore.Repositories.CustomerRepository;
 import com.ecommerce.WatchStore.Repositories.RoleRepository;
 import com.ecommerce.WatchStore.Repositories.UserRepository;
 import com.ecommerce.WatchStore.Repositories.UserRolesRepository;
@@ -32,7 +33,8 @@ public class UserService {
 
     @Autowired
     private UserRolesRepository userRolesRepository;
-
+    @Autowired
+    private CustomerRepository customerRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -113,14 +115,46 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User updateUser(User user, Long userId) {
-        Optional<User> userOptional = userRepository.findById(userId);
+//    public User updateUser(User user, Long userId) {
+//        Optional<User> userOptional = userRepository.findById(userId);
+//        if (userOptional.isPresent()) {
+//            User updatedUser = userOptional.get();
+//            updatedUser.setDisplayName(user.getDisplayName());
+//            updatedUser.setUpdatedDate(user.getUpdatedDate());
+//            updatedUser.setPhoneNumber(user.getPhoneNumber());
+//            updatedUser.setUpdatedBy(user.getDisplayName());
+//            return userRepository.save(updatedUser);
+//
+//        } else {
+//            throw new RuntimeException("Không tim thấy user phù hop");
+//        }
+//    }
+    public User updateUser(UserDTO userDTO) {
+        Optional<User> userOptional = userRepository.findById(userDTO.getId());
         if (userOptional.isPresent()) {
             User updatedUser = userOptional.get();
-            updatedUser.setDisplayName(user.getDisplayName());
-            updatedUser.setUpdatedDate(user.getUpdatedDate());
-            updatedUser.setPhoneNumber(user.getPhoneNumber());
-            updatedUser.setUpdatedBy(user.getDisplayName());
+            updatedUser.setEmail(userDTO.getEmail());
+            updatedUser.setPassword(userDTO.getPassword());
+            Optional<Role> role = roleRepository.findById(userDTO.getId());
+            if(role.isPresent())
+            {
+                updatedUser.setRole(role.get());
+
+            }
+            else {
+                 new Exception("Quyền không tồn tại");
+            }
+            Optional<Customer> customer = customerRepository.findById(userDTO.getId());
+            if(customer.isPresent())
+            {
+                updatedUser.setCustomer(customer.get());
+
+            }
+            else {
+                new Exception("ID khách hàng không tồn tại");
+            }
+            updatedUser.setDisplayName(userDTO.getDisplayName());
+            updatedUser.setPhoneNumber(userDTO.getPhoneNumber());
             return userRepository.save(updatedUser);
 
         } else {
