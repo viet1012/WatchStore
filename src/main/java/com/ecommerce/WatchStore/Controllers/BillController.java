@@ -67,9 +67,19 @@ public class BillController {
         return ResponseEntity.ok(response);
     }
     @GetMapping("/GetBillByUserId")
-
     public ResponseEntity<ResponseWrapper<List<BillDTO>>> getBillFromUserId(@RequestBody BillDTO billDTO) {
         List<BillDTO> billList = billService.getBillFromUserId(billDTO.getUserId());
+
+        if (billList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        ResponseWrapper<List<BillDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true,  billList);
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/GetBillDetailByUserId")
+    public ResponseEntity<ResponseWrapper<List<BillDTO>>> getBillDetailFromUserId(@RequestBody BillDTO billDTO) {
+        List<BillDTO> billList = billService.getBillDetailFromUserId(billDTO.getUserId());
 
         if (billList.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -114,11 +124,11 @@ public class BillController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(savedBill);
     }
 
-    @PutMapping("/Update-Status/{id}")
-    public ResponseEntity<ResponseWrapper<Bill>> updateBillStatus(@PathVariable Long id, @RequestBody Bill Bill) {
+    @PutMapping("/Update-Status")
+    public ResponseEntity<ResponseWrapper<Bill>> updateBillStatus( @RequestBody Bill Bill) {
 
         // Lưu hóa đơn đã cập nhật
-        Bill updatedBill = billService.updateBillStatus(id, Bill.getStatus());
+        Bill updatedBill = billService.updateBillStatus(Bill.getId(), Bill.getStatus());
 
         ResponseWrapper<Bill> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Updated", true, updatedBill);
         return ResponseEntity.ok(response);

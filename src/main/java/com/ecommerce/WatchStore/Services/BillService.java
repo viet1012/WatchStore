@@ -107,7 +107,34 @@ public class BillService {
 
         return billDTOList;
     }
+    public List<BillDTO> getBillDetailFromUserId(Long userId) {
+        List<Object[]> billDetails = billRepository.getAllBillDetailsByUserId(userId);
+        List<BillDTO> billDTOList = new ArrayList<>();
 
+        for (Object[] billDetail : billDetails) {
+            BillDTO billDTO = new BillDTO();
+
+            // Extract receipt details similarly to the getAllReceiptDetailsWithTotalAndSupplierId method
+            List<BillDetail> billDetailList = new ArrayList<>();
+            if (billDetail[4] instanceof BillDetail) {
+                BillDetail singleBillDetail = (BillDetail) billDetail[4];
+                billDetailList.add(singleBillDetail);
+            } else if (billDetail[4] instanceof List<?>) {
+                // If index 4 returns a list of BillDetail
+                billDetailList = (List<BillDetail>) billDetail[4];
+            }
+
+            List<BillDetailDTO> billDetailDTOs = billDetailList.stream()
+                    .map(billDetailItem -> modelMapper.map(billDetailItem, BillDetailDTO.class))
+                    .collect(Collectors.toList());
+
+            billDTO.setBillDetailDTOList(billDetailDTOs);
+
+            billDTOList.add(billDTO);
+        }
+
+        return billDTOList;
+    }
     public Bill cancelbill(Long billId)
     {
         Bill bill = getBillById(billId);
