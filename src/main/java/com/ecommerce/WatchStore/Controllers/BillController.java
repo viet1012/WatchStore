@@ -2,6 +2,7 @@ package com.ecommerce.WatchStore.Controllers;
 
 import com.ecommerce.WatchStore.DTO.BillDTO;
 import com.ecommerce.WatchStore.DTO.BillPageDTO;
+import com.ecommerce.WatchStore.DTO.ListBillDetailDTO;
 import com.ecommerce.WatchStore.DTO.SupplierPageDTO;
 import com.ecommerce.WatchStore.Entities.*;
 import com.ecommerce.WatchStore.Response.ResponseWrapper;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -43,17 +45,6 @@ public class BillController {
     }
 
     @GetMapping("/GetAll")
-//    public ResponseEntity<ResponseWrapper<List<Bill>>> getBillList() {
-//        List<Bill> billList = billService.getBillList();
-//        long totalBills = billService.getTotalBills();
-//
-//        if (billList.isEmpty()) {
-//            return ResponseEntity.noContent().build();
-//        }
-//
-//        ResponseWrapper<List<Bill>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalBills, billList);
-//        return ResponseEntity.ok(response);
-//    }
 
     public ResponseEntity<ResponseWrapper<List<BillDTO>>> getBillList() {
         List<BillDTO> billList = billService.getAll();
@@ -64,6 +55,19 @@ public class BillController {
         }
 
         ResponseWrapper<List<BillDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalBills, billList);
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/GetAllBillDetail")
+
+    public ResponseEntity<ResponseWrapper<List<ListBillDetailDTO>>> getAllBillDetail() {
+        List<ListBillDetailDTO> billDetailList = billService.getAllBillDetail();
+        long totalBills = billService.getTotalBills();
+
+        if (billDetailList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        ResponseWrapper<List<ListBillDetailDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalBills, billDetailList);
         return ResponseEntity.ok(response);
     }
     @GetMapping("/GetBillByUserId")
@@ -78,16 +82,29 @@ public class BillController {
         return ResponseEntity.ok(response);
     }
     @GetMapping("/GetBillDetailByUserId")
-    public ResponseEntity<ResponseWrapper<List<BillDTO>>> getBillDetailFromUserId(@RequestBody BillDTO billDTO) {
-        List<BillDTO> billList = billService.getBillDetailFromUserId(billDTO.getUserId());
+    public ResponseEntity<ResponseWrapper<List<ListBillDetailDTO>>> getBillDetailFromUserId(@RequestBody BillDTO billDTO) {
+        List<ListBillDetailDTO> billList = billService.getBillDetailFromUserId(billDTO.getUserId());
 
         if (billList.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
-        ResponseWrapper<List<BillDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true,  billList);
+        ResponseWrapper<List<ListBillDetailDTO>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true,  billList);
         return ResponseEntity.ok(response);
     }
+    @GetMapping("/GetBillById")
+    public ResponseEntity<ResponseWrapper<ListBillDetailDTO>> getBillFromId(@RequestBody BillDTO billDTO) {
+        ListBillDetailDTO  curBillDTO = billService.getBillWithBillDetailsById(billDTO.getId() , billDTO.getUserId());
+
+        if (curBillDTO == null) {
+            return ResponseEntity.noContent().build();
+        }
+
+        ResponseWrapper<ListBillDetailDTO> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true,  curBillDTO);
+        return ResponseEntity.ok(response);
+    }
+
+
     @PostMapping("/Apply-voucher/{id}")
     public ResponseEntity<Object> applyVoucherToBill(
             @PathVariable Long id,

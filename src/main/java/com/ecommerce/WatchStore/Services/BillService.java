@@ -1,22 +1,23 @@
 package com.ecommerce.WatchStore.Services;
 
+
 import com.ecommerce.WatchStore.DTO.BillDTO;
 import com.ecommerce.WatchStore.DTO.BillDetailDTO;
+import com.ecommerce.WatchStore.DTO.ListBillDetailDTO;
 import com.ecommerce.WatchStore.Entities.*;
-import com.ecommerce.WatchStore.Repositories.BillDetailRepository;
+
 import com.ecommerce.WatchStore.Repositories.BillRepository;
 import com.ecommerce.WatchStore.Repositories.UserRepository;
-import com.ecommerce.WatchStore.Repositories.VoucherRepository;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,93 +35,190 @@ public class BillService {
     private ModelMapper modelMapper;
 
 
+//    public List<BillDTO> getAll() {
+//        List<Object[]> billDetails = billRepository.getAllBillDetails();
+//        List<BillDTO> billDTOList = new ArrayList<>();
+//
+//        for (Object[] billDetail : billDetails) {
+//            BillDTO billDTO = new BillDTO();
+//
+//            // Mapping data from the query result to the BillDTO fields
+//            billDTO.setId((Long) billDetail[0]); // Assuming id is at index 0 in the query result
+//            billDTO.setTotalPrice((float) billDetail[1]); // Assuming totalPrice is at index 1 in the query result
+//            billDTO.setUserId((Long) billDetail[2]); // Assuming user_id is at index 2 in the query result
+//            billDTO.setDeliverAddress((String) billDetail[3]); // Assuming deliverAddress is at index 3 in the query result
+//
+//            // Extract receipt details similarly to the getAllReceiptDetailsWithTotalAndSupplierId method
+//            List<BillDetail> billDetailList = new ArrayList<>();
+//            if (billDetail[4] instanceof BillDetail) {
+//                BillDetail singleBillDetail = (BillDetail) billDetail[4];
+//                billDetailList.add(singleBillDetail);
+//            } else if (billDetail[4] instanceof List<?>) {
+//                // If index 4 returns a list of BillDetail
+//                billDetailList = (List<BillDetail>) billDetail[4];
+//            }
+//
+//
+//            billDTO.setVoucherId((Long) billDetail[5]);
+//            billDTO.setCreateDate((LocalDateTime) billDetail[6]);
+//            billDTO.setStatus((String) billDetail[7]);
+//
+//            List<BillDetailDTO> billDetailDTOs = billDetailList.stream()
+//                    .map(billDetailItem -> modelMapper.map(billDetailItem, BillDetailDTO.class))
+//                    .collect(Collectors.toList());
+//
+//            billDTO.setBillDetailDTOList(billDetailDTOs);
+//
+//            billDTOList.add(billDTO);
+//        }
+//        return billDTOList;
+//
+//    }
+
     public List<BillDTO> getAll() {
         List<Object[]> billDetails = billRepository.getAllBillDetails();
-        List<BillDTO> billDTOList = new ArrayList<>();
+        Map<Long, BillDTO> billMap = new HashMap<>();
 
         for (Object[] billDetail : billDetails) {
-            BillDTO billDTO = new BillDTO();
+            Long billId = (Long) billDetail[0]; // Assuming billId is at index 0 in the query result
 
-            // Mapping data from the query result to the BillDTO fields
-            billDTO.setId((Long) billDetail[0]); // Assuming id is at index 0 in the query result
-            billDTO.setTotalPrice((float) billDetail[1]); // Assuming totalPrice is at index 1 in the query result
-            billDTO.setUserId((Long) billDetail[2]); // Assuming user_id is at index 2 in the query result
-            billDTO.setDeliverAddress((String) billDetail[3]); // Assuming deliverAddress is at index 3 in the query result
+            BillDTO billDTO;
+            if (!billMap.containsKey(billId)) {
+                billDTO = new BillDTO();
+                // Set other fields in BillDTO as you were doing before
+                billDTO.setId((Long) billDetail[0]);
+                billDTO.setTotalPrice((float) billDetail[1]);
+                billDTO.setUserId((Long) billDetail[2]);
+                billDTO.setDeliverAddress((String) billDetail[3]);
+                billDTO.setVoucherId((Long) billDetail[4]);
+                billDTO.setCreateDate((LocalDateTime) billDetail[5]);
+                billDTO.setStatus((String) billDetail[6]);
+                billDTO.setBillDetailDTOList(new ArrayList<>());
 
-            // Extract receipt details similarly to the getAllReceiptDetailsWithTotalAndSupplierId method
-            List<BillDetail> billDetailList = new ArrayList<>();
-            if (billDetail[4] instanceof BillDetail) {
-                BillDetail singleBillDetail = (BillDetail) billDetail[4];
-                billDetailList.add(singleBillDetail);
-            } else if (billDetail[4] instanceof List<?>) {
-                // If index 4 returns a list of BillDetail
-                billDetailList = (List<BillDetail>) billDetail[4];
+                billMap.put(billId, billDTO);
+            } else {
+                billDTO = billMap.get(billId);
             }
-            billDTO.setVoucherId((Long) billDetail[5]);
-            billDTO.setCreateDate((LocalDateTime) billDetail[6]);
-            billDTO.setStatus((String) billDetail[7]);
-            List<BillDetailDTO> billDetailDTOs = billDetailList.stream()
-                    .map(billDetailItem -> modelMapper.map(billDetailItem, BillDetailDTO.class))
-                    .collect(Collectors.toList());
 
-            billDTO.setBillDetailDTOList(billDetailDTOs);
+            BillDetailDTO billDetailDTO = new BillDetailDTO();
 
-            billDTOList.add(billDTO);
+            billDetailDTO.setBillId(billId); // Set billId for BillDetailDTO
+            // Set other fields in BillDetailDTO using the corresponding indices in the query result
+            billDetailDTO.setProductId((Long) billDetail[7]); // Assuming productId is at index 8
+            billDetailDTO.setUnitPrice((float) billDetail[8]); // Assuming unitPrice is at index 9
+            billDetailDTO.setQuantity((int) billDetail[9]); // Assuming quantity is at index 10
+
+            billDTO.getBillDetailDTOList().add(billDetailDTO);
         }
 
-        return billDTOList;
+        return new ArrayList<>(billMap.values());
     }
+
+    public List<ListBillDetailDTO> getAllBillDetail() {
+        List<Object[]> billDetails = billRepository.getAllBillDetails();
+        Map<Long, ListBillDetailDTO> billMap = new HashMap<>();
+        for (Object[] billDetail : billDetails) {
+            Long billId = (Long) billDetail[0]; // Assuming billId is at index 0 in the query result
+
+            ListBillDetailDTO listBillDetailDTO;
+            if (!billMap.containsKey(billId)) {
+                listBillDetailDTO = new ListBillDetailDTO();
+                listBillDetailDTO.setBillDetailDTOList(new ArrayList<>());
+
+                billMap.put(billId, listBillDetailDTO);
+            } else {
+                listBillDetailDTO = billMap.get(billId);
+            }
+
+            BillDetailDTO billDetailDTO = new BillDetailDTO();
+
+            billDetailDTO.setBillId(billId); // Set billId for BillDetailDTO
+            // Set other fields in BillDetailDTO using the corresponding indices in the query result
+            billDetailDTO.setProductId((Long) billDetail[7]); // Assuming productId is at index 8
+            billDetailDTO.setUnitPrice((float) billDetail[8]); // Assuming unitPrice is at index 9
+            billDetailDTO.setQuantity((int) billDetail[9]); // Assuming quantity is at index 10
+
+            listBillDetailDTO.getBillDetailDTOList().add(billDetailDTO);
+        }
+
+        return new ArrayList<>(billMap.values());
+
+    }
+
+
+    public ListBillDetailDTO getBillWithBillDetailsById(Long billId , Long userId) {
+        List<Object[]> billDetails = billRepository.getBillWithBillDetailsById(billId, userId);
+        ListBillDetailDTO billDTO = new ListBillDetailDTO();
+
+        if (!billDetails.isEmpty()) {
+
+            List<BillDetailDTO> billDetailDTOs = new ArrayList<>();
+            for (Object[] row : billDetails) {
+                BillDetailDTO billDetailDTO = new BillDetailDTO();
+                billDetailDTO.setBillId((Long) row[0]); // Assuming billId is at index 0 in the query result
+                billDetailDTO.setProductId((Long) row[5]); // Assuming productId is at index 5 in the query result
+
+                // Set other fields for BillDetailDTO...
+
+                billDetailDTOs.add(billDetailDTO);
+            }
+
+            billDTO.setBillDetailDTOList(billDetailDTOs);
+        }
+
+        return billDTO;
+    }
+
     public List<BillDTO> getBillFromUserId(Long userId) {
         List<Object[]> billDetails = billRepository.getAllBillDetailsByUserId(userId);
-        List<BillDTO> billDTOList = new ArrayList<>();
+        Map<Long, BillDTO> billMap = new HashMap<>();
 
         for (Object[] billDetail : billDetails) {
-            BillDTO billDTO = new BillDTO();
+            Long billId = (Long) billDetail[0]; // Assuming billId is at index 0 in the query result
 
-            // Mapping data from the query result to the BillDTO fields
-            billDTO.setId((Long) billDetail[0]); // Assuming id is at index 0 in the query result
-            billDTO.setTotalPrice((float) billDetail[1]); // Assuming totalPrice is at index 1 in the query result
-            billDTO.setUserId((Long) billDetail[2]); // Assuming user_id is at index 2 in the query result
-            billDTO.setDeliverAddress((String) billDetail[3]); // Assuming deliverAddress is at index 3 in the query result
+            BillDTO billDTO;
+            if (!billMap.containsKey(billId)) {
+                billDTO = new BillDTO();
+                // Set other fields in BillDTO as you were doing before
+                billDTO.setId((Long) billDetail[0]);
+                billDTO.setTotalPrice((float) billDetail[1]);
+                billDTO.setUserId((Long) billDetail[2]);
+                billDTO.setDeliverAddress((String) billDetail[3]);
+                billDTO.setVoucherId((Long) billDetail[4]);
+                billDTO.setCreateDate((LocalDateTime) billDetail[5]);
+                billDTO.setStatus((String) billDetail[6]);
+                billDTO.setBillDetailDTOList(new ArrayList<>());
 
-            // Extract receipt details similarly to the getAllReceiptDetailsWithTotalAndSupplierId method
-            List<BillDetail> billDetailList = new ArrayList<>();
-            if (billDetail[4] instanceof BillDetail) {
-                BillDetail singleBillDetail = (BillDetail) billDetail[4];
-                billDetailList.add(singleBillDetail);
-            } else if (billDetail[4] instanceof List<?>) {
-                // If index 4 returns a list of BillDetail
-                billDetailList = (List<BillDetail>) billDetail[4];
+                billMap.put(billId, billDTO);
+            } else {
+                billDTO = billMap.get(billId);
             }
-            billDTO.setVoucherId((Long) billDetail[5]);
-            billDTO.setCreateDate((LocalDateTime) billDetail[6]);
-            billDTO.setStatus((String) billDetail[7]);
 
-            List<BillDetailDTO> billDetailDTOs = billDetailList.stream()
-                    .map(billDetailItem -> modelMapper.map(billDetailItem, BillDetailDTO.class))
-                    .collect(Collectors.toList());
+            BillDetailDTO billDetailDTO = new BillDetailDTO();
 
-            billDTO.setBillDetailDTOList(billDetailDTOs);
+            billDetailDTO.setBillId(billId); // Set billId for BillDetailDTO
+            // Set other fields in BillDetailDTO using the corresponding indices in the query result
+            billDetailDTO.setProductId((Long) billDetail[7]); // Assuming productId is at index 8
+            billDetailDTO.setUnitPrice((float) billDetail[8]); // Assuming unitPrice is at index 9
+            billDetailDTO.setQuantity((int) billDetail[9]); // Assuming quantity is at index 10
 
-            billDTOList.add(billDTO);
+            billDTO.getBillDetailDTOList().add(billDetailDTO);
         }
 
-        return billDTOList;
+        return new ArrayList<>(billMap.values());
     }
-    public List<BillDTO> getBillDetailFromUserId(Long userId) {
+
+    public List<ListBillDetailDTO> getBillDetailFromUserId(Long userId) {
         List<Object[]> billDetails = billRepository.getAllBillDetailsByUserId(userId);
-        List<BillDTO> billDTOList = new ArrayList<>();
+        List<ListBillDetailDTO> billDTOList = new ArrayList<>();
 
         for (Object[] billDetail : billDetails) {
-            BillDTO billDTO = new BillDTO();
-
-            // Extract receipt details similarly to the getAllReceiptDetailsWithTotalAndSupplierId method
             List<BillDetail> billDetailList = new ArrayList<>();
+
             if (billDetail[4] instanceof BillDetail) {
                 BillDetail singleBillDetail = (BillDetail) billDetail[4];
                 billDetailList.add(singleBillDetail);
             } else if (billDetail[4] instanceof List<?>) {
-                // If index 4 returns a list of BillDetail
                 billDetailList = (List<BillDetail>) billDetail[4];
             }
 
@@ -128,15 +226,19 @@ public class BillService {
                     .map(billDetailItem -> modelMapper.map(billDetailItem, BillDetailDTO.class))
                     .collect(Collectors.toList());
 
-            billDTO.setBillDetailDTOList(billDetailDTOs);
+            if (!billDetailDTOs.isEmpty()) {
+                ListBillDetailDTO billDTO = new ListBillDetailDTO();
+                billDTO.setBillDetailDTOList(billDetailDTOs);
 
-            billDTOList.add(billDTO);
+                billDTOList.add(billDTO);
+            }
         }
 
         return billDTOList;
     }
-    public Bill cancelbill(Long billId)
-    {
+
+
+    public Bill cancelbill(Long billId) {
         Bill bill = getBillById(billId);
         bill.setStatus("Đã hủy");
         return billRepository.save(bill);

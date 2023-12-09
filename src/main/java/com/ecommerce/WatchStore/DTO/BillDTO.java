@@ -9,7 +9,7 @@ import java.util.List;
 @Setter
 public class BillDTO {
     private Long id;
-    private String token;
+
     private Long userId;
     private String deliverAddress;
     private LocalDateTime createDate;
