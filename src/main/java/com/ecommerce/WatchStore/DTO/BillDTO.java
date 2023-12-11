@@ -19,6 +19,10 @@ public class BillDTO {
     private LocalDateTime updateDate;
     private String updatedBy;
     private String status;
+    private String currency;
+    private String method;
+    private String intent;
+    private String description;
     private List<BillDetailDTO> billDetailDTOList;
 
 }
