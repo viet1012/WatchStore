@@ -3,6 +3,7 @@ package com.ecommerce.WatchStore.Controllers;
 import com.ecommerce.WatchStore.Entities.User;
 import com.ecommerce.WatchStore.Repositories.UserRepository;
 import com.ecommerce.WatchStore.Services.EmailService;
+import com.ecommerce.WatchStore.Services.UserService;
 import com.ecommerce.WatchStore.Utils.OtpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,8 @@ public class EmailController {
     private EmailService emailService;
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private UserService userService;
     @PostMapping("/send-email-ads")
     public ResponseEntity<String> sendEmailADS(
             @RequestParam("recipientEmail") String recipientEmail
@@ -38,9 +40,10 @@ public class EmailController {
        @RequestBody User user
     ) {
         try {
+            User currentUser = userService.getUserFromEmail(user.getEmail());
             OtpUtils otpUtils = new OtpUtils();
             String otp = otpUtils.generateOtp();
-            emailService.sendEmailWithOTP(user.getEmail(), user.getDisplayName(), otp);
+            emailService.sendEmailWithOTP(currentUser.getEmail(), currentUser.getDisplayName(), otp);
             return ResponseEntity.ok("Email sent successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send email");
