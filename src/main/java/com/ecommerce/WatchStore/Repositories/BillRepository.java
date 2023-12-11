@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BillRepository extends JpaRepository<Bill,Long> {
 
@@ -30,5 +31,8 @@ public interface BillRepository extends JpaRepository<Bill,Long> {
             "WHERE b.id = :billId and b.user.id = :userId ")
     List<Object[]> getBillWithBillDetailsById(@Param("billId") Long billId, @Param("userId") Long userId );
 
+
+    @Query("SELECT b FROM Bill b WHERE b.createdDate = (SELECT MIN(bill.createdDate) FROM Bill bill)")
+    Optional<Bill> findBillWithEarliestCreationDate();
 
 }

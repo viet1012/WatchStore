@@ -383,4 +383,16 @@ public class BillService {
     public long getTotalBills() {
         return billRepository.count(); // Sử dụng phương thức count của JpaRepository để đếm tổng số receipt.
     }
+
+    public Bill findBillWithEarliestCreationDate()
+    {
+        Optional<Bill> earliestBill = billRepository.findBillWithEarliestCreationDate();
+        if (earliestBill.isPresent()) {
+            Bill bill = earliestBill.get();
+            return bill;
+        } else {
+          new Exception("Không tìm thấy hóa đơn phù hợp");
+        }
+        return null;
+    }
 }
