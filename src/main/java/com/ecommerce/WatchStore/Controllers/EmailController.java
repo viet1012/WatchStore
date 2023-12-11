@@ -35,12 +35,12 @@ public class EmailController {
 
     @PostMapping("/send-email-otp")
     public ResponseEntity<String> sendEmailOTP(
-            @RequestParam("recipientEmail") String recipientEmail
+       @RequestBody User user
     ) {
         try {
             OtpUtils otpUtils = new OtpUtils();
             String otp = otpUtils.generateOtp();
-            emailService.sendEmailWithOTP(recipientEmail, "Viet", otp);
+            emailService.sendEmailWithOTP(user.getEmail(), user.getDisplayName(), otp);
             return ResponseEntity.ok("Email sent successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send email");
