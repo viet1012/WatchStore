@@ -386,7 +386,7 @@ public class BillService {
 
     public Bill findBillWithEarliestCreationDate()
     {
-        Optional<Bill> earliestBill = billRepository.findBillWithEarliestCreationDate();
+        Optional<Bill> earliestBill = billRepository.findEarliestBill();
         if (earliestBill.isPresent()) {
             Bill bill = earliestBill.get();
             return bill;

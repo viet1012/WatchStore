@@ -182,5 +182,17 @@ public class BillController {
         }
     }
 
+    @GetMapping("/BillWithEarliestCreationDate")
+    public ResponseEntity<ResponseWrapper<Bill>> findBillWithEarliestCreationDate() {
+        Bill bill = billService.findBillWithEarliestCreationDate();
+        if (bill != null) {
+            ResponseWrapper<Bill> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, bill);
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
 }
 

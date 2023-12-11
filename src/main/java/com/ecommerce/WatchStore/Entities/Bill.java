@@ -64,8 +64,8 @@ public class Bill {
     @Column(name = "payment_method ")
     private String paymentMethod ;
 
-    @Column(name = "temp ivoice total")
-    private float tempInvoiceTotal;
+    @Column(name = "temp invoice total")
+    private Long tempInvoiceTotal;
 
 
 }

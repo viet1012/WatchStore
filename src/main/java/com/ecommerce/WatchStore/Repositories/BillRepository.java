@@ -32,7 +32,8 @@ public interface BillRepository extends JpaRepository<Bill,Long> {
     List<Object[]> getBillWithBillDetailsById(@Param("billId") Long billId, @Param("userId") Long userId );
 
 
-    @Query("SELECT b FROM Bill b WHERE b.createdDate = (SELECT MIN(bill.createdDate) FROM Bill bill)")
-    Optional<Bill> findBillWithEarliestCreationDate();
+    @Query("SELECT b FROM Bill b ORDER BY b.createdDate ASC LIMIT 1")
+    Optional<Bill> findEarliestBill();
+
 
 }
