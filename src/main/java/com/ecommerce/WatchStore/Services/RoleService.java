@@ -29,8 +29,8 @@ public class RoleService {
     }
 
     @Transactional
-    public Role updateRole(Long id, Role updatedRole) {
-        Optional<Role> roleOptional = roleRepository.findById(id);
+    public Role updateRole(Role updatedRole) {
+        Optional<Role> roleOptional = roleRepository.findById(updatedRole.getId());
         if (roleOptional.isPresent()) {
             Role existingRole = roleOptional.get();
             // Cập nhật thông tin role với dữ liệu từ updatedRole
@@ -40,7 +40,7 @@ public class RoleService {
             return roleRepository.save(existingRole);
         } else {
             // Xử lý khi không tìm thấy role
-            throw new RuntimeException("Role with id " + id + " not found");
+            throw new RuntimeException("Role with id " + updatedRole.getId() + " not found");
         }
     }
 
