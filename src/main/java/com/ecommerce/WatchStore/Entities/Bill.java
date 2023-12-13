@@ -61,10 +61,10 @@ public class Bill {
     @Column(name = "active")
     private Boolean active;
 
-    @Column(name = "payment_method ")
+    @Column(name = "payment_method")
     private String paymentMethod ;
 
-    @Column(name = "temp invoice total")
+    @Column(name = "temp_invoice_total")
     private Long tempInvoiceTotal;
 
 
