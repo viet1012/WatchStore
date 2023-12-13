@@ -83,6 +83,7 @@ public class BillController {
     }
     @GetMapping("/GetBillDetailByUserId")
     public ResponseEntity<ResponseWrapper<List<ListBillDetailDTO>>> getBillDetailFromUserId(@RequestBody BillDTO billDTO) {
+        System.out.println("User ID: " + billDTO.getUserId());
         List<ListBillDetailDTO> billList = billService.getBillDetailFromUserId(billDTO.getUserId());
 
         if (billList.isEmpty()) {

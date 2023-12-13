@@ -208,33 +208,36 @@ public class BillService {
         return new ArrayList<>(billMap.values());
     }
 
+
     public List<ListBillDetailDTO> getBillDetailFromUserId(Long userId) {
+
         List<Object[]> billDetails = billRepository.getAllBillDetailsByUserId(userId);
-        List<ListBillDetailDTO> billDTOList = new ArrayList<>();
+        System.out.println("Total " + billDetails.size() );
+        Map<Long, ListBillDetailDTO> billMap = new HashMap<>();
 
         for (Object[] billDetail : billDetails) {
-            List<BillDetail> billDetailList = new ArrayList<>();
+            Long billId = (Long) billDetail[0];
 
-            if (billDetail[4] instanceof BillDetail) {
-                BillDetail singleBillDetail = (BillDetail) billDetail[4];
-                billDetailList.add(singleBillDetail);
-            } else if (billDetail[4] instanceof List<?>) {
-                billDetailList = (List<BillDetail>) billDetail[4];
+            ListBillDetailDTO billDTO;
+            if (!billMap.containsKey(billId)) {
+                billDTO = new ListBillDetailDTO();
+                billMap.put(billId, billDTO);
+            } else {
+                billDTO = billMap.get(billId);
             }
 
-            List<BillDetailDTO> billDetailDTOs = billDetailList.stream()
-                    .map(billDetailItem -> modelMapper.map(billDetailItem, BillDetailDTO.class))
-                    .collect(Collectors.toList());
+            BillDetailDTO billDetailDTO = new BillDetailDTO();
 
-            if (!billDetailDTOs.isEmpty()) {
-                ListBillDetailDTO billDTO = new ListBillDetailDTO();
-                billDTO.setBillDetailDTOList(billDetailDTOs);
+            billDetailDTO.setBillId(billId); // Set billId for BillDetailDTO
+            billDetailDTO.setProductId((Long) billDetail[7]);
+            billDetailDTO.setUnitPrice((float) billDetail[8]);
+            billDetailDTO.setQuantity((int) billDetail[9]);
 
-                billDTOList.add(billDTO);
-            }
+            billDTO.getBillDetailDTOList().add(billDetailDTO);
         }
 
-        return billDTOList;
+        return new ArrayList<>(billMap.values());
+
     }
 
 
