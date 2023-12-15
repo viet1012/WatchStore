@@ -7,10 +7,12 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 @Setter
 @Getter
@@ -30,6 +32,12 @@ public class Bill {
 
     @Column(name = "total_price")
     private float totalPrice;
+
+    public String getFormattedTotalPrice(float price) {
+        Locale vietnameseLocale = new Locale("vi", "VN");
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(vietnameseLocale);
+        return numberFormat.format(price);
+    }
 
     @Column(name = "status")
     private String status;

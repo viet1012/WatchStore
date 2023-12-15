@@ -232,7 +232,7 @@ public class EmailService {
                 + "<p>Thông tin đơn hàng:</p>\n"
 
                 + "<p>Địa chỉ giao hàng: <u><span style='color: blue;'>" + bill.getDeliverAddress() + "</span></u>  </p>\n"
-                + "<p>Tổng giá: <u><span style='color: blue;'>" + bill.getTotalPrice() + "</span></u></p>\n"
+                + "<p>Tổng giá: <u><span style='color: blue;'>" + bill.getFormattedTotalPrice(bill.getTotalPrice())+ "</span></u></p>\n"
                 + "<p>Chi tiết đơn hàng:</p>\n"
                 + "<ul>";
 
