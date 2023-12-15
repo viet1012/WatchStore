@@ -33,7 +33,8 @@ public class BillService {
     private ProductService productService;
     @Autowired
     private ModelMapper modelMapper;
-
+    @Autowired
+    private EmailService emailService;
 
 //    public List<BillDTO> getAll() {
 //        List<Object[]> billDetails = billRepository.getAllBillDetails();
@@ -301,6 +302,8 @@ public class BillService {
 //            voucherService.applyVoucher(newBill, billDTO.getVoucherId());
 //        }
         newBill.setBillDetailList(savedBillDetails);
+        emailService.sendOrderConfirmationEmail(newBill.getUser().getEmail(), newBill, savedBillDetails);
+
         Bill savedBill = billRepository.save(newBill);
 
         return savedBill;

@@ -90,6 +90,8 @@ public class ReceiptService {
                 receiptDetailDTOs = new ArrayList<>();
             }
 
+
+
             receiptDetailDTOs.add(modelMapper.map(receiptDetail, ReceiptDetailDTO.class));
             receiptInfo.setReceiptDetails(receiptDetailDTOs);
 
@@ -163,7 +165,7 @@ public class ReceiptService {
             detail.setPrice(detailDTO.getPrice());
 
             product.setQuantity(detailDTO.getQuantity());
-            product.setPrice((float)detailDTO.getPrice());
+            product.setPrice((float)detailDTO.getPrice()  +(float)detailDTO.getPrice() * 0.15f);
             productRepository.save(product);
             savedReceiptDetails.add(detail);
 
