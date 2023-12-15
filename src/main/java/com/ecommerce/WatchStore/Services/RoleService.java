@@ -17,6 +17,14 @@ public class RoleService {
     @Autowired
     private RoleRepository roleRepository;
 
+    public List<Role> getAll()
+    {
+        return roleRepository.findAll();
+    }
+    public long totalRoles()
+    {
+        return roleRepository.count();
+    }
     @Transactional
     public Role createRole(Role role) {
         // Kiểm tra xem vai trò đã tồn tại chưa

@@ -1,18 +1,30 @@
 package com.ecommerce.WatchStore.Controllers;
 
+import com.ecommerce.WatchStore.DTO.SupplierPageDTO;
+import com.ecommerce.WatchStore.DTO.UserDTO;
 import com.ecommerce.WatchStore.Entities.Role;
+import com.ecommerce.WatchStore.Entities.Supplier;
+import com.ecommerce.WatchStore.Response.ResponseWrapper;
 import com.ecommerce.WatchStore.Services.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/Admin/Roles")
 public class RoleController {
     @Autowired
     private RoleService roleService;
-
+    @GetMapping("/GetAll")
+    public ResponseEntity<ResponseWrapper<List<Role>>> getAllRoles() {
+        List<Role> roles = roleService.getAllRoles();
+        long totalRoles = roleService.totalRoles();
+        ResponseWrapper<List<Role>> response = new ResponseWrapper<>(HttpStatus.OK.value(), "Success", true, totalRoles, roles);
+        return ResponseEntity.ok(response);
+    }
     @PostMapping("/Create")
     public ResponseEntity<String> createRole(@RequestBody Role role) {
         Role existingRole = roleService.getRoleByTitle(role.getRoleTitle());
