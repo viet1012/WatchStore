@@ -1,5 +1,7 @@
 package com.ecommerce.WatchStore.DTO;
 
+import com.ecommerce.WatchStore.Entities.Product;
+
 public class BillDetailDTO {
     private Long billId;
     private Long productId;
@@ -54,5 +56,6 @@ public class BillDetailDTO {
     public void setActive(Boolean active) {
         this.active = active;
     }
+    private Product product;
 }
 

@@ -1,6 +1,8 @@
 package com.ecommerce.WatchStore.Services;
 
 
+import com.ecommerce.WatchStore.DTO.BillDTO;
+import com.ecommerce.WatchStore.DTO.BillDetailDTO;
 import com.ecommerce.WatchStore.Entities.Bill;
 import com.ecommerce.WatchStore.Entities.BillDetail;
 import com.ecommerce.WatchStore.Entities.User;
@@ -224,7 +226,7 @@ public class EmailService {
     }
 
 
-    public boolean sendOrderConfirmationEmail(String emailTo, Bill bill, List<BillDetail> billDetails) {
+    public boolean sendOrderConfirmationEmail(String emailTo, BillDTO bill) {
         boolean isSended = false;
         String subject = "Xác nhận đơn hàng";
         String body = "<p>Xin chào " + bill.getUser().getDisplayName() + ",</p>\n"
@@ -236,7 +238,7 @@ public class EmailService {
                 + "<p>Chi tiết đơn hàng:</p>\n"
                 + "<ul>";
 
-        for (BillDetail detail : billDetails) {
+        for (BillDetailDTO detail : billDetails) {
             body += "<li><strong style=\"color:blue;\">" + detail.getProduct().getProductName() + "</strong> - Số lượng: <strong style=\"color:blue;\">" + detail.getQuantity() + "</strong></li>";
         }
 
